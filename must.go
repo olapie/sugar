@@ -86,6 +86,18 @@ func MustNotEmptyMap[K comparable, V any](m map[K]V, msgAndArgs ...any) {
 	}
 }
 
+func MustEmptyString[S ~string](s S, msgAndArgs ...any) {
+	if len(s) != 0 {
+		panicWithMessages(msgAndArgs)
+	}
+}
+
+func MustNotEmptyString[S ~string](s S, msgAndArgs ...any) {
+	if len(s) == 0 {
+		panicWithMessages(msgAndArgs)
+	}
+}
+
 // Recover recovers from panic and assign message to outErr
 // outErr usually is a pointer to return error
 // E.g.
