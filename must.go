@@ -23,78 +23,78 @@ func MustGetTwo[T1 any, T2 any](v1 T1, v2 T2, err error) (T1, T2) {
 // MustTrue panics if b is not true
 func MustTrue(b bool, msgAndArgs ...any) {
 	if !b {
-		panicWithMessages(msgAndArgs)
+		panicWithMessages(msgAndArgs...)
 	}
 }
 
 // MustFalse panics if b is not true
 func MustFalse(b bool, msgAndArgs ...any) {
 	if b {
-		panicWithMessages(msgAndArgs)
+		panicWithMessages(msgAndArgs...)
 	}
 }
 
 // MustError panics if b is not nil
 func MustError(err error, msgAndArgs ...any) {
 	if err == nil {
-		panicWithMessages(msgAndArgs)
+		panicWithMessages(msgAndArgs...)
 	}
 }
 
 // MustNoError panics if b is not nil
 func MustNoError(err error, msgAndArgs ...any) {
 	if err != nil {
-		panicWithMessages(msgAndArgs)
+		panicWithMessages(msgAndArgs...)
 	}
 }
 
 // MustNil panics if v is not nil
 func MustNil[T any](v *T, msgAndArgs ...any) {
 	if v != nil {
-		panicWithMessages(msgAndArgs)
+		panicWithMessages(msgAndArgs...)
 	}
 }
 
 // MustNotNil panics if v is nil
 func MustNotNil[T any](v *T, msgAndArgs ...any) {
 	if v == nil {
-		panicWithMessages(msgAndArgs)
+		panicWithMessages(msgAndArgs...)
 	}
 }
 
 func MustEmptySlice[T any](a []T, msgAndArgs ...any) {
 	if len(a) == 0 {
-		panicWithMessages(msgAndArgs)
+		panicWithMessages(msgAndArgs...)
 	}
 }
 
 func MustNotEmptySlice[T any](a []T, msgAndArgs ...any) {
 	if len(a) == 0 {
-		panicWithMessages(msgAndArgs)
+		panicWithMessages(msgAndArgs...)
 	}
 }
 
 func MustEmptyMap[K comparable, V any](m map[K]V, msgAndArgs ...any) {
 	if len(m) != 0 {
-		panicWithMessages(msgAndArgs)
+		panicWithMessages(msgAndArgs...)
 	}
 }
 
 func MustNotEmptyMap[K comparable, V any](m map[K]V, msgAndArgs ...any) {
 	if len(m) == 0 {
-		panicWithMessages(msgAndArgs)
+		panicWithMessages(msgAndArgs...)
 	}
 }
 
 func MustEmptyString[S ~string](s S, msgAndArgs ...any) {
 	if len(s) != 0 {
-		panicWithMessages(msgAndArgs)
+		panicWithMessages(msgAndArgs...)
 	}
 }
 
 func MustNotEmptyString[S ~string](s S, msgAndArgs ...any) {
 	if len(s) == 0 {
-		panicWithMessages(msgAndArgs)
+		panicWithMessages(msgAndArgs...)
 	}
 }
 
@@ -127,6 +127,6 @@ func panicWithMessages(msgAndArgs ...any) {
 		if format, ok := msgAndArgs[0].(string); ok {
 			panic(fmt.Sprintf(format, msgAndArgs[1:]...))
 		}
-		panic(msgAndArgs)
+		panic(fmt.Sprint(msgAndArgs))
 	}
 }
