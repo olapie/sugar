@@ -186,6 +186,43 @@ func DeepCopy(dst, src any) error {
 	return fmt.Errorf("cannot copy %T to %T", src, dst)
 }
 
+// AllocValue allocate value: ppObj should be the address of a pointer to a value
+func AllocValue(ppObj any) {
+	v := reflect.ValueOf(ppObj)
+	if v.Kind() != reflect.Ptr {
+		panic("pointer required")
+	}
+
+	v = v.Elem()
+
+	//v is a pointer to a non-pointer value
+	if v.Kind() != reflect.Ptr {
+		return
+	}
+
+	//v is a pointer to a non-nil pointer
+	if !v.IsNil() {
+		return
+	}
+
+	v.Set(reflect.New(v.Type().Elem()))
+}
+
+func MakeZero(ptr any) {
+	v := reflect.ValueOf(ptr).Elem()
+	v.Set(reflect.Zero(v.Type()))
+}
+
+func Renew(ptrDst any, src any) {
+	pdv := reflect.ValueOf(ptrDst)
+	sv := reflect.ValueOf(src)
+	if sv.Kind() == reflect.Ptr {
+		pdv.Elem().Set(reflect.New(sv.Type().Elem()))
+	} else {
+		pdv.Elem().Set(reflect.Zero(sv.Type()))
+	}
+}
+
 func DeepNew(t reflect.Type) reflect.Value {
 	v := reflect.New(t)
 	e := v.Elem()
@@ -248,4 +285,52 @@ func JSONCopy(dst, src any) error {
 
 func IsExported(name string) bool {
 	return name != "" && name[0] >= 'A' && name[0] <= 'Z'
+}
+
+func IsInt(v reflect.Value) bool {
+	switch v.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return true
+	default:
+		return false
+	}
+}
+
+func IsUint(v reflect.Value) bool {
+	switch v.Kind() {
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return true
+	default:
+		return false
+	}
+}
+
+func IsFloat(v reflect.Value) bool {
+	switch v.Kind() {
+	case reflect.Float32, reflect.Float64:
+		return true
+	default:
+		return false
+	}
+}
+
+func IsComplex(v reflect.Value) bool {
+	switch v.Kind() {
+	case reflect.Complex64, reflect.Complex128:
+		return true
+	default:
+		return false
+	}
+}
+
+func IsBasic(v reflect.Value) bool {
+	switch v.Kind() {
+	case reflect.String,
+		reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
+		reflect.Bool, reflect.Float32, reflect.Float64, reflect.Complex64, reflect.Complex128:
+		return true
+	default:
+		return false
+	}
 }
