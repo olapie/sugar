@@ -1,4 +1,4 @@
-package netutil_test
+package netx_test
 
 import (
 	"testing"
@@ -7,5 +7,5 @@ import (
 )
 
 func TestGetOutboundIPString(t *testing.T) {
-	t.Log(netutil.GetOutboundIPString())
+	t.Log(netx.GetOutboundIPString())
 }
