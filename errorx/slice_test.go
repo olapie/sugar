@@ -1,13 +1,16 @@
 package errorx_test
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"testing"
+
+	"code.olapie.com/sugar/errorx"
 )
 
 func TestAppend(t *testing.T) {
-	var err = errorx.New("List of xerror")
+	var err = errors.New("List of xerror")
 	var b strings.Builder
 	b.WriteString("List of xerror")
 	for i := 1; i < 10; i++ {

@@ -1,6 +1,11 @@
 package must
 
-import "code.olapie.com/sugar/rtx"
+import (
+	"log"
+
+	"code.olapie.com/sugar/conv"
+	"code.olapie.com/sugar/rtx"
+)
 
 // Get eliminates nil err and panics if err isn't nil
 func Get[T any](v T, err error) T {
@@ -94,4 +99,173 @@ func NotEmptyMap[K comparable, V any](m map[K]V, msgAndArgs ...any) {
 	if len(m) == 0 {
 		rtx.PanicWithMessages(msgAndArgs...)
 	}
+}
+
+// ToBoolSlice converts i to []bool, will panic if failed
+func ToBoolSlice(i any) []bool {
+	v, err := conv.ToBoolSlice(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+// ToBool converts i to bool, will panic if failed
+func ToBool(i any) bool {
+	v, err := conv.ToBool(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+func ToFloat32(i any) float32 {
+	v, err := conv.ToFloat32(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+func ToFloat64(i any) float64 {
+	v, err := conv.ToFloat64(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+func ToFloat32Slice(i any) []float32 {
+	v, err := conv.ToFloat32Slice(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+func ToFloat64Slice(i any) []float64 {
+	v, err := conv.ToFloat64Slice(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+// ToInt panics if ToInt(i) failed
+func ToInt(i any) int {
+	v, err := conv.ToInt(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+// ToInt8 panics if ToInt8(i) failed
+func ToInt8(i any) int8 {
+	v, err := conv.ToInt8(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+// ToInt16 panics if ToInt16(i) failed
+func ToInt16(i any) int16 {
+	v, err := conv.ToInt16(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+func ToInt64(i any) int64 {
+	v, err := conv.ToInt64(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+func ToUint(i any) uint {
+	v, err := conv.ToUint(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+func ToUint8(i any) uint8 {
+	v, err := conv.ToUint8(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+func ToUint16(i any) uint16 {
+	v, err := conv.ToUint16(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+func ToUint32(i any) uint32 {
+	v, err := conv.ToUint32(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+func ToUint64(i any) uint64 {
+	v, err := conv.ToUint64(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+func ToIntSlice(i any) []int {
+	v, err := conv.ToIntSlice(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+func ToInt64Slice(i any) []int64 {
+	v, err := conv.ToInt64Slice(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+func ToUintSlice(i any) []uint {
+	v, err := conv.ToUintSlice(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+func ToUint64Slice(i any) []uint64 {
+	v, err := conv.ToUint64Slice(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+func ToString(i any) string {
+	v, err := conv.ToString(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+func ToStringSlice(i any) []string {
+	v, err := conv.ToStringSlice(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
 }

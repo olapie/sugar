@@ -2,6 +2,8 @@ package errorx_test
 
 import (
 	"testing"
+
+	"code.olapie.com/sugar/errorx"
 )
 
 func TestFromString(t *testing.T) {
