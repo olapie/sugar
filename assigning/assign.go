@@ -277,7 +277,7 @@ func structToStruct(dst reflect.Value, src reflect.Value, nm naming.Checker) err
 				continue
 			}
 
-			if !isExported(sfName) || !nm.Check(sfName, ft.Name) {
+			if !rtx.IsExported(sfName) || !nm.Check(sfName, ft.Name) {
 				continue
 			}
 
@@ -292,7 +292,7 @@ func structToStruct(dst reflect.Value, src reflect.Value, nm naming.Checker) err
 	for i := 0; i < src.NumField(); i++ {
 		sfv := src.Field(i)
 		sfName := src.Type().Field(i).Name
-		if !sfv.IsValid() || (sfv.CanInterface() && sfv.Interface() == nil) || sfv.IsZero() || !isExported(sfName) {
+		if !sfv.IsValid() || (sfv.CanInterface() && sfv.Interface() == nil) || sfv.IsZero() || !rtx.IsExported(sfName) {
 			continue
 		}
 
@@ -301,10 +301,6 @@ func structToStruct(dst reflect.Value, src reflect.Value, nm naming.Checker) err
 		}
 	}
 	return nil
-}
-
-func isExported(name string) bool {
-	return name != "" && name[0] >= 'A' && name[0] <= 'Z'
 }
 
 type Validator interface {
@@ -330,7 +326,7 @@ func Validate(i any) error {
 	if v.Kind() == reflect.Struct {
 		t := v.Type()
 		for j := 0; j < v.NumField(); j++ {
-			if !isExported(t.Field(j).Name) {
+			if !rtx.IsExported(t.Field(j).Name) {
 				continue
 			}
 			if err := Validate(v.Field(j).Interface()); err != nil {

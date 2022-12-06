@@ -245,3 +245,7 @@ func JSONCopy(dst, src any) error {
 	}
 	return nil
 }
+
+func IsExported(name string) bool {
+	return name != "" && name[0] >= 'A' && name[0] <= 'Z'
+}

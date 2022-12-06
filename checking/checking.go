@@ -1,6 +1,8 @@
 package checking
 
 import (
+	"code.olapie.com/sugar/rtx"
+	"fmt"
 	"reflect"
 	"regexp"
 
@@ -71,4 +73,38 @@ func IsUsername(s string) bool {
 
 func IsNickname(s string) bool {
 	return nickRegexp.MatchString(s)
+}
+
+type Validator interface {
+	Validate() error
+}
+
+func Validate(i any) error {
+	if v, ok := i.(Validator); ok {
+		return v.Validate()
+	}
+
+	v := reflect.ValueOf(i)
+	if v.IsValid() && (v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface) && !v.IsNil() {
+		v = v.Elem()
+		if v.CanInterface() {
+			if va, ok := v.Interface().(Validator); ok {
+				return va.Validate()
+			}
+		}
+	}
+
+	v = rtx.IndirectReadableValue(v)
+	if v.Kind() == reflect.Struct {
+		t := v.Type()
+		for j := 0; j < v.NumField(); j++ {
+			if !rtx.IsExported(t.Field(j).Name) {
+				continue
+			}
+			if err := Validate(v.Field(j).Interface()); err != nil {
+				return fmt.Errorf("%s:%w", t.Field(j).Name, err)
+			}
+		}
+	}
+	return nil
 }
