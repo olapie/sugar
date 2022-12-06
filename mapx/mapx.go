@@ -1,29 +1,42 @@
 package mapx
 
-import "strings"
+import (
+	"code.olapie.com/sugar/conv"
+	"strings"
+)
 
 func Int[K comparable, V any](m map[K]V, k K) (int, bool) {
-	return 0, false
+	v, ok := m[k]
+	if !ok {
+		return 0, ok
+	}
+	i, err := conv.ToInt(v)
+	return i, err == nil
 }
 
 func MustInt[K comparable, V any](m map[K]V, k K) int {
-	return 0
+	i, ok := Int(m, k)
+	if !ok {
+		panic("")
+	}
+	return i
 }
 
-func Int64[K comparable, V any](m map[K]V, k K) (int, bool) {
-	return 0, false
+func Int64[K comparable, V any](m map[K]V, k K) (int64, bool) {
+	v, ok := m[k]
+	if !ok {
+		return 0, ok
+	}
+	i, err := conv.ToInt64(v)
+	return i, err == nil
 }
 
-func MustInt64[K comparable, V any](m map[K]V, k K) int {
-	return 0
-}
-
-func Bool[K comparable, V any](m map[K]V, k K) (bool, bool) {
-	return false, false
-}
-
-func MustBool[K comparable, V any](m map[K]V, k K) bool {
-	return false
+func MustInt64[K comparable, V any](m map[K]V, k K) int64 {
+	i, ok := Int64(m, k)
+	if !ok {
+		panic("")
+	}
+	return i
 }
 
 func Clone[K comparable, V any](m map[K]V) map[K]V {
