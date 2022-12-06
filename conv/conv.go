@@ -7,6 +7,7 @@ import (
 	"log"
 	"math"
 	"net/mail"
+	"net/url"
 	"reflect"
 	"strconv"
 	"strings"
@@ -651,6 +652,20 @@ func ToEmailAddress(s string) (string, error) {
 		return "", err
 	}
 	return addr.String(), nil
+}
+
+func ToURL(s string) (string, error) {
+	u, err := url.Parse(s)
+	if err != nil {
+		return "", fmt.Errorf("parse: %w", err)
+	}
+	if u.Scheme == "" {
+		return "", errors.New("missing schema")
+	}
+	if u.Host == "" {
+		return "", errors.New("missing host")
+	}
+	return u.String(), nil
 }
 
 const (

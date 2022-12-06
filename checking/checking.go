@@ -53,3 +53,8 @@ func IsEmailAddress(s string) bool {
 	addr, _ := conv.ToEmailAddress(s)
 	return addr != ""
 }
+
+func IsURL(s string) bool {
+	u, _ := conv.ToURL(s)
+	return u != ""
+}
