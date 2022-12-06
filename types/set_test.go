@@ -5,8 +5,8 @@ import (
 	"sort"
 	"testing"
 
-	"code.olapie.com/types"
-	"github.com/stretchr/testify/require"
+	"code.olapie.com/sugar/testx"
+	"code.olapie.com/sugar/types"
 )
 
 func TestMarshalJSON(t *testing.T) {
@@ -16,14 +16,14 @@ func TestMarshalJSON(t *testing.T) {
 		s1.Add(v)
 	}
 	d1, err := s1.MarshalJSON()
-	require.NoError(t, err)
+	testx.NoError(t, err)
 	var s2 *types.Set[int]
 	err = json.Unmarshal(d1, &s2)
-	require.NoError(t, err)
+	testx.NoError(t, err)
 	a1 := s1.Slice()
 	a2 := s2.Slice()
 	sort.IntSlice(a1).Sort()
 	sort.IntSlice(a2).Sort()
-	require.Equal(t, a0, a1)
-	require.Equal(t, a1, a2)
+	testx.Equal(t, a0, a1)
+	testx.Equal(t, a1, a2)
 }
