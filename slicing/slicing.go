@@ -1,6 +1,11 @@
 package slicing
 
-import "fmt"
+import (
+	"fmt"
+	"reflect"
+
+	"code.olapie.com/sugar/rtx"
+)
 
 func Clone[T any](a []T) []T {
 	res := make([]T, len(a))
@@ -75,6 +80,28 @@ func Reverse[E comparable](a []E) {
 	for i, j := 0, len(a)-1; i < j; i, j = i+1, j-1 {
 		a[i], a[j] = a[j], a[i]
 	}
+}
+
+func ReverseArray(a any) bool {
+	a = rtx.Indirect(a)
+	if a == nil {
+		return false
+	}
+	v := reflect.ValueOf(a)
+	if v.IsNil() || !v.IsValid() || v.Kind() != reflect.Array && v.Kind() != reflect.Slice {
+		return false
+	}
+
+	for i, j := 0, v.Len()-1; i < j; i, j = i+1, j-1 {
+		vi, vj := v.Index(i), v.Index(j)
+		tmp := vi.Interface()
+		if !vi.CanSet() {
+			return false
+		}
+		vi.Set(vj)
+		vj.Set(reflect.ValueOf(tmp))
+	}
+	return true
 }
 
 func Remove[E comparable](a []E, v E) []E {
