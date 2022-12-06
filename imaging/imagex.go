@@ -1,4 +1,4 @@
-package imagex
+package imaging
 
 import (
 	"bytes"
