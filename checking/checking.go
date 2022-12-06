@@ -2,6 +2,7 @@ package checking
 
 import (
 	"reflect"
+	"regexp"
 
 	"code.olapie.com/sugar/conv"
 )
@@ -57,4 +58,17 @@ func IsEmailAddress(s string) bool {
 func IsURL(s string) bool {
 	u, _ := conv.ToURL(s)
 	return u != ""
+}
+
+var (
+	nickRegexp     = regexp.MustCompile("^[^ \n\r\t\f][^\n\r\t\f]{0,28}[^ \n\r\t\f]$")
+	usernameRegexp = regexp.MustCompile("^[a-zA-Z][\\w\\.]{1,19}$")
+)
+
+func IsUsername(s string) bool {
+	return usernameRegexp.MatchString(s)
+}
+
+func IsNickname(s string) bool {
+	return nickRegexp.MatchString(s)
 }
