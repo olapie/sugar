@@ -1,23 +1,21 @@
-package timex_test
+package timing_test
 
 import (
 	"testing"
-
-	"code.olapie.com/sugar/timex"
 )
 
 func TestMonth_NumOfWeeks(t *testing.T) {
 	tests := []struct {
-		Month      *timex.Month
+		Month      *timing.Month
 		NumOfWeeks int
 	}{
-		{timex.NewMonth(2020, 6),
+		{timing.NewMonth(2020, 6),
 			5,
-		}, {timex.NewMonth(2020, 7),
+		}, {timing.NewMonth(2020, 7),
 			5,
-		}, {timex.NewMonth(2020, 8),
+		}, {timing.NewMonth(2020, 8),
 			6,
-		}, {timex.NewMonth(2020, 9),
+		}, {timing.NewMonth(2020, 9),
 			5,
 		},
 	}
@@ -31,28 +29,28 @@ func TestMonth_NumOfWeeks(t *testing.T) {
 
 func TestMonth_GetCalendarDate(t *testing.T) {
 	tests := []struct {
-		Month *timex.Month
+		Month *timing.Month
 		Week  int
 		Day   int
-		Date  *timex.Date
+		Date  *timing.Date
 	}{
-		{timex.NewMonth(2020, 9),
+		{timing.NewMonth(2020, 9),
 			1,
 			3,
-			timex.NewDate(2020, 9, 1),
-		}, {timex.NewMonth(2020, 9),
+			timing.NewDate(2020, 9, 1),
+		}, {timing.NewMonth(2020, 9),
 			4,
 			1,
-			timex.NewDate(2020, 9, 20),
-		}, {timex.NewMonth(2020, 9),
+			timing.NewDate(2020, 9, 20),
+		}, {timing.NewMonth(2020, 9),
 			5,
 			4,
-			timex.NewDate(2020, 9, 30),
-		}, {timex.NewMonth(2020, 9),
+			timing.NewDate(2020, 9, 30),
+		}, {timing.NewMonth(2020, 9),
 			1,
 			1,
 			nil,
-		}, {timex.NewMonth(2020, 9),
+		}, {timing.NewMonth(2020, 9),
 			5,
 			7,
 			nil,

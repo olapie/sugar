@@ -1,11 +1,10 @@
-package timex_test
+package timing_test
 
 import (
 	"testing"
 	"time"
 
 	"code.olapie.com/sugar/testx"
-	"code.olapie.com/sugar/timex"
 )
 
 func TestToDuration(t *testing.T) {
@@ -41,7 +40,7 @@ func TestToDuration(t *testing.T) {
 	}
 
 	for _, te := range tests {
-		d, err := timex.ToDuration(te.Value)
+		d, err := timing.ToDuration(te.Value)
 		if err != nil {
 			t.Error(err)
 		}
@@ -87,7 +86,7 @@ func TestToTime(t *testing.T) {
 	}
 
 	for _, te := range tests {
-		d, err := timex.ToTime(te.Value)
+		d, err := timing.ToTime(te.Value)
 		if err != nil {
 			t.Error(err)
 		}

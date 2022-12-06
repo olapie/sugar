@@ -1,9 +1,7 @@
-package timex_test
+package timing_test
 
 import (
 	"testing"
-
-	"code.olapie.com/sugar/timex"
 )
 
 func TestLenOfMonth(t *testing.T) {
@@ -80,7 +78,7 @@ func TestLenOfMonth(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		got := timex.NewMonth(test.Year, test.Month).NumOfDays()
+		got := timing.NewMonth(test.Year, test.Month).NumOfDays()
 		if test.Len != got {
 			t.Errorf("%v expect: %v, got %v", test, test.Len, got)
 		}

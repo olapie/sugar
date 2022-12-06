@@ -1,4 +1,4 @@
-package timex
+package timing
 
 import (
 	"fmt"
