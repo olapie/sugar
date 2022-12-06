@@ -1,8 +1,9 @@
 package mapping
 
 import (
-	"code.olapie.com/sugar/conv"
 	"strings"
+
+	"code.olapie.com/sugar/conv"
 )
 
 func Int[K comparable, V any](m map[K]V, k K) (int, bool) {

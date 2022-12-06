@@ -2,11 +2,12 @@ package cryptox_test
 
 import (
 	"bytes"
-	"code.olapie.com/sugar/hashing"
-	"code.olapie.com/sugar/testx"
 	"io"
 	"testing"
 	"time"
+
+	"code.olapie.com/sugar/hashing"
+	"code.olapie.com/sugar/testx"
 
 	"code.olapie.com/sugar/cryptox"
 )

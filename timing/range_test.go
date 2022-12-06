@@ -3,6 +3,8 @@ package timing_test
 import (
 	"testing"
 	"time"
+
+	"code.olapie.com/sugar/timing"
 )
 
 func TestRange_SplitInDay(t *testing.T) {

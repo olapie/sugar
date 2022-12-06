@@ -2,11 +2,12 @@ package cryptox_test
 
 import (
 	"bytes"
+	"testing"
+	"time"
+
 	"code.olapie.com/sugar/cryptox"
 	"code.olapie.com/sugar/hashing"
 	"code.olapie.com/sugar/slicing"
-	"testing"
-	"time"
 )
 
 func TestDeriveKey(t *testing.T) {

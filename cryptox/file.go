@@ -1,10 +1,11 @@
 package cryptox
 
 import (
-	"code.olapie.com/sugar/errorx"
 	"fmt"
 	"io"
 	"os"
+
+	"code.olapie.com/sugar/errorx"
 )
 
 type Source string

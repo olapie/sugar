@@ -1,13 +1,14 @@
 package cryptox_test
 
 import (
-	"code.olapie.com/sugar/cryptox"
-	"code.olapie.com/sugar/hashing"
-	"code.olapie.com/sugar/testx"
 	"crypto/ecdsa"
 	"crypto/rand"
 	"testing"
 	"time"
+
+	"code.olapie.com/sugar/cryptox"
+	"code.olapie.com/sugar/hashing"
+	"code.olapie.com/sugar/testx"
 )
 
 func TestEncodePrivateKey(t *testing.T) {

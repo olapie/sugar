@@ -2,6 +2,8 @@ package timing_test
 
 import (
 	"testing"
+
+	"code.olapie.com/sugar/timing"
 )
 
 func TestLenOfMonth(t *testing.T) {

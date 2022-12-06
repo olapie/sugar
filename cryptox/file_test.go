@@ -1,14 +1,15 @@
 package cryptox_test
 
 import (
-	"code.olapie.com/sugar/hashing"
-	"code.olapie.com/sugar/testx"
 	"crypto/rand"
 	"io"
 	"os"
 	"path/filepath"
 	"testing"
 	"time"
+
+	"code.olapie.com/sugar/hashing"
+	"code.olapie.com/sugar/testx"
 
 	"code.olapie.com/sugar/cryptox"
 )

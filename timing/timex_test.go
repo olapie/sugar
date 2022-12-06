@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"code.olapie.com/sugar/testx"
+	"code.olapie.com/sugar/timing"
 )
 
 func TestToDuration(t *testing.T) {

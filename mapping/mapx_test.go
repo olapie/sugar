@@ -3,6 +3,7 @@ package mapping_test
 import (
 	"testing"
 
+	"code.olapie.com/sugar/mapping"
 	"code.olapie.com/sugar/testx"
 )
 

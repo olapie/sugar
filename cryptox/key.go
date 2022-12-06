@@ -2,7 +2,6 @@ package cryptox
 
 import (
 	"bytes"
-	"code.olapie.com/sugar/errorx"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/md5"
@@ -11,6 +10,8 @@ import (
 	"io"
 	"os"
 	"strings"
+
+	"code.olapie.com/sugar/errorx"
 
 	"golang.org/x/crypto/argon2"
 )

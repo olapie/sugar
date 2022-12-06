@@ -1,16 +1,17 @@
 package main
 
 import (
-	"code.olapie.com/sugar/cryptox"
-	"code.olapie.com/sugar/must"
 	"crypto/ecdsa"
 	"crypto/rand"
 	"crypto/sha256"
 	"fmt"
-	"golang.org/x/crypto/ssh/terminal"
 	"os"
 	"syscall"
 	"time"
+
+	"code.olapie.com/sugar/cryptox"
+	"code.olapie.com/sugar/must"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 func main() {

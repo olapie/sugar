@@ -2,12 +2,13 @@ package cryptox_test
 
 import (
 	"bytes"
-	"code.olapie.com/sugar/cryptox"
-	"code.olapie.com/sugar/hashing"
-	"code.olapie.com/sugar/testx"
 	"io"
 	"testing"
 	"time"
+
+	"code.olapie.com/sugar/cryptox"
+	"code.olapie.com/sugar/hashing"
+	"code.olapie.com/sugar/testx"
 )
 
 func TestDecryptedReader(t *testing.T) {
