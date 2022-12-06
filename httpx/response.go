@@ -1,8 +1,6 @@
-package httpkit
+package httpx
 
 import (
-	"code.olapie.com/sugar/assigning"
-	"code.olapie.com/sugar/errorx"
 	"encoding/json"
 	"encoding/xml"
 	"errors"
@@ -12,6 +10,9 @@ import (
 	"reflect"
 	"strconv"
 	"sync"
+
+	"code.olapie.com/sugar/assigning"
+	"code.olapie.com/sugar/errorx"
 )
 
 type UnmarshalFunc func([]byte, any) error

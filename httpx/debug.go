@@ -1,8 +1,9 @@
-package httpkit
+package httpx
 
 import (
-	"code.olapie.com/sugar/urlx"
 	"context"
+
+	"code.olapie.com/sugar/urlx"
 )
 
 const dateEndpoint = "ola-debug/date"

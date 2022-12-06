@@ -1,12 +1,13 @@
-package httpkit
+package httpx
 
 import (
 	"bytes"
-	"code.olapie.com/sugar/errorx"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+
+	"code.olapie.com/sugar/errorx"
 )
 
 func DoRequest(req *http.Request) (*http.Response, error) {

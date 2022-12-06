@@ -1,11 +1,11 @@
-package httpkit_test
+package httpx_test
 
 import (
-	"code.olapie.com/sugar/testx"
 	"net/http"
 	"testing"
 
 	"code.olapie.com/sugar/httpx"
+	"code.olapie.com/sugar/testx"
 	"code.olapie.com/sugar/types"
 )
 
@@ -15,7 +15,7 @@ func TestToMap(t *testing.T) {
 		h.Set("k1", "v1")
 		h.Set("k2", "v2")
 		h.Add("k2", "v22")
-		m := httpkit.ToM(h)
+		m := httpx.ToM(h)
 		testx.Equal(t, types.M{"K1": "v1", "K2": []string{"v2", "v22"}}, m)
 	})
 }

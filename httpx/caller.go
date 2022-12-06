@@ -1,11 +1,7 @@
-package httpkit
+package httpx
 
 import (
 	"bytes"
-	"code.olapie.com/sugar/checking"
-	"code.olapie.com/sugar/errorx"
-	"code.olapie.com/sugar/rtx"
-	"code.olapie.com/sugar/urlx"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -13,6 +9,11 @@ import (
 	"net/http"
 	"net/url"
 	"reflect"
+
+	"code.olapie.com/sugar/checking"
+	"code.olapie.com/sugar/errorx"
+	"code.olapie.com/sugar/rtx"
+	"code.olapie.com/sugar/urlx"
 
 	"github.com/google/uuid"
 )

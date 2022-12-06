@@ -1,11 +1,12 @@
-package httpkit
+package httpx
 
 import (
-	"code.olapie.com/sugar/must"
 	"encoding/base64"
 	"fmt"
 	"net/http"
 	"strings"
+
+	"code.olapie.com/sugar/must"
 )
 
 const (
