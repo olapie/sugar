@@ -7,7 +7,9 @@ type {{$name}} struct {
 }
 
 func New{{$name}}() *{{$name}} {
-	return new({{$name}})
+	v := new({{$name}})
+	v.Set = *types.NewSet[{{.Elem}}](10)
+	return v
 }
 
 {{end}}

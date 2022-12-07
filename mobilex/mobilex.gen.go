@@ -18,7 +18,9 @@ type IntSet struct {
 }
 
 func NewIntSet() *IntSet {
-	return new(IntSet)
+	v := new(IntSet)
+	v.Set = *types.NewSet[int](10)
+	return v
 }
 
 type IntE struct {
@@ -44,7 +46,9 @@ type Int16Set struct {
 }
 
 func NewInt16Set() *Int16Set {
-	return new(Int16Set)
+	v := new(Int16Set)
+	v.Set = *types.NewSet[int16](10)
+	return v
 }
 
 type Int16E struct {
@@ -70,7 +74,9 @@ type Int32Set struct {
 }
 
 func NewInt32Set() *Int32Set {
-	return new(Int32Set)
+	v := new(Int32Set)
+	v.Set = *types.NewSet[int32](10)
+	return v
 }
 
 type Int32E struct {
@@ -96,7 +102,9 @@ type Int64Set struct {
 }
 
 func NewInt64Set() *Int64Set {
-	return new(Int64Set)
+	v := new(Int64Set)
+	v.Set = *types.NewSet[int64](10)
+	return v
 }
 
 type Int64E struct {
@@ -122,7 +130,9 @@ type Float64Set struct {
 }
 
 func NewFloat64Set() *Float64Set {
-	return new(Float64Set)
+	v := new(Float64Set)
+	v.Set = *types.NewSet[float64](10)
+	return v
 }
 
 type Float64E struct {
@@ -148,7 +158,9 @@ type BoolSet struct {
 }
 
 func NewBoolSet() *BoolSet {
-	return new(BoolSet)
+	v := new(BoolSet)
+	v.Set = *types.NewSet[bool](10)
+	return v
 }
 
 type BoolE struct {
@@ -174,7 +186,9 @@ type StringSet struct {
 }
 
 func NewStringSet() *StringSet {
-	return new(StringSet)
+	v := new(StringSet)
+	v.Set = *types.NewSet[string](10)
+	return v
 }
 
 type StringE struct {
