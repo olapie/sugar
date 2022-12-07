@@ -113,3 +113,21 @@ func Remove[E comparable](a []E, v E) []E {
 	}
 	return a
 }
+
+func Contains[E comparable](a []E, v E) bool {
+	for _, e := range a {
+		if e == v {
+			return true
+		}
+	}
+	return false
+}
+
+func IndexOf[E comparable](a []E, v E) int {
+	for i, e := range a {
+		if e == v {
+			return i
+		}
+	}
+	return -1
+}
