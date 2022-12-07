@@ -29,6 +29,12 @@ var nameToPrototype = map[string]reflect.Type{
 	"string":  reflect.TypeOf(""),
 }
 
+func init() {
+	RegisterAnyType(&Audio{})
+	RegisterAnyType(&Image{})
+	RegisterAnyType(&Video{})
+}
+
 type AnyType interface {
 	AnyType() string
 }
