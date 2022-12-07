@@ -125,9 +125,11 @@ func getMessageHashForSigning(req *http.Request) []byte {
 	}
 	buf.WriteString(path)
 	buf.WriteString(req.URL.RawQuery)
-	buf.WriteString(req.Header.Get(KeyContentType))
-	buf.WriteString(req.Header.Get(KeyTimestamp))
-	buf.WriteString(req.Header.Get(KeyAuthorization))
+	buf.WriteString(GetHeader(req.Header, KeyContentType))
+	buf.WriteString(GetHeader(req.Header, KeyAppID))
+	buf.WriteString(GetHeader(req.Header, KeyClientID))
+	buf.WriteString(GetHeader(req.Header, KeyTimestamp))
+	buf.WriteString(GetHeader(req.Header, KeyAuthorization))
 	hash := sha256.Sum256(buf.Bytes())
 	return hash[:]
 }
