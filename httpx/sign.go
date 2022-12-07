@@ -2,9 +2,11 @@ package httpx
 
 import (
 	"bytes"
+	"code.olapie.com/sugar/contexts"
 	"code.olapie.com/sugar/conv"
 	"code.olapie.com/sugar/errorx"
 	"code.olapie.com/sugar/mathx"
+	"context"
 	"crypto"
 	"crypto/ecdsa"
 	"crypto/elliptic"
@@ -14,6 +16,7 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"fmt"
+	"github.com/google/uuid"
 	"net/http"
 	"strconv"
 	"time"
@@ -25,22 +28,29 @@ const (
 )
 
 type Signer interface {
-	Sign(req *http.Request) error
+	Sign(ctx context.Context, req *http.Request) error
 }
 
-type SignerFunc func(req *http.Request) error
+type SignerFunc func(ctx context.Context, req *http.Request) error
 
-func (h SignerFunc) Sign(req *http.Request) error {
-	return h(req)
+func (h SignerFunc) Sign(ctx context.Context, req *http.Request) error {
+	return h(ctx, req)
 }
 
 type PrivateKey interface {
 	ecdsa.PrivateKey | rsa.PrivateKey
 }
 
-func Sign[K PrivateKey](req *http.Request, priv *K) error {
-	ts := fmt.Sprint(time.Now().Unix())
-	req.Header.Set(KeyTimestamp, ts)
+func Sign[K PrivateKey](ctx context.Context, req *http.Request, priv *K) error {
+	SetHeaderNX(req.Header, KeyAppID, contexts.GetAppID(ctx))
+	SetHeaderNX(req.Header, KeyClientID, contexts.GetClientID(ctx))
+	traceID := contexts.GetTraceID(ctx)
+	if traceID == "" {
+		traceID = uuid.NewString()
+	}
+	SetHeaderNX(req.Header, KeyTraceID, contexts.GetClientID(ctx))
+	SetHeaderNX(req.Header, KeyTimestamp, fmt.Sprint(time.Now().Unix()))
+
 	hash := getMessageHashForSigning(req)
 	var sign []byte
 	var err error
@@ -62,26 +72,26 @@ func Sign[K PrivateKey](req *http.Request, priv *K) error {
 }
 
 func GetSigner[K PrivateKey](priv *K) Signer {
-	return SignerFunc(func(req *http.Request) error {
-		return Sign(req, priv)
+	return SignerFunc(func(ctx context.Context, req *http.Request) error {
+		return Sign(ctx, req, priv)
 	})
 }
 
 type Verifier interface {
-	Verify(req *http.Request) bool
+	Verify(ctx context.Context, req *http.Request) bool
 }
 
-type VerifierFunc func(req *http.Request) bool
+type VerifierFunc func(ctx context.Context, req *http.Request) bool
 
-func (h VerifierFunc) Verify(req *http.Request) bool {
-	return h(req)
+func (h VerifierFunc) Verify(ctx context.Context, req *http.Request) bool {
+	return h(ctx, req)
 }
 
 type PublicKey interface {
 	ecdsa.PublicKey | rsa.PublicKey
 }
 
-func Verify[K PublicKey](req *http.Request, pub *K) bool {
+func Verify[K PublicKey](ctx context.Context, req *http.Request, pub *K) bool {
 	ts := req.Header.Get(KeyTimestamp)
 	if ts == "" {
 		fmt.Printf("[sugar/httpx] missing %s in header\n", KeyTimestamp)
@@ -114,8 +124,8 @@ func Verify[K PublicKey](req *http.Request, pub *K) bool {
 }
 
 func GetVerifier[K PublicKey](pub *K) Verifier {
-	return VerifierFunc(func(req *http.Request) bool {
-		return Verify(req, pub)
+	return VerifierFunc(func(ctx context.Context, req *http.Request) bool {
+		return Verify(ctx, req, pub)
 	})
 }
 
