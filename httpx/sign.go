@@ -2,6 +2,9 @@ package httpx
 
 import (
 	"bytes"
+	"code.olapie.com/sugar/conv"
+	"code.olapie.com/sugar/errorx"
+	"code.olapie.com/sugar/mathx"
 	"crypto"
 	"crypto/ecdsa"
 	"crypto/elliptic"
@@ -132,6 +135,22 @@ func getMessageHashForSigning(req *http.Request) []byte {
 	buf.WriteString(GetHeader(req.Header, KeyAuthorization))
 	hash := sha256.Sum256(buf.Bytes())
 	return hash[:]
+}
+
+func CheckTimestamp[H HeaderTypeSet](h H) error {
+	ts := GetHeader(h, KeyTimestamp)
+	if ts == "" {
+		return errorx.BadRequest("missing %s", KeyTimestamp)
+	}
+	t, err := conv.ToInt64(ts)
+	if err != nil {
+		return errorx.BadRequest("invalid timestamp")
+	}
+	now := time.Now().Unix()
+	if mathx.Abs(now-t) > 10 {
+		return errorx.NotAcceptable("outdated request")
+	}
+	return nil
 }
 
 func example() {
