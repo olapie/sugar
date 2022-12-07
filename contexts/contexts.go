@@ -8,10 +8,10 @@ import (
 )
 
 const (
-	headerClientID      = "X-Client-Id"
-	headerApplicationID = "X-Application-Id"
-	headerServiceID     = "X-Service-Id"
-	headerTraceID       = "X-App-Trace-Id"
+	headerClientID  = "X-Client-Id"
+	headerAppID     = "X-App-Id"
+	headerServiceID = "X-Service-Id"
+	headerTraceID   = "X-App-Trace-Id"
 )
 
 type keyType int
@@ -23,7 +23,7 @@ const (
 	keyTraceID
 	keySudo
 	keyHttpHeader
-	keyApplicationID
+	keyAppID
 	keyClientID
 	keyServiceID
 	keyLogger
@@ -94,19 +94,19 @@ func IsSudo(ctx context.Context) bool {
 	return b
 }
 
-func GetApplicationID(ctx context.Context) string {
-	id, ok := ctx.Value(keyApplicationID).(string)
+func GetAppID(ctx context.Context) string {
+	id, ok := ctx.Value(keyAppID).(string)
 	if ok {
 		return id
 	}
-	return GetHTTPHeader(ctx).Get(headerApplicationID)
+	return GetHTTPHeader(ctx).Get(headerAppID)
 }
 
-func WithApplicationID(ctx context.Context, id string) context.Context {
+func WithAppID(ctx context.Context, id string) context.Context {
 	if id == "" {
 		return ctx
 	}
-	return context.WithValue(ctx, keyApplicationID, id)
+	return context.WithValue(ctx, keyAppID, id)
 }
 
 func GetServiceID(ctx context.Context) string {

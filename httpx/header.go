@@ -28,11 +28,11 @@ const (
 	KeyWWWAuthenticate     = "WWW-Authenticate"
 	KeyAcceptLanguage      = "Accept-Language"
 
-	KeyClientID      = "X-Client-Id"
-	KeyApplicationID = "X-Application-Id"
-	KeyServiceID     = "X-Service-Id"
-	KeyTraceID       = "X-Trace-Id"
-	KeyUserID        = "X-User-Id"
+	KeyClientID  = "X-Client-Id"
+	KeyAppID     = "X-App-Id"
+	KeyServiceID = "X-Service-Id"
+	KeyTraceID   = "X-Trace-Id"
+	KeyUserID    = "X-User-Id"
 )
 
 const (
@@ -225,12 +225,12 @@ func SetClientID[H HeaderTypeSet](h H, id string) {
 	SetHeader(h, KeyClientID, id)
 }
 
-func GetApplicationID[H HeaderTypeSet](h H) string {
-	return GetHeader(h, KeyApplicationID)
+func GetAppID[H HeaderTypeSet](h H) string {
+	return GetHeader(h, KeyAppID)
 }
 
-func SetApplicationID[H HeaderTypeSet](h H, id string) {
-	SetHeader(h, KeyApplicationID, id)
+func SetAppID[H HeaderTypeSet](h H, id string) {
+	SetHeader(h, KeyAppID, id)
 }
 
 func IsWebsocket(h http.Header) bool {
@@ -310,12 +310,12 @@ func (h *Header) ClientID() string {
 	return h.Get(KeyClientID)
 }
 
-func (h *Header) SetApplicationID(id string) {
-	h.Set(KeyApplicationID, id)
+func (h *Header) SetAppID(id string) {
+	h.Set(KeyAppID, id)
 }
 
-func (h *Header) ApplicationID() string {
-	return h.Get(KeyApplicationID)
+func (h *Header) AppID() string {
+	return h.Get(KeyAppID)
 }
 
 func (h *Header) AllowMethods(methods ...string) {

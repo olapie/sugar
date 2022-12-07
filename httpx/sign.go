@@ -1,6 +1,7 @@
 package httpx
 
 import (
+	"bytes"
 	"crypto"
 	"crypto/ecdsa"
 	"crypto/elliptic"
@@ -79,8 +80,12 @@ type PublicKey interface {
 
 func Verify[K PublicKey](req *http.Request, pub *K) bool {
 	ts := req.Header.Get(KeyTimestamp)
+	if ts == "" {
+		fmt.Printf("[sugar/httpx] missing %s in header\n", KeyTimestamp)
+	}
 	t, err := strconv.ParseInt(ts, 0, 64)
 	if err != nil {
+		fmt.Printf("[sugar/httpx] strconv.ParseInt: %s, %v\n", ts, err)
 		return false
 	}
 
@@ -88,8 +93,10 @@ func Verify[K PublicKey](req *http.Request, pub *K) bool {
 		return false
 	}
 
-	sign, err := base64.StdEncoding.DecodeString(req.Header.Get(KeySignature))
+	signature := req.Header.Get(KeySignature)
+	sign, err := base64.StdEncoding.DecodeString(signature)
 	if err != nil {
+		fmt.Printf("[sugar/httpx] base64.DecodeString: %s, %v\n", signature, err)
 		return false
 	}
 	hash := getMessageHashForSigning(req)
@@ -110,14 +117,17 @@ func GetVerifier[K PublicKey](pub *K) Verifier {
 }
 
 func getMessageHashForSigning(req *http.Request) []byte {
-	ts := req.Header.Get(KeyTimestamp)
-	auth := req.Header.Get(KeyAuthorization)
+	var buf bytes.Buffer
+	buf.WriteString(req.Method)
 	path := req.URL.Path
 	if path == "" {
 		path = req.URL.RawPath
 	}
-	message := req.Method + path + auth + ts
-	hash := sha256.Sum256([]byte(message))
+	buf.WriteString(path)
+	buf.WriteString(req.URL.RawQuery)
+	buf.WriteString(req.Header.Get(KeyTimestamp))
+	buf.WriteString(req.Header.Get(KeyAuthorization))
+	hash := sha256.Sum256(buf.Bytes())
 	return hash[:]
 }
 
