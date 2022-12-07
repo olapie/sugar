@@ -1,10 +1,11 @@
 package mobilex
 
 import (
-	"code.olapie.com/sugar/checking"
-	"code.olapie.com/sugar/timing"
 	"strings"
 	"unicode"
+
+	"code.olapie.com/sugar/checking"
+	"code.olapie.com/sugar/timing"
 )
 
 func IsEmailAddress(s string) bool {
