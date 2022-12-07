@@ -18,6 +18,10 @@ func NewList[E comparable](l []E) *List[E] {
 	return &List[E]{elements: l}
 }
 
+func (l *List[E]) Elements() []E {
+	return l.elements
+}
+
 func (l *List[E]) Len() int {
 	return len(l.elements)
 }

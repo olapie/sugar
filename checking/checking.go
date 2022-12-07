@@ -1,10 +1,11 @@
 package checking
 
 import (
-	"code.olapie.com/sugar/rtx"
 	"fmt"
 	"reflect"
 	"regexp"
+
+	"code.olapie.com/sugar/rtx"
 
 	"code.olapie.com/sugar/conv"
 )

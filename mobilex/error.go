@@ -1,9 +1,10 @@
 package mobilex
 
 import (
-	"code.olapie.com/sugar/errorx"
 	"fmt"
 	"reflect"
+
+	"code.olapie.com/sugar/errorx"
 )
 
 type Error errorx.Error

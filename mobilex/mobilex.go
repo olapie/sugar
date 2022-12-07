@@ -1,6 +1,7 @@
 package mobilex
 
 import (
+	"net/http"
 	"time"
 
 	"code.olapie.com/sugar/stringx"
@@ -68,4 +69,32 @@ func SmartLen(s string) int {
 
 func SquishString(s string) string {
 	return stringx.Squish(s)
+}
+
+type Handler interface {
+	SaveSecret(name, value string) bool
+	DeleteSecret(name string) bool
+	GetSecret(name string) string
+	NeedSignIn()
+}
+
+type AuthErrorChecker struct {
+	h Handler
+}
+
+func NewAuthErrorChecker(h Handler) *AuthErrorChecker {
+	return &AuthErrorChecker{
+		h: h,
+	}
+}
+
+func (c *AuthErrorChecker) Check(err error) {
+	if err == nil {
+		return
+	}
+
+	code := ToError(err).Code
+	if code == http.StatusUnauthorized {
+		go c.h.NeedSignIn()
+	}
 }

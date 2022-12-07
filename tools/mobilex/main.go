@@ -2,15 +2,16 @@ package main
 
 import (
 	"bytes"
-	"code.olapie.com/sugar/must"
-	"code.olapie.com/sugar/templatex"
-	"code.olapie.com/sugar/types"
 	"embed"
 	_ "embed"
 	"fmt"
 	"html/template"
 	"os"
 	"strings"
+
+	"code.olapie.com/sugar/must"
+	"code.olapie.com/sugar/templatex"
+	"code.olapie.com/sugar/types"
 )
 
 //go:embed templates/*
