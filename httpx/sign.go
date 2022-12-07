@@ -153,6 +153,18 @@ func CheckTimestamp[H HeaderTypeSet](h H) error {
 	return nil
 }
 
+func DecodeSign[H HeaderTypeSet](h H) ([]byte, error) {
+	signature := GetHeader(h, KeySignature)
+	if signature == "" {
+		return nil, errorx.BadRequest("missing %s", KeySignature)
+	}
+	sign, err := base64.StdEncoding.DecodeString(signature)
+	if err != nil {
+		return nil, errorx.NotAcceptable("malformed signature")
+	}
+	return sign, nil
+}
+
 func example() {
 	// generate and marshal
 	privateKey, _ := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
