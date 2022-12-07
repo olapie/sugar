@@ -1,0 +1,13 @@
+{{define "list"}}
+
+{{$name := concat (ttn .Elem ) "List"}}
+
+type {{$name}} struct {
+    nomobile.List[{{.Elem}}]
+}
+
+func New{{$name}}() *{{$name}} {
+	return new({{$name}})
+}
+
+{{end}}

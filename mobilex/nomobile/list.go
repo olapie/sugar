@@ -2,6 +2,7 @@ package nomobile
 
 import (
 	"encoding/json"
+	"fmt"
 	"reflect"
 )
 
@@ -10,44 +11,52 @@ type equaler[T any] interface {
 }
 
 type List[E comparable] struct {
-	Elements []E
+	elements []E
+}
+
+func NewList[E comparable](l []E) *List[E] {
+	return &List[E]{elements: l}
 }
 
 func (l *List[E]) Len() int {
-	return len(l.Elements)
+	return len(l.elements)
 }
 
 func (l *List[E]) Get(index int) E {
-	return l.Elements[index]
+	return l.elements[index]
 }
 
 func (l *List[E]) Add(e E) {
-	l.Elements = append(l.Elements, e)
+	l.elements = append(l.elements, e)
+}
+
+func (l *List[E]) AddList(v *List[E]) {
+	l.elements = append(l.elements, v.elements...)
 }
 
 func (l *List[E]) RemoveAt(i int) {
-	l.Elements = append(l.Elements[:i], l.Elements[i+1:]...)
+	l.elements = append(l.elements[:i], l.elements[i+1:]...)
 }
 
 func (l *List[E]) Remove(e E) {
 	if i := l.IndexOf(e); i >= 0 {
-		l.Elements = append(l.Elements[:i], l.Elements[i+1:]...)
+		l.elements = append(l.elements[:i], l.elements[i+1:]...)
 	}
 }
 
 func (l *List[E]) Insert(i int, e E) {
-	if len(l.Elements) <= i {
-		l.Elements = append(l.Elements, e)
+	if len(l.elements) <= i {
+		l.elements = append(l.elements, e)
 	} else {
-		n := len(l.Elements)
-		l.Elements = append(l.Elements, e)
-		copy(l.Elements[i+1:], l.Elements[i:n])
-		l.Elements[i] = e
+		n := len(l.elements)
+		l.elements = append(l.elements, e)
+		copy(l.elements[i+1:], l.elements[i:n])
+		l.elements[i] = e
 	}
 }
 
 func (l *List[E]) IndexOf(e E) int {
-	for i, v := range l.Elements {
+	for i, v := range l.elements {
 		if v == e {
 			return i
 		}
@@ -82,30 +91,39 @@ func (l *List[E]) Last() E {
 }
 
 func (l *List[E]) IsEmpty() bool {
-	return len(l.Elements) == 0
+	return len(l.elements) == 0
 }
 
 func (l *List[E]) Clear() {
-	l.Elements = l.Elements[0:0]
+	l.elements = l.elements[0:0]
 }
 
 func (l *List[E]) Reverse() {
 	for i, j := 0, l.Len()-1; i < j; i, j = i+1, j-1 {
-		l.Elements[i], l.Elements[j] = l.Elements[j], l.Elements[i]
+		l.elements[i], l.elements[j] = l.elements[j], l.elements[i]
 	}
 }
 
 func (l *List[E]) Clone() *List[E] {
 	res := new(List[E])
-	res.Elements = make([]E, l.Len())
-	copy(res.Elements, l.Elements)
+	res.elements = make([]E, l.Len())
+	copy(res.elements, l.elements)
 	return res
 }
 
+func (l *List[E]) JSONString() string {
+	data, err := json.Marshal(l.elements)
+	if err != nil {
+		fmt.Println(err)
+		return ""
+	}
+	return string(data)
+}
+
 func (l *List[E]) UnmarshalJSON(data []byte) error {
-	return json.Unmarshal(data, &l.Elements)
+	return json.Unmarshal(data, &l.elements)
 }
 
 func (l *List[E]) MarshalJSON() ([]byte, error) {
-	return json.Marshal(l.Elements)
+	return json.Marshal(l.elements)
 }

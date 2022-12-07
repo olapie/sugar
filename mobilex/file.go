@@ -45,21 +45,22 @@ func NewTestDirInfo() *DirInfo {
 	}
 }
 
-func GetDiskSize(path string) *Int64E {
-	res := new(Int64E)
+func GetDiskSize(path string) int64 {
+	var sum int64
 	err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 		if !info.IsDir() {
-			res.Val += info.Size()
+			sum += info.Size()
 		}
 		return err
 	})
 	if err != nil {
-		res.Err = ToError(err)
+		fmt.Println(err)
+		return 0
 	}
-	return res
+	return sum
 }
 
 func MustMkdir(dir string) {

@@ -48,6 +48,18 @@ func Clone[K comparable, V any](m map[K]V) map[K]V {
 	return res
 }
 
+func Merge[K comparable, V any](m1 map[K]V, m2 map[K]V) map[K]V {
+	res := make(map[K]V, len(m1)+len(m2))
+	for k, v := range m1 {
+		res[k] = v
+	}
+
+	for k, v := range m2 {
+		res[k] = v
+	}
+	return res
+}
+
 func GetKeys[K comparable, V any](m map[K]V) []K {
 	a := make([]K, 0, len(m))
 	for k := range m {
