@@ -10,4 +10,8 @@ func New{{$name}}() *{{$name}} {
 	return new({{$name}})
 }
 
+func (l *{{$name}}) AddList(l2 *{{$name}}) {
+    l.List.AddList(&l2.List)
+}
+
 {{end}}

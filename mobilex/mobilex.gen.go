@@ -13,24 +13,8 @@ func NewIntList() *IntList {
 	return new(IntList)
 }
 
-type IntSet struct {
-	types.Set[int]
-}
-
-func NewIntSet() *IntSet {
-	v := new(IntSet)
-	v.Set = *types.NewSet[int](10)
-	return v
-}
-
-type IntE struct {
-	Value int
-	Error *Error
-}
-
-type IntListE struct {
-	Value *IntList
-	Error *Error
+func (l *IntList) AddList(l2 *IntList) {
+	l.List.AddList(&l2.List)
 }
 
 type Int16List struct {
@@ -41,24 +25,8 @@ func NewInt16List() *Int16List {
 	return new(Int16List)
 }
 
-type Int16Set struct {
-	types.Set[int16]
-}
-
-func NewInt16Set() *Int16Set {
-	v := new(Int16Set)
-	v.Set = *types.NewSet[int16](10)
-	return v
-}
-
-type Int16E struct {
-	Value int16
-	Error *Error
-}
-
-type Int16ListE struct {
-	Value *Int16List
-	Error *Error
+func (l *Int16List) AddList(l2 *Int16List) {
+	l.List.AddList(&l2.List)
 }
 
 type Int32List struct {
@@ -69,24 +37,8 @@ func NewInt32List() *Int32List {
 	return new(Int32List)
 }
 
-type Int32Set struct {
-	types.Set[int32]
-}
-
-func NewInt32Set() *Int32Set {
-	v := new(Int32Set)
-	v.Set = *types.NewSet[int32](10)
-	return v
-}
-
-type Int32E struct {
-	Value int32
-	Error *Error
-}
-
-type Int32ListE struct {
-	Value *Int32List
-	Error *Error
+func (l *Int32List) AddList(l2 *Int32List) {
+	l.List.AddList(&l2.List)
 }
 
 type Int64List struct {
@@ -97,24 +49,8 @@ func NewInt64List() *Int64List {
 	return new(Int64List)
 }
 
-type Int64Set struct {
-	types.Set[int64]
-}
-
-func NewInt64Set() *Int64Set {
-	v := new(Int64Set)
-	v.Set = *types.NewSet[int64](10)
-	return v
-}
-
-type Int64E struct {
-	Value int64
-	Error *Error
-}
-
-type Int64ListE struct {
-	Value *Int64List
-	Error *Error
+func (l *Int64List) AddList(l2 *Int64List) {
+	l.List.AddList(&l2.List)
 }
 
 type Float64List struct {
@@ -125,24 +61,8 @@ func NewFloat64List() *Float64List {
 	return new(Float64List)
 }
 
-type Float64Set struct {
-	types.Set[float64]
-}
-
-func NewFloat64Set() *Float64Set {
-	v := new(Float64Set)
-	v.Set = *types.NewSet[float64](10)
-	return v
-}
-
-type Float64E struct {
-	Value float64
-	Error *Error
-}
-
-type Float64ListE struct {
-	Value *Float64List
-	Error *Error
+func (l *Float64List) AddList(l2 *Float64List) {
+	l.List.AddList(&l2.List)
 }
 
 type BoolList struct {
@@ -153,24 +73,8 @@ func NewBoolList() *BoolList {
 	return new(BoolList)
 }
 
-type BoolSet struct {
-	types.Set[bool]
-}
-
-func NewBoolSet() *BoolSet {
-	v := new(BoolSet)
-	v.Set = *types.NewSet[bool](10)
-	return v
-}
-
-type BoolE struct {
-	Value bool
-	Error *Error
-}
-
-type BoolListE struct {
-	Value *BoolList
-	Error *Error
+func (l *BoolList) AddList(l2 *BoolList) {
+	l.List.AddList(&l2.List)
 }
 
 type StringList struct {
@@ -181,14 +85,108 @@ func NewStringList() *StringList {
 	return new(StringList)
 }
 
+func (l *StringList) AddList(l2 *StringList) {
+	l.List.AddList(&l2.List)
+}
+
+type IntSet struct {
+	types.Set[int]
+}
+
+func NewIntSet() *IntSet {
+	return &IntSet{
+		Set: *types.NewSet[int](10),
+	}
+}
+
+type Int16Set struct {
+	types.Set[int16]
+}
+
+func NewInt16Set() *Int16Set {
+	return &Int16Set{
+		Set: *types.NewSet[int16](10),
+	}
+}
+
+type Int32Set struct {
+	types.Set[int32]
+}
+
+func NewInt32Set() *Int32Set {
+	return &Int32Set{
+		Set: *types.NewSet[int32](10),
+	}
+}
+
+type Int64Set struct {
+	types.Set[int64]
+}
+
+func NewInt64Set() *Int64Set {
+	return &Int64Set{
+		Set: *types.NewSet[int64](10),
+	}
+}
+
+type Float64Set struct {
+	types.Set[float64]
+}
+
+func NewFloat64Set() *Float64Set {
+	return &Float64Set{
+		Set: *types.NewSet[float64](10),
+	}
+}
+
+type BoolSet struct {
+	types.Set[bool]
+}
+
+func NewBoolSet() *BoolSet {
+	return &BoolSet{
+		Set: *types.NewSet[bool](10),
+	}
+}
+
 type StringSet struct {
 	types.Set[string]
 }
 
 func NewStringSet() *StringSet {
-	v := new(StringSet)
-	v.Set = *types.NewSet[string](10)
-	return v
+	return &StringSet{
+		Set: *types.NewSet[string](10),
+	}
+}
+
+type IntE struct {
+	Value int
+	Error *Error
+}
+
+type Int16E struct {
+	Value int16
+	Error *Error
+}
+
+type Int32E struct {
+	Value int32
+	Error *Error
+}
+
+type Int64E struct {
+	Value int64
+	Error *Error
+}
+
+type Float64E struct {
+	Value float64
+	Error *Error
+}
+
+type BoolE struct {
+	Value bool
+	Error *Error
 }
 
 type StringE struct {
@@ -196,15 +194,11 @@ type StringE struct {
 	Error *Error
 }
 
-type StringListE struct {
-	Value *StringList
-	Error *Error
-}
-
 type ByteArrayE struct {
 	Value []byte
 	Error *Error
 }
+
 type IntIntMap struct {
 	nomobile.Map[int, int]
 }

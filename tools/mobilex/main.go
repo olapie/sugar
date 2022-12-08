@@ -39,12 +39,25 @@ func main() {
 
 	for _, elem := range basicTypes {
 		fmt.Println(elem)
+		output.WriteString("\n\n")
 		must.NoError(tpl.ExecuteTemplate(output, "list", types.M{"Elem": elem}))
-		must.NoError(tpl.ExecuteTemplate(output, "set", types.M{"Elem": elem}))
-		must.NoError(tpl.ExecuteTemplate(output, "pair", types.M{"Elem": elem}))
-		must.NoError(tpl.ExecuteTemplate(output, "result", types.M{"Elem": elem}))
-		must.NoError(tpl.ExecuteTemplate(output, "result", types.M{"Elem": "*" + typeToName(elem) + "List"}))
 	}
+	for _, elem := range basicTypes {
+		fmt.Println(elem)
+		output.WriteString("\n\n")
+		must.NoError(tpl.ExecuteTemplate(output, "set", types.M{"Elem": elem}))
+	}
+	for _, elem := range basicTypes {
+		fmt.Println(elem)
+		output.WriteString("\n\n")
+		must.NoError(tpl.ExecuteTemplate(output, "pair", types.M{"Elem": elem}))
+	}
+	for _, elem := range basicTypes {
+		fmt.Println(elem)
+		output.WriteString("\n\n")
+		must.NoError(tpl.ExecuteTemplate(output, "result", types.M{"Elem": elem}))
+	}
+	output.WriteString("\n\n")
 	must.NoError(tpl.ExecuteTemplate(output, "result", types.M{"Elem": "[]byte"}))
 
 	keys := []string{"int", "int16", "int32", "int64", "string"}
@@ -53,6 +66,7 @@ func main() {
 	for _, key := range keys {
 		for _, val := range values {
 			fmt.Println(key, val)
+			output.WriteString("\n")
 			must.NoError(tpl.ExecuteTemplate(output, "map", types.M{"Key": key, "Value": val}))
 		}
 	}

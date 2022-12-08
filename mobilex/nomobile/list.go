@@ -6,7 +6,7 @@ import (
 	"reflect"
 )
 
-type equaler[T any] interface {
+type Equaler[T any] interface {
 	Equals(T) bool
 }
 
@@ -65,7 +65,7 @@ func (l *List[E]) IndexOf(e E) int {
 			return i
 		}
 
-		if eq, ok := any(v).(equaler[E]); ok && eq.Equals(e) {
+		if eq, ok := any(v).(Equaler[E]); ok && eq.Equals(e) {
 			return i
 		}
 	}
