@@ -10,9 +10,9 @@ import (
 	"crypto"
 	"crypto/ecdsa"
 	"crypto/elliptic"
+	"crypto/md5"
 	"crypto/rand"
 	"crypto/rsa"
-	"crypto/sha256"
 	"crypto/x509"
 	"encoding/base64"
 	"fmt"
@@ -55,7 +55,7 @@ func Sign[K PrivateKey](ctx context.Context, req *http.Request, priv *K) error {
 	if traceID == "" {
 		traceID = uuid.NewString()
 	}
-	SetHeaderNX(req.Header, KeyTraceID, contexts.GetClientID(ctx))
+	SetHeaderNX(req.Header, KeyTraceID, traceID)
 	SetHeaderNX(req.Header, KeyTimestamp, fmt.Sprint(time.Now().Unix()))
 
 	hash := getMessageHashForSigning(req)
@@ -150,7 +150,7 @@ func getMessageHashForSigning(req *http.Request) []byte {
 	buf.WriteString(GetHeader(req.Header, KeyClientID))
 	buf.WriteString(GetHeader(req.Header, KeyTimestamp))
 	buf.WriteString(GetHeader(req.Header, KeyAuthorization))
-	hash := sha256.Sum256(buf.Bytes())
+	hash := md5.Sum(buf.Bytes())
 	return hash[:]
 }
 
