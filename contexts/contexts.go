@@ -66,8 +66,27 @@ func Detach(ctx context.Context) context.Context {
 }
 
 func GetLogin[T comparable](ctx context.Context) T {
-	v, _ := ctx.Value(keyLogin).(T)
-	return v
+	var login T
+	v := ctx.Value(keyLogin)
+	if v == nil {
+		return login
+	}
+
+	if login, ok := v.(T); ok {
+		return login
+	}
+
+	expect := reflect.TypeOf(login)
+	got := reflect.TypeOf(v)
+	if got.ConvertibleTo(expect) {
+		defer func() {
+			if msg := recover(); msg != nil {
+				fmt.Printf("[sugar/contexts] GetLogin: %v\n", msg)
+			}
+		}()
+		reflect.ValueOf(&login).Elem().Set(reflect.ValueOf(v).Convert(expect))
+	}
+	return login
 }
 
 func WithLogin[T comparable](ctx context.Context, v T) context.Context {
