@@ -2,10 +2,6 @@ package httpx
 
 import (
 	"bytes"
-	"code.olapie.com/sugar/contexts"
-	"code.olapie.com/sugar/conv"
-	"code.olapie.com/sugar/errorx"
-	"code.olapie.com/sugar/mathx"
 	"context"
 	"crypto"
 	"crypto/ecdsa"
@@ -16,10 +12,15 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"fmt"
-	"github.com/google/uuid"
 	"net/http"
 	"strconv"
 	"time"
+
+	"code.olapie.com/sugar/contexts"
+	"code.olapie.com/sugar/conv"
+	"code.olapie.com/sugar/errorx"
+	"code.olapie.com/sugar/mathx"
+	"github.com/google/uuid"
 )
 
 const (
