@@ -1,11 +1,12 @@
 package sqlitex
 
 import (
-	"code.olapie.com/sugar/must"
 	"database/sql"
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"code.olapie.com/sugar/must"
 )
 
 func Open(fileName string) (*sql.DB, error) {

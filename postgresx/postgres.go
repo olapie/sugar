@@ -1,10 +1,11 @@
 package postgresx
 
 import (
-	"code.olapie.com/sugar/must"
 	"database/sql"
 	"fmt"
 	"os/user"
+
+	"code.olapie.com/sugar/must"
 )
 
 func GetConnectionString(name, host string, port int, user, password string, sslEnabled bool) string {

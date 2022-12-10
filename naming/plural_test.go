@@ -1,11 +1,12 @@
 package naming_test
 
 import (
+	"strings"
+	"testing"
+
 	"code.olapie.com/sugar/naming"
 	"code.olapie.com/sugar/naming/internal/plurals"
 	"code.olapie.com/sugar/stringx"
-	"strings"
-	"testing"
 )
 
 var replacements = map[string]string{

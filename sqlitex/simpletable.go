@@ -1,6 +1,7 @@
 package sqlitex
 
 import (
+	"code.olapie.com/sugar/timing"
 	"database/sql"
 	"fmt"
 	"reflect"
@@ -35,7 +36,7 @@ type SimpleTable[K IntOrString, M PrimaryKey[K]] struct {
 		deleteGreaterThan *sql.Stmt
 		deleteLessThan    *sql.Stmt
 	}
-	Now Clock
+	Now timing.Clock
 }
 
 func NewSimpleTable[K IntOrString, M PrimaryKey[K]](db *sql.DB, name string, newModel func() M) (*SimpleTable[K, M], error) {

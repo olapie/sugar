@@ -1,29 +1,24 @@
 package sqlitex
 
 import (
+	"code.olapie.com/sugar/conv"
 	"code.olapie.com/sugar/sqlx"
+	"code.olapie.com/sugar/timing"
 	"database/sql"
 	"fmt"
-	"sync"
-	"time"
-
-	"code.olapie.com/sugar/conv"
 	"google.golang.org/protobuf/proto"
+	"sync"
 )
-
-type Clock interface {
-	Now() time.Time
-}
 
 type KVStore struct {
 	ID       any
-	clock    Clock
+	clock    timing.Clock
 	db       *sql.DB
 	mu       sync.RWMutex
 	filename string
 }
 
-func NewKVStore(filename string, clock Clock) *KVStore {
+func NewKVStore(filename string, clock timing.Clock) *KVStore {
 	db := MustOpen(filename)
 	r := &KVStore{
 		clock:    clock,
@@ -32,7 +27,7 @@ func NewKVStore(filename string, clock Clock) *KVStore {
 	}
 
 	if r.clock == nil {
-		r.clock = localClock{}
+		r.clock = timing.LocalClock{}
 	}
 
 	_, err := db.Exec(`
@@ -161,11 +156,4 @@ func (s *KVStore) Close() error {
 	err := s.db.Close()
 	s.mu.Unlock()
 	return err
-}
-
-type localClock struct {
-}
-
-func (l localClock) Now() time.Time {
-	return time.Now()
 }

@@ -1,13 +1,14 @@
 package sqlitex_test
 
 import (
+	"database/sql"
+	"errors"
+	"testing"
+
 	"code.olapie.com/sugar/sqlitex"
 	"code.olapie.com/sugar/testx"
 	"code.olapie.com/sugar/types"
-	"database/sql"
-	"errors"
 	_ "github.com/mattn/go-sqlite3"
-	"testing"
 )
 
 func createTable[K sqlitex.IntOrString, M sqlitex.PrimaryKey[K]](t *testing.T, name string, newModel func() M) *sqlitex.SimpleTable[K, M] {
@@ -76,12 +77,12 @@ func TestIntTable(t *testing.T) {
 
 	l, err := tbl.ListAll()
 	testx.NoError(t, err)
-	testx.NotEmpty(t, l)
+	testx.True(t, len(l) != 0)
 	testx.Equal(t, items, l)
 
 	l, err = tbl.ListGreaterThan(item.ID, 10)
 	testx.NoError(t, err)
-	testx.Empty(t, l)
+	testx.True(t, len(l) == 0)
 
 	l, err = tbl.ListLessThan(item.ID+1, 10)
 	testx.NoError(t, err)
@@ -93,7 +94,7 @@ func TestIntTable(t *testing.T) {
 	testx.NoError(t, err)
 
 	v, err = tbl.Get(item.ID)
-	testx.NotEmpty(t, err)
+	testx.Error(t, err)
 	testx.Equal(t, true, errors.Is(err, sql.ErrNoRows))
 }
 
@@ -115,12 +116,12 @@ func TestStringTable(t *testing.T) {
 
 	l, err := tbl.ListAll()
 	testx.NoError(t, err)
-	testx.NotEmpty(t, l)
+	testx.True(t, len(l) != 0)
 	testx.Equal(t, items, l)
 
 	l, err = tbl.ListGreaterThan("a", 10)
 	testx.NoError(t, err)
-	testx.Empty(t, l)
+	testx.True(t, len(l) == 0)
 
 	l, err = tbl.ListLessThan("Z", 10)
 	testx.NoError(t, err)
@@ -132,6 +133,6 @@ func TestStringTable(t *testing.T) {
 	testx.NoError(t, err)
 
 	v, err = tbl.Get(item.ID)
-	testx.NotEmpty(t, err)
+	testx.Error(t, err)
 	testx.Equal(t, true, errors.Is(err, sql.ErrNoRows))
 }

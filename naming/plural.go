@@ -1,10 +1,11 @@
 package naming
 
 import (
-	"code.olapie.com/sugar/naming/internal/plurals"
-	"code.olapie.com/sugar/stringx"
 	"regexp"
 	"strings"
+
+	"code.olapie.com/sugar/naming/internal/plurals"
+	"code.olapie.com/sugar/stringx"
 )
 
 type replacement struct {

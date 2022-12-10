@@ -2,12 +2,13 @@ package sqlx
 
 import (
 	"bytes"
-	"code.olapie.com/sugar/must"
 	"database/sql"
 	"fmt"
 	"io/fs"
 	"path/filepath"
 	"text/template"
+
+	"code.olapie.com/sugar/must"
 )
 
 var Debug = false
