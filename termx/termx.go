@@ -1,12 +1,13 @@
 package termx
 
 import (
-	"code.olapie.com/sugar/must"
 	"fmt"
-	"golang.org/x/crypto/ssh/terminal"
-	"golang.org/x/term"
 	"os"
 	"syscall"
+
+	"code.olapie.com/sugar/must"
+	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 func ReadOne() (byte, error) {

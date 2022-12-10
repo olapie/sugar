@@ -3,6 +3,8 @@ package stringx
 import (
 	"errors"
 	"fmt"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"reflect"
 	"regexp"
 	"strings"
@@ -116,4 +118,8 @@ func FromVarargs(keyValues ...any) (keys []string, values []any, err error) {
 		}
 	}
 	return
+}
+
+func Title(s string) string {
+	return cases.Title(language.English).String(s)
 }

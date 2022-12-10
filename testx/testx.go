@@ -26,15 +26,15 @@ func True(t *testing.T, b bool) {
 	}
 }
 
-func NoError(t *testing.T, err error) {
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-
 func False(t *testing.T, b bool, msgs ...any) {
 	if b {
 		t.Fatal(msgs...)
+	}
+}
+
+func NoError(t *testing.T, err error) {
+	if err != nil {
+		t.Fatal(err)
 	}
 }
 

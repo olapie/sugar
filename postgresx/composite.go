@@ -1,4 +1,4 @@
-package sqlx
+package postgresx
 
 import (
 	"bytes"
@@ -6,26 +6,26 @@ import (
 	"strings"
 )
 
-type psqlCompositeScanState int
+type compositeScanState int
 
 const (
-	psqlCompositeScanInit psqlCompositeScanState = iota
-	psqlCompositeScanField
-	psqlCompositeScanQuoted
+	compositeScanInit compositeScanState = iota
+	compositeScanField
+	compositeScanQuoted
 )
 
-func ToPSQLCompositeString(fields ...any) string {
+func ToCompositeString(fields ...any) string {
 	var builder strings.Builder
 	builder.WriteString("(")
 	n := len(fields)
 	for i, field := range fields {
 		switch v := field.(type) {
 		case string:
-			builder.WriteString(escapePSQLCompositeField(v))
+			builder.WriteString(escapeCompositeField(v))
 		case []byte:
-			builder.WriteString(escapePSQLCompositeField(string(v)))
+			builder.WriteString(escapeCompositeField(string(v)))
 		default:
-			builder.WriteString(escapePSQLCompositeField(fmt.Sprint(v)))
+			builder.WriteString(escapeCompositeField(fmt.Sprint(v)))
 		}
 		if i < n-1 {
 			builder.WriteRune(',')
@@ -35,13 +35,13 @@ func ToPSQLCompositeString(fields ...any) string {
 	return builder.String()
 }
 
-func ParsePSQLCompositeFields(column string) ([]string, error) {
+func ParseCompositeFields(column string) ([]string, error) {
 	if len(column) == 0 {
 		return nil, fmt.Errorf("empty column")
 	}
 
 	fields := make([]string, 0, 2)
-	state := psqlCompositeScanInit
+	state := compositeScanInit
 	var field bytes.Buffer
 	chars := []rune(column)
 	n := len(chars)
@@ -50,18 +50,18 @@ Loop:
 	for i := 0; i < n; i++ {
 		c := chars[i]
 		switch state {
-		case psqlCompositeScanInit:
+		case compositeScanInit:
 			if c != '(' {
 				//errPos = i
 				//break Loop
 				continue
 			}
-			state = psqlCompositeScanField
-		case psqlCompositeScanField:
+			state = compositeScanField
+		case compositeScanField:
 			switch c {
 			case '"':
 				if field.Len() == 0 {
-					state = psqlCompositeScanQuoted
+					state = compositeScanQuoted
 				} else {
 					if i == len(chars)-1 || chars[i+1] != '"' {
 						errPos = i
@@ -83,7 +83,7 @@ Loop:
 			default:
 				field.WriteRune(c)
 			}
-		case psqlCompositeScanQuoted:
+		case compositeScanQuoted:
 			switch c {
 			case '"':
 				if i == len(chars)-1 {
@@ -98,7 +98,7 @@ Loop:
 				case ',':
 					fields = append(fields, field.String())
 					field.Reset()
-					state = psqlCompositeScanField
+					state = compositeScanField
 				case ')':
 					fields = append(fields, field.String())
 					if i != len(chars)-1 {
@@ -129,20 +129,11 @@ func MakeSQLPlaceholder(prefix string, num int) string {
 	return b.String()
 }
 
-func MakePSQLPlaceholder(num int) string {
+func MakePlaceholder(num int) string {
 	return MakeSQLPlaceholder("$", num)
 }
 
-func IsSQLNullValue(s string) bool {
-	switch s {
-	case "{}", "[]", "null", "NULL":
-		return true
-	default:
-		return false
-	}
-}
-
-func escapePSQLCompositeField(s string) string {
+func escapeCompositeField(s string) string {
 	s = strings.Replace(s, ",", "\\,", -1)
 	s = strings.Replace(s, "(", "\\(", -1)
 	s = strings.Replace(s, ")", "\\)", -1)

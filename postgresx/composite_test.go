@@ -1,15 +1,15 @@
-package sqlx_test
+package postgresx_test
 
 import (
 	"fmt"
 	"testing"
 
-	"code.olapie.com/sugar/sqlx"
+	"code.olapie.com/sugar/postgresx"
 )
 
-func TestParsePSQLCompositeFields(t *testing.T) {
+func TestParseCompositeFields(t *testing.T) {
 	t.Run("Single", func(t *testing.T) {
-		res, err := sqlx.ParsePSQLCompositeFields("(abc)")
+		res, err := postgresx.ParseCompositeFields("(abc)")
 		if err != nil {
 			t.Error(err)
 		}
@@ -18,14 +18,14 @@ func TestParsePSQLCompositeFields(t *testing.T) {
 			t.Errorf("Expect [abc] got %v", res)
 		}
 
-		_, err = sqlx.ParsePSQLCompositeFields("(abc\")")
+		_, err = postgresx.ParseCompositeFields("(abc\")")
 		if err == nil {
 			t.Error("Expect error")
 		}
 	})
 
 	t.Run("Multiple", func(t *testing.T) {
-		res, err := sqlx.ParsePSQLCompositeFields("(abc,123)")
+		res, err := postgresx.ParseCompositeFields("(abc,123)")
 		if err != nil {
 			t.Error(err)
 		}
@@ -36,7 +36,7 @@ func TestParsePSQLCompositeFields(t *testing.T) {
 			t.Errorf("Expect %s, got %s", expect, got)
 		}
 
-		res, err = sqlx.ParsePSQLCompositeFields("(abc,)")
+		res, err = postgresx.ParseCompositeFields("(abc,)")
 		if err != nil {
 			t.Error(err)
 		}
@@ -48,7 +48,7 @@ func TestParsePSQLCompositeFields(t *testing.T) {
 	})
 
 	t.Run("Embedded", func(t *testing.T) {
-		res, err := sqlx.ParsePSQLCompositeFields("(abc,123,\"(19,20)\")")
+		res, err := postgresx.ParseCompositeFields("(abc,123,\"(19,20)\")")
 		if err != nil {
 			t.Error(err)
 		}
@@ -58,7 +58,7 @@ func TestParsePSQLCompositeFields(t *testing.T) {
 			t.Errorf("Expect %s, got %s", expect, got)
 		}
 
-		res, err = sqlx.ParsePSQLCompositeFields("(\"(19,20)\",abc,123,)")
+		res, err = postgresx.ParseCompositeFields("(\"(19,20)\",abc,123,)")
 		if err != nil {
 			t.Error(err)
 		}
@@ -70,7 +70,7 @@ func TestParsePSQLCompositeFields(t *testing.T) {
 	})
 
 	t.Run("Quoted", func(t *testing.T) {
-		res, err := sqlx.ParsePSQLCompositeFields("(\"abc\"\", \",123)")
+		res, err := postgresx.ParseCompositeFields("(\"abc\"\", \",123)")
 		if err != nil {
 			t.Error(err)
 		}
