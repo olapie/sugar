@@ -45,6 +45,18 @@ func (s *Set[K]) Range(f func(v K) bool) {
 	}
 }
 
+func (s *Set[K]) AddSlice(a []K) {
+	for _, k := range a {
+		s.entries[k] = void{}
+	}
+}
+
+func (s *Set[K]) RemoveSlice(a []K) {
+	for _, k := range a {
+		delete(s.entries, k)
+	}
+}
+
 func (s *Set[K]) Len() int {
 	return len(s.entries)
 }
