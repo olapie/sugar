@@ -7,7 +7,11 @@ import (
 	"golang.org/x/term"
 )
 
-const ControlD = 0x04
+const (
+	ControlC = 0x03
+	ControlD = 0x04
+	ControlZ = 0x1A
+)
 
 func Read(stop byte) ([]byte, error) {
 	var buf bytes.Buffer
@@ -23,8 +27,11 @@ func Read(stop byte) ([]byte, error) {
 			term.Restore(int(os.Stdin.Fd()), oldState)
 			return nil, err
 		}
-		if b[0] == stop {
+		switch b[0] {
+		case stop, ControlC, ControlZ:
 			break
+		default:
+			buf.WriteByte(b[0])
 		}
 	}
 	term.Restore(int(os.Stdin.Fd()), oldState)
