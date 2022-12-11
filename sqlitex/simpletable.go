@@ -1,12 +1,13 @@
 package sqlitex
 
 import (
-	"code.olapie.com/sugar/timing"
 	"database/sql"
 	"fmt"
 	"reflect"
 	"sync"
 	"time"
+
+	"code.olapie.com/sugar/timing"
 
 	"code.olapie.com/sugar/sqlx"
 )

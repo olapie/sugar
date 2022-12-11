@@ -1,12 +1,13 @@
 package bytex_test
 
 import (
-	"code.olapie.com/sugar/bytex"
-	"code.olapie.com/sugar/testx"
 	"encoding/json"
 	"math/rand"
 	"testing"
 	"time"
+
+	"code.olapie.com/sugar/bytex"
+	"code.olapie.com/sugar/testx"
 )
 
 type customByteSlice []byte

@@ -1,15 +1,16 @@
 package sqlitex_test
 
 import (
-	"code.olapie.com/sugar/sqlitex"
-	"code.olapie.com/sugar/testx"
-	"code.olapie.com/sugar/types"
 	"context"
-	"github.com/google/uuid"
 	"math/rand"
 	"os"
 	"testing"
 	"time"
+
+	"code.olapie.com/sugar/sqlitex"
+	"code.olapie.com/sugar/testx"
+	"code.olapie.com/sugar/types"
+	"github.com/google/uuid"
 )
 
 type localTableItem struct {

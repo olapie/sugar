@@ -1,13 +1,14 @@
 package sqlitex
 
 import (
+	"database/sql"
+	"fmt"
+	"sync"
+
 	"code.olapie.com/sugar/conv"
 	"code.olapie.com/sugar/sqlx"
 	"code.olapie.com/sugar/timing"
-	"database/sql"
-	"fmt"
 	"google.golang.org/protobuf/proto"
-	"sync"
 )
 
 type KVTable struct {
@@ -149,6 +150,14 @@ func (s *KVTable) GetJSON(key string, ptrToObj any) error {
 	err := s.db.QueryRow("SELECT v FROM kv WHERE k=?", key).Scan(sqlx.JSON(ptrToObj))
 	s.mu.RUnlock()
 	return err
+}
+
+func (s *KVTable) Exists(key string) (bool, error) {
+	s.mu.RLock()
+	var exists bool
+	err := s.db.QueryRow("SELECT EXISTS(SELECT * FROM kv WHERE k=?)", key).Scan(&exists)
+	s.mu.RUnlock()
+	return exists, err
 }
 
 func (s *KVTable) Close() error {

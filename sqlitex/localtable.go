@@ -1,16 +1,17 @@
 package sqlitex
 
 import (
-	"code.olapie.com/sugar/bytex"
-	"code.olapie.com/sugar/cryptox"
-	"code.olapie.com/sugar/errorx"
-	"code.olapie.com/sugar/must"
-	"code.olapie.com/sugar/timing"
 	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
+
+	"code.olapie.com/sugar/bytex"
+	"code.olapie.com/sugar/cryptox"
+	"code.olapie.com/sugar/errorx"
+	"code.olapie.com/sugar/must"
+	"code.olapie.com/sugar/timing"
 )
 
 type LocalTable[R any] struct {

@@ -1,14 +1,15 @@
 package bytex
 
 import (
-	"code.olapie.com/sugar/rtx"
 	"encoding"
 	"encoding/gob"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"google.golang.org/protobuf/proto"
 	"reflect"
+
+	"code.olapie.com/sugar/rtx"
+	"google.golang.org/protobuf/proto"
 )
 
 func Marshal(i any) (data []byte, err error) {
