@@ -33,3 +33,13 @@ func (m *Map[K, V]) GetOrStore(key K, value V) (actual V, got bool) {
 func (m *Map[K, V]) Set(k K, v V) {
 	m.m.Store(k, v)
 }
+
+func (m *Map[K, V]) Delete(k K) {
+	m.m.Delete(k)
+}
+
+func (m *Map[K, V]) Range(f func(key K, value V) bool) {
+	m.m.Range(func(key, value any) bool {
+		return f(key.(K), value.(V))
+	})
+}
