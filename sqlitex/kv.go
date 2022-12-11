@@ -136,6 +136,26 @@ func (s *KVTable) GetJSON(key string, ptrToObj any) error {
 	return err
 }
 
+func (s *KVTable) ListAllKeys() ([]string, error) {
+	s.mu.RLock()
+	rows, err := s.db.Query("SELECT k FROM kv")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var keys []string
+	for rows.Next() {
+		var key string
+		err = rows.Scan(&key)
+		if err != nil {
+			return nil, err
+		}
+		keys = append(keys, key)
+	}
+	s.mu.RUnlock()
+	return keys, nil
+}
+
 func (s *KVTable) Delete(key string) error {
 	s.mu.RLock()
 	_, err := s.db.Exec("DELETE FROM kv WHERE k=?)", key)
