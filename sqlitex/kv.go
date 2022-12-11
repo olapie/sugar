@@ -156,9 +156,36 @@ func (s *KVTable) ListAllKeys() ([]string, error) {
 	return keys, nil
 }
 
+func (s *KVTable) ListKeysWithPrefix(prefix string) ([]string, error) {
+	s.mu.RLock()
+	rows, err := s.db.Query("SELECT k FROM kv WHERE k LIKE '" + prefix + "%'")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var keys []string
+	for rows.Next() {
+		var key string
+		err = rows.Scan(&key)
+		if err != nil {
+			return nil, err
+		}
+		keys = append(keys, key)
+	}
+	s.mu.RUnlock()
+	return keys, nil
+}
+
 func (s *KVTable) Delete(key string) error {
 	s.mu.RLock()
-	_, err := s.db.Exec("DELETE FROM kv WHERE k=?)", key)
+	_, err := s.db.Exec("DELETE FROM kv WHERE k=?", key)
+	s.mu.RUnlock()
+	return err
+}
+
+func (s *KVTable) DeleteWithPrefix(prefix string) error {
+	s.mu.RLock()
+	_, err := s.db.Exec("DELETE FROM kv WHERE k like '" + prefix + "%'")
 	s.mu.RUnlock()
 	return err
 }
