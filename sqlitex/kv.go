@@ -12,21 +12,20 @@ import (
 )
 
 type KVTable struct {
-	ID       any
-	clock    timing.Clock
-	db       *sql.DB
-	mu       sync.RWMutex
-	filename string
+	ID    any
+	clock timing.Clock
+	db    *sql.DB
+	mu    sync.RWMutex
+	name  string
 }
 
 func NewKVTable(db *sql.DB, clock timing.Clock) *KVTable {
+	if clock == nil {
+		clock = timing.LocalClock{}
+	}
 	r := &KVTable{
 		clock: clock,
 		db:    db,
-	}
-
-	if r.clock == nil {
-		r.clock = timing.LocalClock{}
 	}
 
 	_, err := db.Exec(`
@@ -39,10 +38,6 @@ updated_at BIGINT NOT NULL
 		panic(err)
 	}
 	return r
-}
-
-func (s *KVTable) Filename() string {
-	return s.filename
 }
 
 func (s *KVTable) SaveInt64(key string, val int64) error {
