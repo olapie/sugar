@@ -226,7 +226,7 @@ func Renew(ptrDst any, src any) {
 func DeepNew(t reflect.Type) reflect.Value {
 	v := reflect.New(t)
 	e := v.Elem()
-	for e.Kind() == reflect.Ptr {
+	for e.Kind() == reflect.Ptr && e.CanSet() {
 		e.Set(reflect.New(e.Type().Elem()))
 		e = e.Elem()
 	}
