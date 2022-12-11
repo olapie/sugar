@@ -10,7 +10,7 @@ import (
 	"sync"
 )
 
-type KVStore struct {
+type KVTable struct {
 	ID       any
 	clock    timing.Clock
 	db       *sql.DB
@@ -18,9 +18,9 @@ type KVStore struct {
 	filename string
 }
 
-func NewKVStore(filename string, clock timing.Clock) *KVStore {
+func NewKVTable(filename string, clock timing.Clock) *KVTable {
 	db := MustOpen(filename)
-	r := &KVStore{
+	r := &KVTable{
 		clock:    clock,
 		db:       db,
 		filename: filename,
@@ -42,11 +42,11 @@ updated_at BIGINT NOT NULL
 	return r
 }
 
-func (s *KVStore) Filename() string {
+func (s *KVTable) Filename() string {
 	return s.filename
 }
 
-func (s *KVStore) SaveInt64(key string, val int64) {
+func (s *KVTable) SaveInt64(key string, val int64) {
 	s.mu.Lock()
 	_, err := s.db.Exec("REPLACE INTO kv(k,v,updated_at) VALUES(?1,?2,?3)",
 		key, fmt.Sprint(val), s.clock.Now())
@@ -56,7 +56,7 @@ func (s *KVStore) SaveInt64(key string, val int64) {
 	}
 }
 
-func (s *KVStore) GetInt64(key string) (int64, error) {
+func (s *KVTable) GetInt64(key string) (int64, error) {
 	var v string
 	s.mu.RLock()
 	err := s.db.QueryRow("SELECT v FROM kv WHERE k=?", key).Scan(&v)
@@ -72,7 +72,7 @@ func (s *KVStore) GetInt64(key string) (int64, error) {
 	return n, nil
 }
 
-func (s *KVStore) SaveData(key string, data []byte) {
+func (s *KVTable) SaveData(key string, data []byte) {
 	s.mu.Lock()
 	_, err := s.db.Exec("REPLACE INTO kv(k,v,updated_at) VALUES(?1,?2,?3)", key, data, s.clock.Now())
 	s.mu.Unlock()
@@ -81,7 +81,7 @@ func (s *KVStore) SaveData(key string, data []byte) {
 	}
 }
 
-func (s *KVStore) GetData(key string) ([]byte, error) {
+func (s *KVTable) GetData(key string) ([]byte, error) {
 	var v []byte
 	s.mu.RLock()
 	err := s.db.QueryRow("SELECT v FROM kv WHERE k=?", key).Scan(&v)
@@ -92,11 +92,11 @@ func (s *KVStore) GetData(key string) ([]byte, error) {
 	return v, nil
 }
 
-func (s *KVStore) SaveString(key string, str string) {
+func (s *KVTable) SaveString(key string, str string) {
 	s.SaveData(key, []byte(str))
 }
 
-func (s *KVStore) GetString(key string) (string, error) {
+func (s *KVTable) GetString(key string) (string, error) {
 	data, err := s.GetData(key)
 	if err != nil {
 		return "", err
@@ -104,7 +104,7 @@ func (s *KVStore) GetString(key string) (string, error) {
 	return string(data), nil
 }
 
-func (s *KVStore) SavePB(key string, msg proto.Message) {
+func (s *KVTable) SavePB(key string, msg proto.Message) {
 	data, err := proto.Marshal(msg)
 	if err != nil {
 		fmt.Println(key, err)
@@ -118,7 +118,7 @@ func (s *KVStore) SavePB(key string, msg proto.Message) {
 	}
 }
 
-func (s *KVStore) GetPB(key string, msg proto.Message) error {
+func (s *KVTable) GetPB(key string, msg proto.Message) error {
 	var v []byte
 	s.mu.RLock()
 	err := s.db.QueryRow("SELECT v FROM kv WHERE k=?", key).Scan(&v)
@@ -129,7 +129,7 @@ func (s *KVStore) GetPB(key string, msg proto.Message) error {
 	return proto.Unmarshal(v, msg)
 }
 
-func (s *KVStore) SaveJSON(key string, obj any) {
+func (s *KVTable) SaveJSON(key string, obj any) {
 	v := sqlx.JSON(obj)
 	s.mu.Lock()
 	var err error
@@ -144,14 +144,14 @@ func (s *KVStore) SaveJSON(key string, obj any) {
 	}
 }
 
-func (s *KVStore) GetJSON(key string, ptrToObj any) error {
+func (s *KVTable) GetJSON(key string, ptrToObj any) error {
 	s.mu.RLock()
 	err := s.db.QueryRow("SELECT v FROM kv WHERE k=?", key).Scan(sqlx.JSON(ptrToObj))
 	s.mu.RUnlock()
 	return err
 }
 
-func (s *KVStore) Close() error {
+func (s *KVTable) Close() error {
 	s.mu.Lock()
 	err := s.db.Close()
 	s.mu.Unlock()
