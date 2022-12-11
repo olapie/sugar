@@ -21,8 +21,8 @@ type KVTable struct {
 
 func NewKVTable(db *sql.DB, clock timing.Clock) *KVTable {
 	r := &KVTable{
-		clock:    clock,
-		db:       db,
+		clock: clock,
+		db:    db,
 	}
 
 	if r.clock == nil {
@@ -45,7 +45,7 @@ func (s *KVTable) Filename() string {
 	return s.filename
 }
 
-func (s *KVTable) SaveInt64(key string, val int64) error{
+func (s *KVTable) SaveInt64(key string, val int64) error {
 	s.mu.Lock()
 	_, err := s.db.Exec("REPLACE INTO kv(k,v,updated_at) VALUES(?1,?2,?3)",
 		key, fmt.Sprint(val), s.clock.Now())
@@ -87,7 +87,7 @@ func (s *KVTable) GetData(key string) ([]byte, error) {
 	return v, nil
 }
 
-func (s *KVTable) SaveString(key string, str string)error {
+func (s *KVTable) SaveString(key string, str string) error {
 	return s.SaveData(key, []byte(str))
 }
 
@@ -99,7 +99,7 @@ func (s *KVTable) GetString(key string) (string, error) {
 	return string(data), nil
 }
 
-func (s *KVTable) SavePB(key string, msg proto.Message) error{
+func (s *KVTable) SavePB(key string, msg proto.Message) error {
 	data, err := proto.Marshal(msg)
 	if err != nil {
 		return err
@@ -121,7 +121,7 @@ func (s *KVTable) GetPB(key string, msg proto.Message) error {
 	return proto.Unmarshal(v, msg)
 }
 
-func (s *KVTable) SaveJSON(key string, obj any) error{
+func (s *KVTable) SaveJSON(key string, obj any) error {
 	v := sqlx.JSON(obj)
 	s.mu.Lock()
 	var err error
@@ -137,6 +137,13 @@ func (s *KVTable) SaveJSON(key string, obj any) error{
 func (s *KVTable) GetJSON(key string, ptrToObj any) error {
 	s.mu.RLock()
 	err := s.db.QueryRow("SELECT v FROM kv WHERE k=?", key).Scan(sqlx.JSON(ptrToObj))
+	s.mu.RUnlock()
+	return err
+}
+
+func (s *KVTable) Delete(key string) error {
+	s.mu.RLock()
+	_, err := s.db.Exec("DELETE FROM kv WHERE k=?)", key)
 	s.mu.RUnlock()
 	return err
 }
