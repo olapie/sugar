@@ -250,13 +250,19 @@ func (t *LocalTable[R]) encode(localID string, r R) (data []byte, err error) {
 		}
 	}
 
+	if t.password == "" {
+		return
+	}
+
 	return cryptox.Encrypt(data, t.password+localID)
 }
 
 func (t *LocalTable[R]) decode(localID string, data []byte) (record R, err error) {
-	data, err = cryptox.Decrypt(data, t.password+localID)
-	if err != nil {
-		return
+	if t.password != "" {
+		data, err = cryptox.Decrypt(data, t.password+localID)
+		if err != nil {
+			return
+		}
 	}
 
 	err = bytex.Unmarshal(data, &record)
