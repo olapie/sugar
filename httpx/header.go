@@ -33,6 +33,7 @@ const (
 	KeyServiceID = "X-Service-Id"
 	KeyTraceID   = "X-Trace-Id"
 	KeyUserID    = "X-User-Id"
+	KeyTestFlag  = "X-Test"
 )
 
 const (

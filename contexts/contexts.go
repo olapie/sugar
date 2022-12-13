@@ -7,13 +7,6 @@ import (
 	"reflect"
 )
 
-const (
-	headerClientID  = "X-Client-Id"
-	headerAppID     = "X-App-Id"
-	headerServiceID = "X-Service-Id"
-	headerTraceID   = "X-App-Trace-Id"
-)
-
 type keyType int
 
 // Context keys
@@ -27,6 +20,7 @@ const (
 	keyClientID
 	keyServiceID
 	keyLogger
+	keyTestFlag
 
 	keyEnd
 )
@@ -41,11 +35,8 @@ func WithHTTPHeader(ctx context.Context, h http.Header) context.Context {
 }
 
 func GetTraceID(ctx context.Context) string {
-	id, ok := ctx.Value(keyTraceID).(string)
-	if ok {
-		return id
-	}
-	return GetHTTPHeader(ctx).Get(headerTraceID)
+	id, _ := ctx.Value(keyTraceID).(string)
+	return id
 }
 
 func WithTraceID(ctx context.Context, traceID string) context.Context {
@@ -114,11 +105,8 @@ func IsSudo(ctx context.Context) bool {
 }
 
 func GetAppID(ctx context.Context) string {
-	id, ok := ctx.Value(keyAppID).(string)
-	if ok {
-		return id
-	}
-	return GetHTTPHeader(ctx).Get(headerAppID)
+	id, _ := ctx.Value(keyAppID).(string)
+	return id
 }
 
 func WithAppID(ctx context.Context, id string) context.Context {
@@ -129,11 +117,8 @@ func WithAppID(ctx context.Context, id string) context.Context {
 }
 
 func GetServiceID(ctx context.Context) string {
-	id, ok := ctx.Value(keyServiceID).(string)
-	if ok {
-		return id
-	}
-	return GetHTTPHeader(ctx).Get(headerServiceID)
+	id, _ := ctx.Value(keyServiceID).(string)
+	return id
 }
 
 func WithServiceID(ctx context.Context, id string) context.Context {
@@ -144,11 +129,8 @@ func WithServiceID(ctx context.Context, id string) context.Context {
 }
 
 func GetClientID(ctx context.Context) string {
-	id, ok := ctx.Value(keyClientID).(string)
-	if ok {
-		return id
-	}
-	return GetHTTPHeader(ctx).Get(headerClientID)
+	id, _ := ctx.Value(keyClientID).(string)
+	return id
 }
 
 func WithClientID(ctx context.Context, id string) context.Context {
@@ -156,6 +138,14 @@ func WithClientID(ctx context.Context, id string) context.Context {
 		return ctx
 	}
 	return context.WithValue(ctx, keyClientID, id)
+}
+
+func IsTest(ctx context.Context) bool {
+	return ctx.Value(keyTestFlag) != nil
+}
+
+func WithTestFlag(ctx context.Context) context.Context {
+	return context.WithValue(ctx, keyTestFlag, true)
 }
 
 func GetLogger[T any](ctx context.Context) T {
