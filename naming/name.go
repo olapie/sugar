@@ -70,6 +70,8 @@ func ToSnake(s string) string {
 
 // ToCamel converts s from Snake to Camel
 func ToCamel(s string) string {
+	s = strings.ReplaceAll(s, ".", "_")
+	s = strings.ReplaceAll(s, "-", "_")
 	a := strings.Split(s, "_")
 	for i := 1; i < len(a); i++ {
 		if abbreviations[a[i]] {
