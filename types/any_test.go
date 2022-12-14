@@ -8,13 +8,8 @@ import (
 	"time"
 
 	"code.olapie.com/sugar/testx"
-
 	"code.olapie.com/sugar/types"
 )
-
-func init() {
-	types.RegisterAnyType(&Image{})
-}
 
 func jsonString(i any) string {
 	b, _ := json.Marshal(i)
@@ -22,10 +17,10 @@ func jsonString(i any) string {
 }
 
 type Image struct {
-	Url    string
-	Width  int32
-	Height int32
-	Format string
+	Url    string `json:"url"`
+	Width  int32  `json:"width"`
+	Height int32  `json:"height"`
+	Format string `json:"format"`
 }
 
 func nextImage() *Image {

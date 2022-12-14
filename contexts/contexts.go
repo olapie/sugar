@@ -1,6 +1,7 @@
 package contexts
 
 import (
+	"code.olapie.com/sugar/rtx"
 	"context"
 	"fmt"
 	"net/http"
@@ -57,27 +58,35 @@ func Detach(ctx context.Context) context.Context {
 }
 
 func GetLogin[T comparable](ctx context.Context) T {
-	var login T
 	v := ctx.Value(keyLogin)
 	if v == nil {
-		return login
+		var zero T
+		return zero
 	}
 
-	if login, ok := v.(T); ok {
-		return login
+	if actual, ok := v.(T); ok {
+		return actual
 	}
 
-	expect := reflect.TypeOf(login)
-	got := reflect.TypeOf(v)
-	if got.ConvertibleTo(expect) {
+	actualVal := reflect.ValueOf(v)
+	var expect T
+	if rtx.IsInt(actualVal) || rtx.IsUint(actualVal) || rtx.IsFloat(actualVal) {
+		if reflect.ValueOf(expect).Kind() == reflect.String {
+			reflect.ValueOf(&expect).Elem().SetString(fmt.Sprint(v))
+			return expect
+		}
+	}
+
+	expectType := reflect.TypeOf(expect)
+	if actualVal.Type().ConvertibleTo(expectType) {
 		defer func() {
 			if msg := recover(); msg != nil {
 				fmt.Printf("[sugar/contexts] GetLogin: %v\n", msg)
 			}
 		}()
-		reflect.ValueOf(&login).Elem().Set(reflect.ValueOf(v).Convert(expect))
+		reflect.ValueOf(&expect).Elem().Set(reflect.ValueOf(v).Convert(expectType))
 	}
-	return login
+	return expect
 }
 
 func WithLogin[T comparable](ctx context.Context, v T) context.Context {
