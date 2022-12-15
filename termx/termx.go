@@ -3,6 +3,7 @@ package termx
 import (
 	"fmt"
 	"os"
+	"strings"
 	"syscall"
 
 	"code.olapie.com/sugar/must"
@@ -43,4 +44,15 @@ func ReadConfirmedPassword(prompt1, prompt2 string) *string {
 		return nil
 	}
 	return &pass1
+}
+
+func ConfirmInput(answer string) bool {
+	answer = strings.TrimSpace(answer)
+	if answer == "" {
+		panic("answer cannot be empty")
+	}
+	fmt.Printf("Enter '%s' to confirm: ", answer)
+	var actual string
+	fmt.Scanln(&actual)
+	return actual == answer
 }
