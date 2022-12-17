@@ -9,9 +9,7 @@ import (
 
 func Clone[T any](a []T) []T {
 	res := make([]T, len(a))
-	for i, v := range a {
-		res[i] = v
-	}
+	copy(res, a)
 	return res
 }
 
@@ -130,4 +128,14 @@ func IndexOf[E comparable](a []E, v E) int {
 		}
 	}
 	return -1
+}
+
+func Filter[E comparable](a []E, filter func(e E) bool) []E {
+	res := make([]E, 0, len(a)/2)
+	for _, v := range a {
+		if filter(v) {
+			res = append(res, v)
+		}
+	}
+	return res
 }

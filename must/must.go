@@ -1,6 +1,7 @@
 package must
 
 import (
+	"fmt"
 	"log"
 
 	"code.olapie.com/sugar/conv"
@@ -47,13 +48,21 @@ func Error(err error, msgAndArgs ...any) {
 // NoError panics if b is not nil
 func NoError(err error, msgAndArgs ...any) {
 	if err != nil {
-		rtx.PanicWithMessages(msgAndArgs...)
+		if len(msgAndArgs) == 0 {
+			rtx.PanicWithMessages(err)
+		} else {
+			msgAndArgs[0] = err.Error() + " " + fmt.Sprint(msgAndArgs[0])
+			rtx.PanicWithMessages(msgAndArgs...)
+		}
 	}
 }
 
 // Nil panics if v is not nil
 func Nil[T any](v *T, msgAndArgs ...any) {
 	if v != nil {
+		if len(msgAndArgs) == 0 {
+			rtx.PanicWithMessages(fmt.Sprintf("%#v", v))
+		}
 		rtx.PanicWithMessages(msgAndArgs...)
 	}
 }
