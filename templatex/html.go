@@ -13,3 +13,19 @@ var HTMLFuncMap = template.FuncMap{
 	"concat":     Concat,
 	"capitalize": Capitalize,
 }
+
+type HTMLMeta struct {
+	Name    string
+	Content string
+}
+
+type HTMLHeader struct {
+	Title    string
+	Meta     []*HTMLMeta
+	CSSLinks []string
+	JSSLinks []string
+}
+
+type HTMLFooter struct {
+	JSSLinks []string
+}
