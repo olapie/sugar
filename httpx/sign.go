@@ -16,8 +16,8 @@ import (
 	"strconv"
 	"time"
 
-	"code.olapie.com/sugar/contexts"
 	"code.olapie.com/sugar/conv"
+	"code.olapie.com/sugar/ctxutil"
 	"code.olapie.com/sugar/errorx"
 	"code.olapie.com/sugar/mathx"
 	"github.com/google/uuid"
@@ -43,16 +43,16 @@ type PrivateKey interface {
 }
 
 func Sign[K PrivateKey](ctx context.Context, req *http.Request, priv *K) error {
-	if contexts.HasLogin(ctx) {
-		if login := contexts.GetLogin[string](ctx); login != "" {
+	if ctxutil.HasLogin(ctx) {
+		if login := ctxutil.GetLogin[string](ctx); login != "" {
 			SetHeaderNX(req.Header, KeyUserID, login)
-		} else if login := contexts.GetLogin[int64](ctx); login != 0 {
+		} else if login := ctxutil.GetLogin[int64](ctx); login != 0 {
 			SetHeaderNX(req.Header, KeyUserID, fmt.Sprint(login))
 		}
 	}
-	SetHeaderNX(req.Header, KeyAppID, contexts.GetAppID(ctx))
-	SetHeaderNX(req.Header, KeyClientID, contexts.GetClientID(ctx))
-	traceID := contexts.GetTraceID(ctx)
+	SetHeaderNX(req.Header, KeyAppID, ctxutil.GetAppID(ctx))
+	SetHeaderNX(req.Header, KeyClientID, ctxutil.GetClientID(ctx))
+	traceID := ctxutil.GetTraceID(ctx)
 	if traceID == "" {
 		traceID = uuid.NewString()
 	}

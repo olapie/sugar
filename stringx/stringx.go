@@ -124,3 +124,15 @@ func FromVarargs(keyValues ...any) (keys []string, values []any, err error) {
 func Title(s string) string {
 	return cases.Title(language.English).String(s)
 }
+
+func Cast[FROM ~string, TO ~string](from FROM) TO {
+	return TO(from)
+}
+
+func CastSlice[FROM ~string, TO ~string](from []FROM) []TO {
+	to := make([]TO, len(from))
+	for i := range from {
+		to[i] = TO(from[i])
+	}
+	return to
+}

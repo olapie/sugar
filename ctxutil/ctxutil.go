@@ -1,11 +1,12 @@
-package contexts
+package ctxutil
 
 import (
-	"code.olapie.com/sugar/rtx"
 	"context"
 	"fmt"
 	"net/http"
 	"reflect"
+
+	"code.olapie.com/sugar/rtx"
 )
 
 type keyType int

@@ -20,12 +20,13 @@ type HTMLMeta struct {
 }
 
 type HTMLHeader struct {
-	Title    string
-	Meta     []*HTMLMeta
-	CSSLinks []string
-	JSSLinks []string
+	Title          string
+	Meta           []*HTMLMeta
+	CSSLinks       []string
+	JSLinks        []string
+	BodyAttributes string
 }
 
 type HTMLFooter struct {
-	JSSLinks []string
+	JSLinks []string
 }
