@@ -162,7 +162,7 @@ func CheckTimestamp[H HeaderTypeSet](h H) error {
 		return errorx.BadRequest("invalid timestamp")
 	}
 	now := time.Now().Unix()
-	if mathx.Abs(now-t) > 10 {
+	if mathx.Abs(now-t) > 60 {
 		return errorx.NotAcceptable("outdated request")
 	}
 	return nil
