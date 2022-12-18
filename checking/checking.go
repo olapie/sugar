@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"regexp"
+	"time"
 
 	"code.olapie.com/sugar/rtx"
 
@@ -74,6 +75,14 @@ func IsUsername(s string) bool {
 
 func IsNickname(s string) bool {
 	return nickRegexp.MatchString(s)
+}
+
+func IsDate(s string) bool {
+	_, err := time.Parse("2006-01-02", s)
+	if err != nil {
+		return false
+	}
+	return true
 }
 
 type Validator interface {
