@@ -245,40 +245,10 @@ ETag is enclosed in quotes https://www.rfc-editor.org/rfc/rfc7232#section-2.3
 */
 
 func GetETag[H HeaderTypeSet](h H) string {
-	etag := GetHeader(h, KeyETag)
-	// invalid
-	if len(etag) <= 2 {
-		return ""
-	}
-	if etag[:2] == "W/" {
-		etag = etag[:2]
-	}
-
-	// invalid
-	if len(etag) <= 2 || etag[0] != '"' || etag[len(etag)-1] != '"' {
-		return ""
-	}
-
-	return etag[1 : len(etag)-1]
+	return GetHeader(h, KeyETag)
 }
 
 func SetETag[H HeaderTypeSet](h H, etag string) {
-	if etag == "" {
-		return
-	}
-	if etag[0] != '"' {
-		etag = fmt.Sprintf(`"%s"`, etag)
-	}
-	SetHeader(h, KeyETag, etag)
-}
-
-func SetWeakETag[H HeaderTypeSet](h H, etag string) {
-	if etag == "" {
-		return
-	}
-	if etag[0] != 'W' {
-		etag = fmt.Sprintf(`W/"%s"`, etag)
-	}
 	SetHeader(h, KeyETag, etag)
 }
 
