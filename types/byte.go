@@ -18,3 +18,7 @@ const (
 func (b ByteUnit) HumanReadable() string {
 	return conv.SizeToHumanReadable(int64(b))
 }
+
+func (b ByteUnit) Int64() int64 {
+	return int64(b)
+}

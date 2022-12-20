@@ -219,3 +219,17 @@ func Combine(errs ...error) error {
 
 	return errorSlice(errs)
 }
+
+func OrFn(err error, errFns ...func() error) error {
+	if err != nil {
+		return err
+	}
+
+	for _, fn := range errFns {
+		if e := fn(); e != nil {
+			return e
+		}
+	}
+
+	return nil
+}
