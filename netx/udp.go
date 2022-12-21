@@ -3,6 +3,7 @@ package netx
 import (
 	"fmt"
 	"net"
+	"time"
 )
 
 // BroadcastUDP sends packet to all devices in the same LAN
@@ -26,20 +27,31 @@ func BroadcastUDP(port int, packet []byte) error {
 	return err
 }
 
-//func ReceiveUDP(port int) {
-//	conn, err := net.ListenPacket("udp", ":1053")
-//	if err != nil {
-//		log.Fatal(err)
-//	}
-//	defer conn.Close()
-//
-//	buf := make([]byte, 14*1024*1024)
-//	for {
-//		nRead, addr, err := conn.ReadFrom(buf)
-//		if err != nil {
-//			fmt.Println(err)
-//		} else {
-//			fmt.Println(addr, buf[:nRead])
-//		}
-//	}
-//}
+func RepeatBroadcastUDP(port int, packet []byte, interval time.Duration) {
+	for {
+		err := BroadcastUDP(port, packet)
+		if err != nil {
+			fmt.Println(err)
+		}
+		time.Sleep(interval)
+	}
+}
+
+func ReceiveUDP(port int, timeout time.Duration) ([]byte, net.Addr, error) {
+	conn, err := net.ListenPacket("udp", ":"+fmt.Sprint(port))
+	if err != nil {
+		return nil, nil, err
+	}
+	defer conn.Close()
+	err = conn.SetReadDeadline(time.Now().Add(timeout))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	buf := make([]byte, 1500)
+	nRead, addr, err := conn.ReadFrom(buf)
+	if err != nil {
+		return nil, nil, err
+	}
+	return buf[:nRead], addr, nil
+}
