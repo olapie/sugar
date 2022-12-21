@@ -38,12 +38,14 @@ func ReadPassword(msg ...any) string {
 }
 
 func ReadConfirmedPassword(prompt1, prompt2 string) *string {
-	pass1 := ReadPassword(prompt1)
-	pass2 := ReadPassword(prompt2)
-	if pass1 != pass2 {
-		return nil
+	for i := 0; i < 3; i++ {
+		pass1 := ReadPassword(prompt1)
+		pass2 := ReadPassword(prompt2)
+		if pass1 == pass2 {
+			return &pass1
+		}
 	}
-	return &pass1
+	return nil
 }
 
 func ConfirmInput(answer string) bool {
