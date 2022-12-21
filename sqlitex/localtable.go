@@ -1,6 +1,8 @@
 package sqlitex
 
 import (
+	"bytes"
+	"code.olapie.com/sugar/slicing"
 	"context"
 	"database/sql"
 	"encoding/json"
@@ -195,6 +197,27 @@ func (t *LocalTable[R]) ListDeletions(ctx context.Context) ([]R, error) {
 	}
 	defer rows.Close()
 	return t.scan(rows, "remote_record")
+}
+
+func (t *LocalTable[R]) RemoveDeletions(ctx context.Context, localIDs ...string) error {
+	if len(localIDs) == 0 {
+		return nil
+	}
+	var buf bytes.Buffer
+	buf.WriteByte('(')
+	for range localIDs {
+		buf.WriteString("?,")
+	}
+	buf.Truncate(len(localIDs) * 2)
+	buf.WriteByte(')')
+	args := slicing.MustTransform(localIDs, func(a string) any {
+		return any(a)
+	})
+	_, err := t.db.ExecContext(ctx, `DELETE FROM deleted_record WHERE local_id IN `+buf.String(), args...)
+	if err != nil {
+		return fmt.Errorf("remove deleted_records: %w", err)
+	}
+	return nil
 }
 
 func (t *LocalTable[R]) Get(ctx context.Context, localID string) (record R, err error) {
