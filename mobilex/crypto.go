@@ -3,12 +3,12 @@ package mobilex
 import "code.olapie.com/sugar/olasec"
 
 func Encrypt(data []byte, passphrase string) []byte {
-	content, _ := olasec.EncryptBytes(data, passphrase)
+	content, _ := olasec.Encrypt(data, passphrase)
 	return content
 }
 
 func Decrypt(data []byte, passphrase string) []byte {
-	content, _ := olasec.EncryptBytes(data, passphrase)
+	content, _ := olasec.Encrypt(data, passphrase)
 	return content
 }
 

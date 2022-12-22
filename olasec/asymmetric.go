@@ -40,7 +40,7 @@ func EncodePrivateKey[K *ecdsa.PrivateKey](k K, passphrase string) ([]byte, erro
 		return nil, err
 	}
 
-	return EncryptBytes(data, passphrase)
+	return Encrypt(data, passphrase)
 }
 
 func MustEncodePrivateKey[K *ecdsa.PrivateKey](k K, passphrase string) []byte {
@@ -56,7 +56,7 @@ func DecodePrivateKey[K *ecdsa.PrivateKey](data []byte, passphrase string) (K, e
 	if size < 0 {
 		return nil, fmt.Errorf("invalid data")
 	}
-	raw, err := DecryptBytes(data, passphrase)
+	raw, err := Decrypt(data, passphrase)
 	if err != nil {
 		return nil, err
 	}

@@ -14,7 +14,7 @@ import (
 
 func TestDecryptedReader(t *testing.T) {
 	raw := []byte(hashing.SHA1(time.Now().String()))
-	enc, err := olasec.EncryptBytes(raw, "123")
+	enc, err := olasec.Encrypt(raw, "123")
 	testx.NoError(t, err)
 	r := olasec.NewDecryptedReader(bytes.NewReader(enc), "123")
 	dec := &bytes.Buffer{}
@@ -26,7 +26,7 @@ func TestDecryptedReader(t *testing.T) {
 
 func BenchmarkDecryptedReader(b *testing.B) {
 	raw := testx.RandomBytes(int(4 * types.MB))
-	enc, err := olasec.EncryptBytes(raw, "123")
+	enc, err := olasec.Encrypt(raw, "123")
 	testx.NoError(b, err)
 	for i := 0; i < b.N; i++ {
 		olasec.DecryptBytes(enc, "123")

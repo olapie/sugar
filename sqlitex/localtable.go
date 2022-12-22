@@ -292,7 +292,7 @@ func (t *LocalTable[R]) encode(localID string, r R) (data []byte, err error) {
 		return
 	}
 
-	return olasec.EncryptBytes(data, t.Password+localID)
+	return olasec.Encrypt(data, t.Password+localID)
 }
 
 func (t *LocalTable[R]) decode(localID string, data []byte) (record R, err error) {

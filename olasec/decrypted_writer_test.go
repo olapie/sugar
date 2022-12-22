@@ -13,7 +13,7 @@ import (
 
 func TestDecryptedWriter(t *testing.T) {
 	raw := []byte(hashing.SHA1(time.Now().String()))
-	enc, err := olasec.EncryptBytes(raw, "123")
+	enc, err := olasec.Encrypt(raw, "123")
 	testx.NoError(t, err)
 	dec := &bytes.Buffer{}
 	w := olasec.NewDecryptedWriter(dec, "123")

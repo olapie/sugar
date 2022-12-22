@@ -21,7 +21,7 @@ func TestEncryptedReader(t *testing.T) {
 		t.Log(n)
 	}
 	{
-		data, err := olasec.EncryptBytes(raw, "123")
+		data, err := olasec.Encrypt(raw, "123")
 		testx.NoError(t, err)
 		testx.Equal(t, enc.Bytes(), data)
 	}

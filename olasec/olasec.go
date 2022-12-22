@@ -64,7 +64,7 @@ func IsEncryptedFile(filename string) bool {
 	return string(header[:MagicNumberSize]) == MagicNumberV1
 }
 
-func ValidateBytesPassword(data []byte, password string) bool {
+func ValidatePassword(data []byte, password string) bool {
 	if len(data) < HeaderSize {
 		return false
 	}
@@ -86,7 +86,7 @@ func ValidateFilePassword(filename, password string) bool {
 	return getCipherStream(password).ValidatePassword(header[:])
 }
 
-func EncryptBytes(raw []byte, password string) ([]byte, error) {
+func Encrypt(raw []byte, password string) ([]byte, error) {
 	buf := bytes.NewBuffer(nil)
 	w := NewEncryptedWriter(buf, password)
 	_, err := io.Copy(w, bytes.NewReader(raw))
@@ -96,7 +96,7 @@ func EncryptBytes(raw []byte, password string) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func DecryptBytes(data []byte, password string) ([]byte, error) {
+func Decrypt(data []byte, password string) ([]byte, error) {
 	r := NewDecryptedReader(bytes.NewReader(data), password)
 	w := bytes.NewBuffer(nil)
 	_, err := io.Copy(w, r)
@@ -106,12 +106,12 @@ func DecryptBytes(data []byte, password string) ([]byte, error) {
 	return w.Bytes(), nil
 }
 
-func ChangeBytesPassword(data []byte, oldKey, newKey string) ([]byte, error) {
-	raw, err := DecryptBytes(data, oldKey)
+func ReEncrypt(data []byte, oldPassword, newPassword string) ([]byte, error) {
+	raw, err := Decrypt(data, oldPassword)
 	if err != nil {
 		return nil, err
 	}
-	return EncryptBytes(raw, newKey)
+	return Encrypt(raw, newPassword)
 }
 
 func EncryptFile(src SourceFile, dst DestFile, password string) error {
@@ -184,7 +184,7 @@ func DecryptFileChunks(chunks []SourceFile, dst DestFile, password string) error
 	return nil
 }
 
-func ChangeFilePassword(src SourceFile, dst DestFile, srcPassword, dstPassword string) error {
+func ReEncryptFile(src SourceFile, dst DestFile, srcPassword, dstPassword string) error {
 	if !ValidateFilePassword(string(src), srcPassword) {
 		return ErrKey
 	}
