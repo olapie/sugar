@@ -9,49 +9,49 @@ import (
 	"time"
 )
 
-func Equal(t *testing.T, expected, result any) {
+func Equal(t testing.TB, expected, result any) {
 	if reflect.DeepEqual(expected, result) {
 		return
 	}
 	t.Errorf("Expect: %v, got: %v", expected, result)
 }
 
-func NotEqual(t *testing.T, expected, result any) {
+func NotEqual(t testing.TB, expected, result any) {
 	if !reflect.DeepEqual(expected, result) {
 		return
 	}
 	t.FailNow()
 }
 
-func True(t *testing.T, b bool, args ...any) {
+func True(t testing.TB, b bool, args ...any) {
 	if !b {
 		args = append([]any{"Expected true, got false"}, args...)
 		t.Fatal(args...)
 	}
 }
 
-func False(t *testing.T, b bool, args ...any) {
+func False(t testing.TB, b bool, args ...any) {
 	if b {
 		args = append([]any{"Expected false, got true"}, args...)
 		t.Fatal(args...)
 	}
 }
 
-func NoError(t *testing.T, err error, args ...any) {
+func NoError(t testing.TB, err error, args ...any) {
 	if err != nil {
 		args = append([]any{err}, args...)
 		t.Fatal(args...)
 	}
 }
 
-func Error(t *testing.T, err error, args ...any) {
+func Error(t testing.TB, err error, args ...any) {
 	if err == nil {
 		args = append([]any{"Expected error, actually got nil"}, args...)
 		t.Fatal(args...)
 	}
 }
 
-func EmptySlice[E any](t *testing.T, a []E, args ...any) {
+func EmptySlice[E any](t testing.TB, a []E, args ...any) {
 	if len(a) != 0 {
 		msg := fmt.Sprintf("Expect empty, got %d", len(a))
 		args = append([]any{msg}, args...)
@@ -59,7 +59,7 @@ func EmptySlice[E any](t *testing.T, a []E, args ...any) {
 	}
 }
 
-func NotEmptySlice[E any](t *testing.T, a []E, args ...any) {
+func NotEmptySlice[E any](t testing.TB, a []E, args ...any) {
 	if len(a) == 0 {
 		msg := "Expect not empty, got empty"
 		args = append([]any{msg}, args...)
@@ -67,7 +67,7 @@ func NotEmptySlice[E any](t *testing.T, a []E, args ...any) {
 	}
 }
 
-func EmptyMap[K comparable, V any](t *testing.T, m map[K]V, args ...any) {
+func EmptyMap[K comparable, V any](t testing.TB, m map[K]V, args ...any) {
 	if len(m) != 0 {
 		msg := fmt.Sprintf("Expect empty, got %d", len(m))
 		args = append([]any{msg}, args...)
@@ -75,7 +75,7 @@ func EmptyMap[K comparable, V any](t *testing.T, m map[K]V, args ...any) {
 	}
 }
 
-func NotEmptyMap[K comparable, V any](t *testing.T, m map[K]V, args ...any) {
+func NotEmptyMap[K comparable, V any](t testing.TB, m map[K]V, args ...any) {
 	if len(m) == 0 {
 		msg := "Expect not empty, got empty"
 		args = append([]any{msg}, args...)
