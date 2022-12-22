@@ -138,6 +138,7 @@ func (s *KVTable) GetJSON(key string, ptrToObj any) error {
 
 func (s *KVTable) ListAllKeys() ([]string, error) {
 	s.mu.RLock()
+	defer s.mu.RUnlock()
 	rows, err := s.db.Query("SELECT k FROM kv")
 	if err != nil {
 		return nil, err
@@ -152,12 +153,12 @@ func (s *KVTable) ListAllKeys() ([]string, error) {
 		}
 		keys = append(keys, key)
 	}
-	s.mu.RUnlock()
 	return keys, nil
 }
 
 func (s *KVTable) ListKeysWithPrefix(prefix string) ([]string, error) {
 	s.mu.RLock()
+	defer s.mu.RUnlock()
 	rows, err := s.db.Query("SELECT k FROM kv WHERE k LIKE '" + prefix + "%'")
 	if err != nil {
 		return nil, err
@@ -172,21 +173,20 @@ func (s *KVTable) ListKeysWithPrefix(prefix string) ([]string, error) {
 		}
 		keys = append(keys, key)
 	}
-	s.mu.RUnlock()
 	return keys, nil
 }
 
 func (s *KVTable) Delete(key string) error {
-	s.mu.RLock()
+	s.mu.Lock()
 	_, err := s.db.Exec("DELETE FROM kv WHERE k=?", key)
-	s.mu.RUnlock()
+	s.mu.Unlock()
 	return err
 }
 
 func (s *KVTable) DeleteWithPrefix(prefix string) error {
-	s.mu.RLock()
+	s.mu.Lock()
 	_, err := s.db.Exec("DELETE FROM kv WHERE k like '" + prefix + "%'")
-	s.mu.RUnlock()
+	s.mu.Unlock()
 	return err
 }
 
@@ -199,8 +199,13 @@ func (s *KVTable) Exists(key string) (bool, error) {
 }
 
 func (s *KVTable) Close() error {
+	if s.db == nil {
+		return nil
+	}
 	s.mu.Lock()
-	err := s.db.Close()
-	s.mu.Unlock()
-	return err
+	defer s.mu.Unlock()
+	if s.db != nil {
+		return s.db.Close()
+	}
+	return nil
 }
