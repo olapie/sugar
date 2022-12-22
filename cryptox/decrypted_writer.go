@@ -6,15 +6,13 @@ import (
 	"io"
 )
 
-var _ io.WriteCloser = (*DecryptedWriter)(nil)
+var _ io.Writer = (*DecryptedWriter)(nil)
 
 // DecryptedWriter decrypts and writes data into original Writer
 type DecryptedWriter struct {
-	w      io.Writer
-	stream *cipherStream
-	block  [encryptionBlockSize]byte
-	buf    bytes.Buffer
-
+	w               io.Writer
+	stream          *cipherStream
+	buf             bytes.Buffer
 	headerDecrypted bool
 }
 
@@ -23,7 +21,6 @@ func NewDecryptedWriter(w io.Writer, password string) *DecryptedWriter {
 		w:      w,
 		stream: getCipherStream(password),
 	}
-
 	return Writer
 }
 
@@ -33,33 +30,23 @@ func (w *DecryptedWriter) Write(p []byte) (n int, err error) {
 		return 0, err
 	}
 
-	if !w.headerDecrypted && w.buf.Len() >= HeaderSize {
+	if !w.headerDecrypted {
+		if w.buf.Len() < HeaderSize {
+			return len(p), nil
+		}
+
 		w.headerDecrypted = true
 		header := w.buf.Next(HeaderSize)
 		if !w.stream.ValidatePassword(header) {
-			return n, ErrKey
+			return len(p), ErrKey
 		}
 	}
 
-	for w.buf.Len() >= encryptionBlockSize {
-		next := w.buf.Next(encryptionBlockSize)
-		w.stream.XORKeyStream(next, next)
-
-		if _, err := w.w.Write(next); err != nil {
-			return n, fmt.Errorf("cannot write: %w", err)
-		}
+	w.stream.XORKeyStream(w.buf.Bytes(), w.buf.Bytes())
+	n, err = w.w.Write(w.buf.Bytes())
+	w.buf.Reset()
+	if err != nil {
+		return n, fmt.Errorf("cannot write: %w", err)
 	}
-
-	return n, nil
-}
-
-func (w *DecryptedWriter) Close() error {
-	for w.buf.Len() > 0 {
-		next := w.buf.Next(encryptionBlockSize)
-		w.stream.XORKeyStream(next, next)
-		if _, err := w.w.Write(next); err != nil {
-			return fmt.Errorf("cannot write: %w", err)
-		}
-	}
-	return nil
+	return len(p), nil
 }

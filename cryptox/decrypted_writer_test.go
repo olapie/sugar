@@ -20,7 +20,6 @@ func TestDecryptedWriter(t *testing.T) {
 	w := cryptox.NewDecryptedWriter(dec, "123")
 	n, err := io.Copy(w, bytes.NewReader(enc))
 	t.Log(n)
-	w.Close()
 	testx.NoError(t, err)
 	testx.Equal(t, raw, dec.Bytes())
 }

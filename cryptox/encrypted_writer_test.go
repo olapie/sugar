@@ -17,7 +17,6 @@ func TestEncryptedWriter(t *testing.T) {
 	enc := &bytes.Buffer{}
 	w := cryptox.NewEncryptedWriter(enc, "123")
 	n, err := io.Copy(w, bytes.NewReader(raw))
-	w.Close()
 	testx.NoError(t, err)
 	t.Log(n)
 	data, err := cryptox.Encrypt(raw, "123")

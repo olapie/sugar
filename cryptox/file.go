@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-
-	"code.olapie.com/sugar/errorx"
 )
 
 type Source string
@@ -45,7 +43,7 @@ func EncryptFile(dst Destination, src Source, password string) error {
 	defer df.Close()
 	w := NewEncryptedWriter(df, password)
 	_, err = io.Copy(w, sf)
-	return errorx.Or(w.Close(), err)
+	return err
 }
 
 func DecryptFile(dst Destination, src Source, password string) error {
@@ -121,7 +119,7 @@ func ChangeFileKey(dst Destination, src Source, oldKey, newKey string) error {
 	dr := NewDecryptedReader(sf, oldKey)
 	ew := NewEncryptedWriter(df, newKey)
 	_, err = io.Copy(ew, dr)
-	return errorx.Or(ew.Close(), err)
+	return err
 }
 
 type fileEncrypterImpl struct {

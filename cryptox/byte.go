@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"crypto/cipher"
 	"io"
-
-	"code.olapie.com/sugar/errorx"
 )
 
 type Encrypter interface {
@@ -32,7 +30,6 @@ func Encrypt(raw []byte, password string) ([]byte, error) {
 	buf := bytes.NewBuffer(nil)
 	w := NewEncryptedWriter(buf, password)
 	_, err := io.Copy(w, bytes.NewReader(raw))
-	err = errorx.Or(w.Close(), err)
 	if err != nil {
 		return nil, err
 	}

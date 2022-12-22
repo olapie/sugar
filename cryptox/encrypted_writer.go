@@ -6,15 +6,13 @@ import (
 	"io"
 )
 
-var _ io.WriteCloser = (*EncryptedWriter)(nil)
+var _ io.Writer = (*EncryptedWriter)(nil)
 
 // EncryptedWriter encrypts and write data into original writer
 type EncryptedWriter struct {
-	w      io.Writer
-	stream *cipherStream
-	block  [encryptionBlockSize]byte
-	buf    bytes.Buffer
-
+	w             io.Writer
+	stream        *cipherStream
+	buf           bytes.Buffer
 	headerWritten bool
 }
 
@@ -40,30 +38,12 @@ func (w *EncryptedWriter) Write(p []byte) (n int, err error) {
 		w.headerWritten = true
 	}
 
-	n, err = w.buf.Write(p)
+	w.buf.Write(p)
+	w.stream.XORKeyStream(w.buf.Bytes(), w.buf.Bytes())
+	n, err = w.w.Write(w.buf.Bytes())
+	w.buf.Reset()
 	if err != nil {
-		return 0, err
+		return n, fmt.Errorf("cannot write: %w", err)
 	}
-
-	for w.buf.Len() >= encryptionBlockSize {
-		next := w.buf.Next(encryptionBlockSize)
-		w.stream.XORKeyStream(next, next)
-
-		if _, err := w.w.Write(next); err != nil {
-			return n, fmt.Errorf("cannot write: %w", err)
-		}
-	}
-
 	return n, nil
-}
-
-func (w *EncryptedWriter) Close() error {
-	for w.buf.Len() > 0 {
-		next := w.buf.Next(encryptionBlockSize)
-		w.stream.XORKeyStream(next, next)
-		if _, err := w.w.Write(next); err != nil {
-			return fmt.Errorf("cannot write: %w", err)
-		}
-	}
-	return nil
 }

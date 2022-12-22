@@ -11,7 +11,6 @@ import (
 const MagicNumber = "\xFE\xF1\xFD\xEA"
 const MagicNumberSize = len(MagicNumber)
 const HeaderSize = MagicNumberSize + KeyHashSize
-const encryptionBlockSize = 1 << 20
 
 func IsEncrypted[S string | []byte](s S) bool {
 	switch v := any(s).(type) {
