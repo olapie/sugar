@@ -31,7 +31,9 @@ func setupLocalTable(t testing.TB) *sqlitex.LocalTable[*localTableItem] {
 			db.Close()
 			os.Remove(filename)
 		})
-	return sqlitex.NewLocalTable[*localTableItem](db, uuid.NewString(), nil)
+	return sqlitex.NewLocalTable[*localTableItem](db, func(opts *sqlitex.LocalTableOptions[*localTableItem]) {
+		opts.Password = testx.RandomString(10)
+	})
 }
 
 func newLocalTableItem() *localTableItem {
