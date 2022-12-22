@@ -1,4 +1,4 @@
-package cryptox
+package olasec
 
 import (
 	"io"
@@ -19,7 +19,7 @@ func NewEncryptedReader(r io.Reader, password string) *EncryptedReader {
 		stream: getCipherStream(password),
 	}
 
-	reader.header = []byte(MagicNumber)
+	reader.header = []byte(MagicNumberV1)
 	reader.header = append(reader.header, reader.stream.keyHash[:]...)
 	return reader
 }

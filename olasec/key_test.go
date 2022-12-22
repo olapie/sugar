@@ -1,4 +1,4 @@
-package cryptox
+package olasec
 
 import (
 	"bytes"
@@ -10,7 +10,7 @@ import (
 func TestDeriveKey(t *testing.T) {
 	key := DeriveKey("123", []byte("abc"))
 	t.Log(key)
-	hash := key.Hash()
+	hash := hashKey(key)
 	t.Log(hash)
 }
 

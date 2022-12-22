@@ -1,4 +1,4 @@
-package cryptox_test
+package olasec_test
 
 import (
 	"crypto/ecdsa"
@@ -6,19 +6,19 @@ import (
 	"testing"
 	"time"
 
-	"code.olapie.com/sugar/cryptox"
 	"code.olapie.com/sugar/hashing"
+	"code.olapie.com/sugar/olasec"
 	"code.olapie.com/sugar/testx"
 )
 
 func TestEncodePrivateKey(t *testing.T) {
-	pk, err := cryptox.GeneratePrivateKey()
+	pk, err := olasec.GeneratePrivateKey()
 	testx.NoError(t, err)
-	data, err := cryptox.EncodePrivateKey(pk, "hello")
+	data, err := olasec.EncodePrivateKey(pk, "hello")
 	testx.NoError(t, err)
-	_, err = cryptox.DecodePrivateKey(data, "hi")
+	_, err = olasec.DecodePrivateKey(data, "hi")
 	testx.Error(t, err)
-	pk2, err := cryptox.DecodePrivateKey(data, "hello")
+	pk2, err := olasec.DecodePrivateKey(data, "hello")
 	testx.NoError(t, err)
 	digest := []byte(hashing.SHA1(time.Now().String()))
 	sign1, err := ecdsa.SignASN1(rand.Reader, pk, digest[:])
@@ -37,11 +37,11 @@ func TestEncodePrivateKey(t *testing.T) {
 }
 
 func TestEncodePublicKey(t *testing.T) {
-	pk, err := cryptox.GeneratePrivateKey()
+	pk, err := olasec.GeneratePrivateKey()
 	testx.NoError(t, err)
-	data, err := cryptox.EncodePublicKey(&pk.PublicKey)
+	data, err := olasec.EncodePublicKey(&pk.PublicKey)
 	testx.NoError(t, err)
-	pub, err := cryptox.DecodePublicKey(data)
+	pub, err := olasec.DecodePublicKey(data)
 	testx.NoError(t, err)
 	digest := []byte(hashing.SHA1(time.Now().String()))
 	sign, err := ecdsa.SignASN1(rand.Reader, pk, digest[:])

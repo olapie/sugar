@@ -1,4 +1,4 @@
-package cryptox
+package olasec
 
 import (
 	"crypto/ecdsa"
@@ -40,7 +40,7 @@ func EncodePrivateKey[K *ecdsa.PrivateKey](k K, passphrase string) ([]byte, erro
 		return nil, err
 	}
 
-	return Encrypt(data, passphrase)
+	return EncryptBytes(data, passphrase)
 }
 
 func MustEncodePrivateKey[K *ecdsa.PrivateKey](k K, passphrase string) []byte {
@@ -56,7 +56,7 @@ func DecodePrivateKey[K *ecdsa.PrivateKey](data []byte, passphrase string) (K, e
 	if size < 0 {
 		return nil, fmt.Errorf("invalid data")
 	}
-	raw, err := Decrypt(data, passphrase)
+	raw, err := DecryptBytes(data, passphrase)
 	if err != nil {
 		return nil, err
 	}

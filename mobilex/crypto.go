@@ -1,23 +1,23 @@
 package mobilex
 
-import "code.olapie.com/sugar/cryptox"
+import "code.olapie.com/sugar/olasec"
 
 func Encrypt(data []byte, passphrase string) []byte {
-	content, _ := cryptox.Encrypt(data, passphrase)
+	content, _ := olasec.EncryptBytes(data, passphrase)
 	return content
 }
 
 func Decrypt(data []byte, passphrase string) []byte {
-	content, _ := cryptox.Decrypt(data, passphrase)
+	content, _ := olasec.EncryptBytes(data, passphrase)
 	return content
 }
 
-func EncryptFile(dst, src, passphrase string) bool {
-	err := cryptox.EncryptFile(cryptox.Destination(dst), cryptox.Source(src), passphrase)
+func EncryptFile(src, dst, passphrase string) bool {
+	err := olasec.EncryptFile(olasec.SF(src), olasec.DF(dst), passphrase)
 	return err == nil
 }
 
-func DecryptFile(dst, src, passphrase string) bool {
-	err := cryptox.DecryptFile(cryptox.Destination(dst), cryptox.Source(src), passphrase)
+func DecryptFile(src, dst, passphrase string) bool {
+	err := olasec.DecryptFile(olasec.SF(src), olasec.DF(dst), passphrase)
 	return err == nil
 }

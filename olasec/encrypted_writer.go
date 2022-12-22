@@ -1,4 +1,4 @@
-package cryptox
+package olasec
 
 import (
 	"bytes"
@@ -17,30 +17,28 @@ type EncryptedWriter struct {
 }
 
 func NewEncryptedWriter(w io.Writer, password string) *EncryptedWriter {
-	Writer := &EncryptedWriter{
+	return &EncryptedWriter{
 		w:      w,
 		stream: getCipherStream(password),
 	}
-
-	return Writer
 }
 
-func (w *EncryptedWriter) Write(p []byte) (n int, err error) {
+func (w *EncryptedWriter) Write(p []byte) (int, error) {
 	if !w.headerWritten {
-		nWrite, err := w.w.Write([]byte(MagicNumber))
+		_, err := w.w.Write([]byte(MagicNumberV1))
 		if err != nil {
-			return nWrite, err
+			return 0, err
 		}
-		nWrite, err = w.w.Write(w.stream.keyHash[:])
+		_, err = w.w.Write(w.stream.keyHash[:])
 		if err != nil {
-			return nWrite + MagicNumberSize, err
+			return 0, err
 		}
 		w.headerWritten = true
 	}
 
 	w.buf.Write(p)
 	w.stream.XORKeyStream(w.buf.Bytes(), w.buf.Bytes())
-	n, err = w.w.Write(w.buf.Bytes())
+	n, err := w.w.Write(w.buf.Bytes())
 	w.buf.Reset()
 	if err != nil {
 		return n, fmt.Errorf("cannot write: %w", err)

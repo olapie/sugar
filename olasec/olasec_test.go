@@ -1,6 +1,7 @@
-package cryptox_test
+package olasec_test
 
 import (
+	"code.olapie.com/sugar/olasec"
 	"crypto/rand"
 	"io"
 	"os"
@@ -10,9 +11,30 @@ import (
 
 	"code.olapie.com/sugar/hashing"
 	"code.olapie.com/sugar/testx"
-
-	"code.olapie.com/sugar/cryptox"
 )
+
+func TestEncryptBytes(t *testing.T) {
+	password := hashing.SHA1(time.Now().String())
+	testEncryptBytes(t, 1<<4+9, password)
+	testEncryptBytes(t, 1<<24, password)
+}
+
+func testEncryptBytes(t *testing.T, size int, password string) {
+	raw := make([]byte, size)
+	_, err := io.ReadFull(rand.Reader, raw[:])
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	enc, err := olasec.EncryptBytes(raw[:], password)
+	t.Log(enc[:30])
+	testx.NoError(t, err)
+	testx.True(t, olasec.IsEncrypted(enc))
+	dec, err := olasec.DecryptBytes(enc, password)
+	testx.NoError(t, err)
+	testx.False(t, olasec.IsEncrypted(dec), dec[:olasec.HeaderSize])
+	testx.Equal(t, raw, dec)
+}
 
 func TestEncryptFile(t *testing.T) {
 	err := os.MkdirAll("testdata", 0755)
@@ -64,12 +86,12 @@ func testEncryptFile(t *testing.T, rawFilename string, password string) {
 		os.RemoveAll(decFilename)
 		os.RemoveAll(encFilename)
 	})
-	err := cryptox.EncryptFile(cryptox.Destination(encFilename), cryptox.Source(rawFilename), password)
+	err := olasec.EncryptFile(olasec.SF(rawFilename), olasec.DF(encFilename), password)
 	testx.NoError(t, err)
 
-	testx.True(t, cryptox.IsEncrypted(encFilename))
-	testx.False(t, cryptox.IsEncrypted(rawFilename))
-	err = cryptox.DecryptFile(cryptox.Destination(decFilename), cryptox.Source(encFilename), password)
+	testx.True(t, olasec.IsEncryptedFile(encFilename))
+	testx.False(t, olasec.IsEncryptedFile(rawFilename))
+	err = olasec.DecryptFile(olasec.SF(encFilename), olasec.DF(decFilename), password)
 	testx.NoError(t, err)
 	raw, err := os.ReadFile(rawFilename)
 	testx.NoError(t, err)
@@ -81,4 +103,7 @@ func testEncryptFile(t *testing.T, rawFilename string, password string) {
 	dec, err := os.ReadFile(decFilename)
 	testx.NoError(t, err)
 	testx.Equal(t, raw, dec)
+
+	valid := olasec.ValidateFilePassword(encFilename, password)
+	testx.True(t, valid)
 }

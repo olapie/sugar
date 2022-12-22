@@ -9,7 +9,6 @@ import (
 	"syscall"
 	"time"
 
-	"code.olapie.com/sugar/cryptox"
 	"code.olapie.com/sugar/must"
 	"golang.org/x/crypto/ssh/terminal"
 )
@@ -20,15 +19,15 @@ func main() {
 		fmt.Println("Password is too short")
 		return
 	}
-	pk := must.Get(cryptox.GeneratePrivateKey())
-	pri := must.Get(cryptox.EncodePrivateKey(pk, pass))
-	pub := must.Get(cryptox.EncodePublicKey(&pk.PublicKey))
+	pk := must.Get(olasec.GeneratePrivateKey())
+	pri := must.Get(olasec.EncodePrivateKey(pk, pass))
+	pub := must.Get(olasec.EncodePublicKey(&pk.PublicKey))
 	name := time.Now().Format("20060102")
 	must.NoError(os.WriteFile(name+"-key.png", pri, 0644))
 	must.NoError(os.WriteFile(name+"-pub.png", pub, 0644))
 
-	pubKey := must.Get(cryptox.DecodePublicKey(pub))
-	priKey := must.Get(cryptox.DecodePrivateKey(pri, pass))
+	pubKey := must.Get(olasec.DecodePublicKey(pub))
+	priKey := must.Get(olasec.DecodePrivateKey(pri, pass))
 
 	// Test
 	hash := sha256.Sum256([]byte("message: hello"))

@@ -3,9 +3,9 @@ package sqlitex
 import (
 	"bytes"
 	"code.olapie.com/sugar/bytex"
-	"code.olapie.com/sugar/cryptox"
 	"code.olapie.com/sugar/errorx"
 	"code.olapie.com/sugar/must"
+	"code.olapie.com/sugar/olasec"
 	"code.olapie.com/sugar/slicing"
 	"code.olapie.com/sugar/timing"
 	"context"
@@ -15,21 +15,28 @@ import (
 	"fmt"
 )
 
-type LocalTable[R any] struct {
-	db       *sql.DB
-	password string
-	clock    timing.Clock
+type LocalTableOptions[R any] struct {
+	Clock         timing.Clock
+	MarshalFunc   func(r R) ([]byte, error)
+	UnmarshalFunc func(data []byte, r *R) error
+	Password      string
 }
 
-func NewLocalTable[R any](db *sql.DB, password string, clock timing.Clock) *LocalTable[R] {
-	if clock == nil {
-		clock = timing.LocalClock{}
-	}
+type LocalTable[R any] struct {
+	db       *sql.DB
+	Password string
+	LocalTableOptions[R]
+}
 
+func NewLocalTable[R any](db *sql.DB, optFns ...func(*LocalTableOptions[R])) *LocalTable[R] {
 	t := &LocalTable[R]{
-		db:       db,
-		password: password,
-		clock:    clock,
+		db: db,
+	}
+	for _, fn := range optFns {
+		fn(&t.LocalTableOptions)
+	}
+	if t.Clock == nil {
+		t.Clock = timing.LocalClock{}
 	}
 
 	// table remote_record: localID, recordData, updateTime, synced
@@ -109,7 +116,7 @@ func (t *LocalTable[R]) SaveLocal(ctx context.Context, localID string, record R)
 	}
 
 	_, err = t.db.ExecContext(ctx, `REPLACE INTO local_record(local_id, data, update_time) VALUES(?,?,?)`,
-		localID, data, t.clock.Now().Unix())
+		localID, data, t.Clock.Now().Unix())
 	if err != nil {
 		return fmt.Errorf("replace into remote_record: %s,%w", localID, err)
 	}
@@ -136,7 +143,7 @@ func (t *LocalTable[R]) Delete(ctx context.Context, localID string) error {
 		return fmt.Errorf("query remote_record: %s, %w", localID, err)
 	default:
 		_, err := t.db.ExecContext(ctx, `REPLACE INTO deleted_record(local_id, data, delete_time) VALUES (?,?,?)`,
-			localID, remoteData, t.clock.Now().Unix())
+			localID, remoteData, t.Clock.Now().Unix())
 		if err != nil {
 			return fmt.Errorf("replace into deleted_record: %s, %w", localID, err)
 		}
@@ -155,7 +162,7 @@ func (t *LocalTable[R]) Update(ctx context.Context, localID string, record R) er
 		return fmt.Errorf("encode: %s, %w", localID, err)
 	}
 	_, err = t.db.ExecContext(ctx, `REPLACE INTO remote_record(local_id, data, update_time, synced) VALUES(?,?,?,1)`,
-		localID, data, t.clock.Now().Unix())
+		localID, data, t.Clock.Now().Unix())
 	if err != nil {
 		return fmt.Errorf("replace into remote_record: %s,%w", localID, err)
 	}
@@ -245,7 +252,6 @@ func (t *LocalTable[R]) Get(ctx context.Context, localID string) (record R, err 
 }
 
 func (t *LocalTable[R]) scan(rows *sql.Rows, tableName string) ([]R, error) {
-
 	var records []R
 	for rows.Next() {
 		var localID string
@@ -269,37 +275,42 @@ func (t *LocalTable[R]) scan(rows *sql.Rows, tableName string) ([]R, error) {
 }
 
 func (t *LocalTable[R]) encode(localID string, r R) (data []byte, err error) {
-	data, err = bytex.Marshal(r)
-	if err != nil {
-		data, err = json.Marshal(r)
+	if t.MarshalFunc != nil {
+		data, err = t.MarshalFunc(r)
+	} else {
+		data, err = bytex.Marshal(r)
 		if err != nil {
-			return
+			data, err = json.Marshal(r)
 		}
 	}
 
-	if t.password == "" {
+	if err != nil {
 		return
 	}
 
-	return cryptox.Encrypt(data, t.password+localID)
+	if t.Password == "" {
+		return
+	}
+
+	return olasec.EncryptBytes(data, t.Password+localID)
 }
 
 func (t *LocalTable[R]) decode(localID string, data []byte) (record R, err error) {
-	if t.password != "" {
-
-		data, err = cryptox.Decrypt(data, t.password+localID)
-
+	if t.Password != "" {
+		data, err = olasec.DecryptBytes(data, t.Password+localID)
 		if err != nil {
 			return
 		}
 	}
 
+	if t.UnmarshalFunc != nil {
+		err := t.UnmarshalFunc(data, &record)
+		return record, err
+	}
+
 	err = bytex.Unmarshal(data, &record)
-
 	if err != nil {
-
 		err = json.Unmarshal(data, &record)
-
 	}
 	return
 }

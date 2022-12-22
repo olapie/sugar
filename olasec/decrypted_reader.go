@@ -1,4 +1,4 @@
-package cryptox
+package olasec
 
 import (
 	"io"
@@ -14,12 +14,10 @@ type DecryptedReader struct {
 }
 
 func NewDecryptedReader(r io.Reader, password string) *DecryptedReader {
-	reader := &DecryptedReader{
+	return &DecryptedReader{
 		r:      r,
 		stream: getCipherStream(password),
 	}
-
-	return reader
 }
 
 func (r *DecryptedReader) Read(p []byte) (n int, err error) {
@@ -30,7 +28,6 @@ func (r *DecryptedReader) Read(p []byte) (n int, err error) {
 		if err != nil {
 			return 0, err
 		}
-
 		if !r.stream.ValidatePassword(header[:]) {
 			return 0, ErrKey
 		}
