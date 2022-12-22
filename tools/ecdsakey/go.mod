@@ -3,7 +3,7 @@ module code.olapie.com/sugar/tool/ecdsakey
 go 1.19
 
 require (
-	code.olapie.com/sugar v1.2.2
+	code.olapie.com/sugar v1.6.1
 	golang.org/x/crypto v0.3.0
 )
 

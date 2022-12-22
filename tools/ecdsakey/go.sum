@@ -1,8 +1,11 @@
-code.olapie.com/sugar v1.2.2 h1:1VV2FauprnKZZxuEMq15kO6TMez8/Wv8O5ENnLx/thg=
-code.olapie.com/sugar v1.2.2/go.mod h1:NU2czcjoll975JkT5JmgD/mWVkXlX9Z1JPx3Ji0dB5Y=
+code.olapie.com/sugar v1.6.1 h1:p4lJIHl4nHc0nHWhAD7JEnqa2nTwKH+/KNas8xOH3n8=
+code.olapie.com/sugar v1.6.1/go.mod h1:kB2NS/g7qMk8Qi7KifGKomGwMC+qPVV0Cm5pOJGkFJI=
+github.com/golang/geo v0.0.0-20210211234256-740aa86cb551 h1:gtexQ/VGyN+VVFRXSFiguSNcXmS6rkKT+X7FdIrTtfo=
 golang.org/x/crypto v0.3.0 h1:a06MkbcxBrEFc0w0QIZWXrH/9cCX6KJyWbBOIwAn+7A=
 golang.org/x/crypto v0.3.0/go.mod h1:hebNnKkNXi2UzZN1eVRvBB7co0a+JxK6XbPiWVs/3J4=
 golang.org/x/sys v0.2.0 h1:ljd4t30dBnAvMZaQCevtY0xLLD0A+bRZXbgLMLU1F/A=
 golang.org/x/sys v0.2.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/term v0.2.0 h1:z85xZCsEl7bi/KwbNADeBYoOP0++7W1ipu+aGnpwzRM=
 golang.org/x/term v0.2.0/go.mod h1:TVmDHMZPmdnySmBfhjOoOdhjzdE1h4u1VwSiw2l1Nuc=
+golang.org/x/text v0.5.0 h1:OLmvp0KP+FVG99Ct/qFiL/Fhk4zp4QQnZ7b2U+5piUM=
+google.golang.org/protobuf v1.28.1 h1:d0NfwRgPtno5B1Wa6L2DAG+KivqkdutMf1UhdNx175w=
