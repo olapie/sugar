@@ -12,7 +12,7 @@ var _ io.Reader = (*DecryptedReader)(nil)
 // DecryptedReader reads and decrypt data from original reader
 type DecryptedReader struct {
 	r      io.Reader
-	key    Key
+	stream *cipherStream
 	block  [encryptionBlockSize]byte
 	srcBuf bytes.Buffer
 	dstBuf bytes.Buffer
@@ -21,10 +21,10 @@ type DecryptedReader struct {
 	readHeader bool
 }
 
-func NewDecryptedReader[K string | Key](r io.Reader, k K) *DecryptedReader {
+func NewDecryptedReader(r io.Reader, password string) *DecryptedReader {
 	reader := &DecryptedReader{
-		r:   r,
-		key: getKey(k),
+		r:      r,
+		stream: getCipherStream(password),
 	}
 
 	return reader
@@ -39,19 +39,24 @@ func (r *DecryptedReader) Read(p []byte) (n int, err error) {
 			return 0, err
 		}
 
-		if !ValidateKey(header[:], r.key) {
+		if !r.stream.ValidatePassword(header[:]) {
 			return 0, ErrKey
 		}
+
 	}
 	size := len(p)
 	for n < size {
+
 		nRead, err := r.dstBuf.Read(p[n:])
+
 		n += nRead
 		if n >= size {
+
 			return n, err
 		}
 
 		if r.eof {
+
 			return n, io.EOF
 		}
 
@@ -59,9 +64,11 @@ func (r *DecryptedReader) Read(p []byte) (n int, err error) {
 		if err != nil {
 			r.eof = errors.Is(err, io.EOF)
 			if !r.eof {
+
 				return n, err
 			}
 		}
+
 	}
 
 	return n, nil
@@ -76,9 +83,8 @@ func (r *DecryptedReader) readBlock() error {
 	if readErr == io.EOF {
 		for r.srcBuf.Len() > 0 {
 			next := r.srcBuf.Next(encryptionBlockSize)
-			if err := r.key.AES(next, next); err != nil {
-				return fmt.Errorf("aes: %w", err)
-			}
+
+			r.stream.XORKeyStream(next, next)
 
 			if _, err := r.dstBuf.Write(next); err != nil {
 				return fmt.Errorf("cannot write: %w", err)
@@ -87,9 +93,8 @@ func (r *DecryptedReader) readBlock() error {
 	} else {
 		for r.srcBuf.Len() >= encryptionBlockSize {
 			next := r.srcBuf.Next(encryptionBlockSize)
-			if err := r.key.AES(next, next); err != nil {
-				return fmt.Errorf("aes: %w", err)
-			}
+
+			r.stream.XORKeyStream(next, next)
 
 			if _, err := r.dstBuf.Write(next); err != nil {
 				return fmt.Errorf("cannot write: %w", err)

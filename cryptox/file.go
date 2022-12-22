@@ -19,19 +19,19 @@ type FileDecrypter interface {
 	Decrypt(dst Destination, src Source) error
 }
 
-func MakeFileEncrypter[K string | Key](k K) FileEncrypter {
+func MakeFileEncrypter(password string) FileEncrypter {
 	return &fileEncrypterImpl{
-		key: getKey(k),
+		password: password,
 	}
 }
 
-func MakeFileDecrypter[K string | Key](k K) FileDecrypter {
+func MakeFileDecrypter(password string) FileDecrypter {
 	return &fileDecrypterImpl{
-		key: getKey(k),
+		password: password,
 	}
 }
 
-func EncryptFile[K string | Key](dst Destination, src Source, k K) error {
+func EncryptFile(dst Destination, src Source, password string) error {
 	sf, err := os.Open(string(src))
 	if err != nil {
 		return fmt.Errorf("cannot open file %s: %w", src, err)
@@ -43,18 +43,18 @@ func EncryptFile[K string | Key](dst Destination, src Source, k K) error {
 		return fmt.Errorf("cannot open file %s: %w", dst, err)
 	}
 	defer df.Close()
-	w := NewEncryptedWriter(df, k)
+	w := NewEncryptedWriter(df, password)
 	_, err = io.Copy(w, sf)
 	return errorx.Or(w.Close(), err)
 }
 
-func DecryptFile[K string | Key](dst Destination, src Source, k K) error {
+func DecryptFile(dst Destination, src Source, password string) error {
 	sf, err := os.Open(string(src))
 	if err != nil {
 		return fmt.Errorf("cannot open file %s: %w", src, err)
 	}
 	defer sf.Close()
-	r := NewDecryptedReader(sf, k)
+	r := NewDecryptedReader(sf, password)
 	df, err := os.OpenFile(string(dst), os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return fmt.Errorf("cannot open file %s: %w", dst, err)
@@ -64,12 +64,12 @@ func DecryptFile[K string | Key](dst Destination, src Source, k K) error {
 	return err
 }
 
-func DecryptFileChunks[K string | Key](dst Destination, chunks []Source, k K) error {
+func DecryptFileChunks(dst Destination, chunks []Source, password string) error {
 	if len(chunks) == 0 {
 		return nil
 	}
 
-	err := DecryptFile(dst, chunks[0], k)
+	err := DecryptFile(dst, chunks[0], password)
 	if err != nil {
 		return fmt.Errorf("cryptox.DecryptFile:%s, %w", chunks[0], err)
 	}
@@ -90,7 +90,7 @@ func DecryptFileChunks[K string | Key](dst Destination, chunks []Source, k K) er
 		if err != nil {
 			return fmt.Errorf("os.Open:%s, %w", chunk, err)
 		}
-		r := NewDecryptedReader(sf, k)
+		r := NewDecryptedReader(sf, password)
 		_, err = io.Copy(df, r)
 		sf.Close()
 		if err != nil {
@@ -101,8 +101,8 @@ func DecryptFileChunks[K string | Key](dst Destination, chunks []Source, k K) er
 	return nil
 }
 
-func ChangeFileKey[K string | Key](dst Destination, src Source, oldKey, newKey K) error {
-	if !ValidateKey(string(src), getKey(oldKey)) {
+func ChangeFileKey(dst Destination, src Source, oldKey, newKey string) error {
+	if !ValidateKey(string(src), oldKey) {
 		return ErrKey
 	}
 
@@ -125,17 +125,17 @@ func ChangeFileKey[K string | Key](dst Destination, src Source, oldKey, newKey K
 }
 
 type fileEncrypterImpl struct {
-	key Key
+	password string
 }
 
 func (e *fileEncrypterImpl) Encrypt(dst Destination, src Source) error {
-	return EncryptFile(dst, src, e.key)
+	return EncryptFile(dst, src, e.password)
 }
 
 type fileDecrypterImpl struct {
-	key Key
+	password string
 }
 
 func (e *fileDecrypterImpl) Decrypt(dst Destination, src Source) error {
-	return DecryptFile(dst, src, e.key)
+	return DecryptFile(dst, src, e.password)
 }

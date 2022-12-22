@@ -2,34 +2,35 @@ package cryptox
 
 import (
 	"bytes"
+	"crypto/cipher"
 	"io"
 
 	"code.olapie.com/sugar/errorx"
 )
 
 type Encrypter interface {
-	Encrypt(raw []byte) ([]byte, error)
+	Encrypt(raw []byte) []byte
 }
 
 type Decrypter interface {
-	Decrypt(raw []byte) ([]byte, error)
+	Decrypt(raw []byte) []byte
 }
 
-func MakeEncrypter[K string | Key](k K) Encrypter {
+func MakeEncrypter(password string) Encrypter {
 	return &encrypterImpl{
-		key: getKey(k),
+		stream: getCipherStream(password),
 	}
 }
 
-func MakeDecrypter[K string | Key](k K) Decrypter {
+func MakeDecrypter(password string) Decrypter {
 	return &decrypterImpl{
-		key: getKey(k),
+		stream: getCipherStream(password),
 	}
 }
 
-func Encrypt[K string | Key](raw []byte, k K) ([]byte, error) {
+func Encrypt(raw []byte, password string) ([]byte, error) {
 	buf := bytes.NewBuffer(nil)
-	w := NewEncryptedWriter(buf, k)
+	w := NewEncryptedWriter(buf, password)
 	_, err := io.Copy(w, bytes.NewReader(raw))
 	err = errorx.Or(w.Close(), err)
 	if err != nil {
@@ -38,8 +39,8 @@ func Encrypt[K string | Key](raw []byte, k K) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func Decrypt[K string | Key](data []byte, k K) ([]byte, error) {
-	r := NewDecryptedReader(bytes.NewReader(data), k)
+func Decrypt(data []byte, password string) ([]byte, error) {
+	r := NewDecryptedReader(bytes.NewReader(data), password)
 	w := bytes.NewBuffer(nil)
 	_, err := io.Copy(w, r)
 	if err != nil {
@@ -48,7 +49,7 @@ func Decrypt[K string | Key](data []byte, k K) ([]byte, error) {
 	return w.Bytes(), nil
 }
 
-func ChangeKey[K string | Key](data []byte, oldKey, newKey K) ([]byte, error) {
+func ChangeKey(data []byte, oldKey, newKey string) ([]byte, error) {
 	raw, err := Decrypt(data, oldKey)
 	if err != nil {
 		return nil, err
@@ -58,17 +59,21 @@ func ChangeKey[K string | Key](data []byte, oldKey, newKey K) ([]byte, error) {
 }
 
 type encrypterImpl struct {
-	key Key
+	stream cipher.Stream
 }
 
-func (e *encrypterImpl) Encrypt(raw []byte) ([]byte, error) {
-	return Encrypt(raw, e.key)
+func (e *encrypterImpl) Encrypt(raw []byte) []byte {
+	dst := make([]byte, len(raw))
+	e.stream.XORKeyStream(dst, raw)
+	return dst
 }
 
 type decrypterImpl struct {
-	key Key
+	stream cipher.Stream
 }
 
-func (e *decrypterImpl) Decrypt(raw []byte) ([]byte, error) {
-	return Decrypt(raw, e.key)
+func (e *decrypterImpl) Decrypt(raw []byte) []byte {
+	dst := make([]byte, len(raw))
+	e.stream.XORKeyStream(dst, raw)
+	return dst
 }

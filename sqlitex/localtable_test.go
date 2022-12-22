@@ -31,7 +31,7 @@ func setupLocalTable(t testing.TB) *sqlitex.LocalTable[*localTableItem] {
 			db.Close()
 			os.Remove(filename)
 		})
-	return sqlitex.NewLocalTable[*localTableItem](db, "", nil)
+	return sqlitex.NewLocalTable[*localTableItem](db, uuid.NewString(), nil)
 }
 
 func newLocalTableItem() *localTableItem {
@@ -214,5 +214,61 @@ func BenchmarkLocalTable_Get(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		table.Get(ctx, ids[i%len(ids)])
+	}
+}
+
+func BenchmarkLocalTable_ListLocals(b *testing.B) {
+	ctx := context.TODO()
+	table := setupLocalTable(b)
+	for i := 0; i < 100; i++ {
+		item := newLocalTableItem()
+		localID := uuid.NewString()
+		err := table.SaveLocal(ctx, localID, item)
+		testx.NoError(b, err)
+	}
+
+	var ids []string
+	for i := 0; i < 100; i++ {
+		item := newLocalTableItem()
+		localID := uuid.NewString()
+		err := table.SaveRemote(ctx, localID, item, time.Now().Unix())
+		testx.NoError(b, err)
+		ids = append(ids, localID)
+	}
+	for i := 0; i < 30; i++ {
+		err := table.Delete(ctx, uuid.NewString())
+		testx.NoError(b, err)
+	}
+
+	for i := 0; i < b.N; i++ {
+		table.ListLocals(ctx)
+	}
+}
+
+func BenchmarkLocalTable_ListRemotes(b *testing.B) {
+	ctx := context.TODO()
+	table := setupLocalTable(b)
+	for i := 0; i < 100; i++ {
+		item := newLocalTableItem()
+		localID := uuid.NewString()
+		err := table.SaveLocal(ctx, localID, item)
+		testx.NoError(b, err)
+	}
+
+	var ids []string
+	for i := 0; i < 100; i++ {
+		item := newLocalTableItem()
+		localID := uuid.NewString()
+		err := table.SaveRemote(ctx, localID, item, time.Now().Unix())
+		testx.NoError(b, err)
+		ids = append(ids, localID)
+	}
+	for i := 0; i < 30; i++ {
+		err := table.Delete(ctx, uuid.NewString())
+		testx.NoError(b, err)
+	}
+
+	for i := 0; i < b.N; i++ {
+		table.ListRemotes(ctx)
 	}
 }

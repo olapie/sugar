@@ -28,8 +28,6 @@ func TestEncryptFile(t *testing.T) {
 	})
 
 	password := hashing.SHA1(time.Now().String())
-	salt := []byte(hashing.SHA1(time.Now().String()))
-	key := cryptox.DeriveKey(password, salt)
 	var raw [32]byte
 	n, err := io.ReadFull(rand.Reader, raw[:])
 	testx.NoError(t, err)
@@ -43,7 +41,7 @@ func TestEncryptFile(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Log(rawFilename)
-	testEncryptFile(t, rawFilename, key)
+	testEncryptFile(t, rawFilename, password)
 
 	var large [32 * 1024 * 1024]byte
 	n, err = io.ReadFull(rand.Reader, large[:])
@@ -56,22 +54,22 @@ func TestEncryptFile(t *testing.T) {
 	f.Close()
 	testx.NoError(t, err)
 
-	testEncryptFile(t, largeFilename, key)
+	testEncryptFile(t, largeFilename, password)
 }
 
-func testEncryptFile(t *testing.T, rawFilename string, key cryptox.Key) {
+func testEncryptFile(t *testing.T, rawFilename string, password string) {
 	encFilename := rawFilename + ".enc" + filepath.Ext(rawFilename)
 	decFilename := rawFilename + ".dec" + filepath.Ext(rawFilename)
 	t.Cleanup(func() {
 		os.RemoveAll(decFilename)
 		os.RemoveAll(encFilename)
 	})
-	err := cryptox.EncryptFile(cryptox.Destination(encFilename), cryptox.Source(rawFilename), key)
+	err := cryptox.EncryptFile(cryptox.Destination(encFilename), cryptox.Source(rawFilename), password)
 	testx.NoError(t, err)
 
 	testx.True(t, cryptox.IsEncrypted(encFilename))
 	testx.False(t, cryptox.IsEncrypted(rawFilename))
-	err = cryptox.DecryptFile(cryptox.Destination(decFilename), cryptox.Source(encFilename), key)
+	err = cryptox.DecryptFile(cryptox.Destination(decFilename), cryptox.Source(encFilename), password)
 	testx.NoError(t, err)
 	raw, err := os.ReadFile(rawFilename)
 	testx.NoError(t, err)

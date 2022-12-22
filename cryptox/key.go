@@ -2,6 +2,7 @@ package cryptox
 
 import (
 	"bytes"
+	"code.olapie.com/sugar/errorx"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/md5"
@@ -10,8 +11,6 @@ import (
 	"io"
 	"os"
 	"strings"
-
-	"code.olapie.com/sugar/errorx"
 
 	"golang.org/x/crypto/argon2"
 )
@@ -25,20 +24,21 @@ const ErrKey errorx.String = "invalid key"
 
 type Key [KeySize]byte
 
-func (k *Key) AES(dst, src []byte) error {
-	block, err := aes.NewCipher((*k)[:KeySize/2])
-	if err != nil {
-		return err
-	}
-	stream := cipher.NewCTR(block, (*k)[KeySize/2:])
-	stream.XORKeyStream(dst, src)
-	return nil
-}
+//
+//func (k *Key) AES(dst, src []byte) error {
+//	block, err := aes.NewCipher((*k)[:KeySize/2])
+//	if err != nil {
+//		return err
+//	}
+//	stream := cipher.NewCTR(block, (*k)[KeySize/2:])
+//	stream.XORKeyStream(dst, src)
+//	return nil
+//}
 
 func (k *Key) Hash() [KeyHashSize]byte {
 	md5Sum := md5.Sum((*k)[:])
 	sha1Sum := sha1.Sum((*k)[:])
-	hash := argon2.IDKey(sha1Sum[:], md5Sum[:], 1, 64*1024, 4, KeyHashSize)
+	hash := argon2.IDKey(sha1Sum[:], md5Sum[:], 1, 64, 4, KeyHashSize)
 	var res KeyHash
 	copy(res[:], hash)
 	return res
@@ -48,11 +48,14 @@ func (k *Key) Hash() [KeyHashSize]byte {
 type KeyHash [KeyHashSize]byte
 
 func DeriveKey(password string, salt []byte) Key {
+
 	if len(salt) == 0 {
 		md5Sum := md5.Sum([]byte(strings.Repeat("ola"+password, 3)))
 		salt = md5Sum[:]
+
 	}
 	k := argon2.IDKey([]byte(password), salt, 1, 64, 1, KeySize)
+
 	if len(k) != 32 {
 		panic(fmt.Errorf("key length is %d instead of %d", len(k), KeySize))
 	}
@@ -61,8 +64,7 @@ func DeriveKey(password string, salt []byte) Key {
 	return res
 }
 
-func ValidateKey[S string | []byte, K string | Key](s S, k K) bool {
-	var header [HeaderSize]byte
+func ValidateKey[S string | []byte](s S, password string) bool {
 	switch v := any(s).(type) {
 	case string:
 		sf, err := os.Open(v)
@@ -71,37 +73,48 @@ func ValidateKey[S string | []byte, K string | Key](s S, k K) bool {
 		}
 		defer sf.Close()
 
+		var header [HeaderSize]byte
 		_, err = io.ReadFull(sf, header[:])
+
 		if err != nil {
 			return false
 		}
+		return getCipherStream(password).ValidatePassword(header[:])
 	case []byte:
-		if len(v) < HeaderSize {
-			return false
-		}
-		copy(header[:], v[:HeaderSize])
+		return getCipherStream(password).ValidatePassword(v)
 	default:
 		return false
 	}
+}
+
+func getCipherStream(password string) *cipherStream {
+	key := DeriveKey(password, nil)
+	block, err := aes.NewCipher((key)[:KeySize/2])
+	if err != nil {
+		panic(err)
+	}
+	stream := cipher.NewCTR(block, (key)[KeySize/2:])
+	return &cipherStream{
+		keyHash: key.Hash(),
+		Stream:  stream,
+	}
+}
+
+type cipherStream struct {
+	keyHash KeyHash
+	cipher.Stream
+}
+
+func (i *cipherStream) ValidatePassword(data []byte) bool {
+	var header [HeaderSize]byte
+	if len(data) < HeaderSize {
+		return false
+	}
+
+	copy(header[:], data[:HeaderSize])
 
 	if string(header[:MagicNumberSize]) != MagicNumber {
 		return false
 	}
-
-	key := getKey(k)
-	keyHash := key.Hash()
-	return bytes.Compare(header[MagicNumberSize:], keyHash[:]) == 0
-}
-
-func getKey[K string | Key](k K) Key {
-	var key Key
-	switch kv := any(k).(type) {
-	case Key:
-		key = kv
-	case string:
-		key = DeriveKey(kv, nil)
-	default:
-		panic("unsupported key type")
-	}
-	return key
+	return bytes.Compare(header[MagicNumberSize:], i.keyHash[:]) == 0
 }

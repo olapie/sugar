@@ -10,18 +10,18 @@ var _ io.WriteCloser = (*EncryptedWriter)(nil)
 
 // EncryptedWriter encrypts and write data into original writer
 type EncryptedWriter struct {
-	w     io.Writer
-	key   Key
-	block [encryptionBlockSize]byte
-	buf   bytes.Buffer
+	w      io.Writer
+	stream *cipherStream
+	block  [encryptionBlockSize]byte
+	buf    bytes.Buffer
 
 	headerWritten bool
 }
 
-func NewEncryptedWriter[K string | Key](w io.Writer, k K) *EncryptedWriter {
+func NewEncryptedWriter(w io.Writer, password string) *EncryptedWriter {
 	Writer := &EncryptedWriter{
-		w:   w,
-		key: getKey(k),
+		w:      w,
+		stream: getCipherStream(password),
 	}
 
 	return Writer
@@ -33,8 +33,7 @@ func (w *EncryptedWriter) Write(p []byte) (n int, err error) {
 		if err != nil {
 			return nWrite, err
 		}
-		hash := w.key.Hash()
-		nWrite, err = w.w.Write(hash[:])
+		nWrite, err = w.w.Write(w.stream.keyHash[:])
 		if err != nil {
 			return nWrite + MagicNumberSize, err
 		}
@@ -48,9 +47,7 @@ func (w *EncryptedWriter) Write(p []byte) (n int, err error) {
 
 	for w.buf.Len() >= encryptionBlockSize {
 		next := w.buf.Next(encryptionBlockSize)
-		if err := w.key.AES(next, next); err != nil {
-			return n, fmt.Errorf("aes: %w", err)
-		}
+		w.stream.XORKeyStream(next, next)
 
 		if _, err := w.w.Write(next); err != nil {
 			return n, fmt.Errorf("cannot write: %w", err)
@@ -63,10 +60,7 @@ func (w *EncryptedWriter) Write(p []byte) (n int, err error) {
 func (w *EncryptedWriter) Close() error {
 	for w.buf.Len() > 0 {
 		next := w.buf.Next(encryptionBlockSize)
-		if err := w.key.AES(next, next); err != nil {
-			return fmt.Errorf("aes: %w", err)
-		}
-
+		w.stream.XORKeyStream(next, next)
 		if _, err := w.w.Write(next); err != nil {
 			return fmt.Errorf("cannot write: %w", err)
 		}

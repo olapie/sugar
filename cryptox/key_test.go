@@ -1,44 +1,32 @@
-package cryptox_test
+package cryptox
 
 import (
-	"bytes"
-	"testing"
-	"time"
-
-	"code.olapie.com/sugar/cryptox"
-	"code.olapie.com/sugar/hashing"
 	"code.olapie.com/sugar/slicing"
+	"code.olapie.com/sugar/testx"
+	"testing"
 )
 
 func TestDeriveKey(t *testing.T) {
-	key := cryptox.DeriveKey("123", []byte("abc"))
+	key := DeriveKey("123", []byte("abc"))
 	t.Log(key)
 	hash := key.Hash()
 	t.Log(hash)
 }
 
 func TestAES(t *testing.T) {
-	raw := []byte(hashing.SHA1(time.Now().String()))
-	password := hashing.SHA1(time.Now().String())
-	salt := []byte(hashing.SHA1(time.Now().String()))
-	key := cryptox.DeriveKey(password, salt)
+	raw := testx.RandomBytes(8)
+	password := testx.RandomString(8)
+	stream1 := getCipherStream(password)
+	stream2 := getCipherStream(password)
 
 	data := slicing.Clone(raw)
-	if bytes.Compare(raw, data) != 0 {
-		t.FailNow()
-	}
+	testx.Equal(t, raw, data)
 
-	err := key.AES(data, data)
-	if err != nil {
-		t.Fatal(err)
-	}
+	// encrypt
+	stream1.XORKeyStream(data, data)
+	testx.NotEqual(t, raw, data)
 
-	if bytes.Compare(raw, data) == 0 {
-		t.FailNow()
-	}
-
-	err = key.AES(data, data)
-	if bytes.Compare(raw, data) != 0 {
-		t.FailNow()
-	}
+	// decrypt
+	stream2.XORKeyStream(data, data)
+	testx.Equal(t, raw, data)
 }

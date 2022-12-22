@@ -13,7 +13,10 @@ func Equal(t testing.TB, expected, result any) {
 	if reflect.DeepEqual(expected, result) {
 		return
 	}
-	t.Errorf("Expect: %v, got: %v", expected, result)
+	t.Error("Expected:")
+	t.Error(expected)
+	t.Error("Got:")
+	t.Error(result)
 }
 
 func NotEqual(t testing.TB, expected, result any) {

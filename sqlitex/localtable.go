@@ -2,18 +2,17 @@ package sqlitex
 
 import (
 	"bytes"
+	"code.olapie.com/sugar/bytex"
+	"code.olapie.com/sugar/cryptox"
+	"code.olapie.com/sugar/errorx"
+	"code.olapie.com/sugar/must"
 	"code.olapie.com/sugar/slicing"
+	"code.olapie.com/sugar/timing"
 	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
-
-	"code.olapie.com/sugar/bytex"
-	"code.olapie.com/sugar/cryptox"
-	"code.olapie.com/sugar/errorx"
-	"code.olapie.com/sugar/must"
-	"code.olapie.com/sugar/timing"
 )
 
 type LocalTable[R any] struct {
@@ -246,11 +245,14 @@ func (t *LocalTable[R]) Get(ctx context.Context, localID string) (record R, err 
 }
 
 func (t *LocalTable[R]) scan(rows *sql.Rows, tableName string) ([]R, error) {
+
 	var records []R
 	for rows.Next() {
 		var localID string
 		var data []byte
+
 		err := rows.Scan(&localID, &data)
+
 		if err != nil {
 			return nil, fmt.Errorf("scan %s: %w", tableName, err)
 		}
@@ -259,8 +261,10 @@ func (t *LocalTable[R]) scan(rows *sql.Rows, tableName string) ([]R, error) {
 		if err != nil {
 			return nil, fmt.Errorf("decode: %w", err)
 		}
+
 		records = append(records, r)
 	}
+
 	return records, nil
 }
 
@@ -282,15 +286,20 @@ func (t *LocalTable[R]) encode(localID string, r R) (data []byte, err error) {
 
 func (t *LocalTable[R]) decode(localID string, data []byte) (record R, err error) {
 	if t.password != "" {
+
 		data, err = cryptox.Decrypt(data, t.password+localID)
+
 		if err != nil {
 			return
 		}
 	}
 
 	err = bytex.Unmarshal(data, &record)
+
 	if err != nil {
+
 		err = json.Unmarshal(data, &record)
+
 	}
 	return
 }

@@ -12,23 +12,21 @@ var _ io.Reader = (*EncryptedReader)(nil)
 // EncryptedReader reads and encrypts data from original reader
 type EncryptedReader struct {
 	r      io.Reader
-	key    Key
+	stream *cipherStream
 	block  [encryptionBlockSize]byte
 	srcBuf bytes.Buffer
 	dstBuf bytes.Buffer
 	eof    bool
 }
 
-func NewEncryptedReader[K string | Key](r io.Reader, k K) *EncryptedReader {
-	key := getKey(k)
+func NewEncryptedReader(r io.Reader, password string) *EncryptedReader {
 	reader := &EncryptedReader{
-		r:   r,
-		key: key,
+		r:      r,
+		stream: getCipherStream(password),
 	}
 
 	reader.dstBuf.Write([]byte(MagicNumber))
-	hash := key.Hash()
-	reader.dstBuf.Write(hash[:])
+	reader.dstBuf.Write(reader.stream.keyHash[:])
 	return reader
 }
 
@@ -77,9 +75,7 @@ func (r *EncryptedReader) readBlock() error {
 func (r *EncryptedReader) encrypt(all bool) error {
 	for r.srcBuf.Len() >= encryptionBlockSize {
 		next := r.srcBuf.Next(encryptionBlockSize)
-		if err := r.key.AES(next, next); err != nil {
-			return fmt.Errorf("aes: %w", err)
-		}
+		r.stream.XORKeyStream(next, next)
 
 		if _, err := r.dstBuf.Write(next); err != nil {
 			return fmt.Errorf("cannot write: %w", err)
@@ -89,10 +85,7 @@ func (r *EncryptedReader) encrypt(all bool) error {
 	if all {
 		for r.srcBuf.Len() > 0 {
 			next := r.srcBuf.Next(encryptionBlockSize)
-			if err := r.key.AES(next, next); err != nil {
-				return fmt.Errorf("aes: %w", err)
-			}
-
+			r.stream.XORKeyStream(next, next)
 			if _, err := r.dstBuf.Write(next); err != nil {
 				return fmt.Errorf("cannot write: %w", err)
 			}
