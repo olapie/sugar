@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"code.olapie.com/sugar/must"
+	"code.olapie.com/sugar/olasec"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
