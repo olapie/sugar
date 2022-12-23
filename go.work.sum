@@ -1,1 +1,2 @@
-code.olapie.com/sugar v1.6.4/go.mod h1:kB2NS/g7qMk8Qi7KifGKomGwMC+qPVV0Cm5pOJGkFJI=
+golang.org/x/net v0.3.0/go.mod h1:MBQ8lrhLObU/6UmLb4fmbmk5OcyYmqtbGd/9yIeKjEE=
+golang.org/x/term v0.3.0/go.mod h1:q750SLmJuPmVoN1blW3UFBPREJfb1KmY3vwxfr+nFDA=

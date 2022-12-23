@@ -13,18 +13,30 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	lru "github.com/hashicorp/golang-lru/v2"
+)
+
+const (
+	defaultLocalTableCacheSize = 1024
+	minimumLocalTableCacheSize = 256
 )
 
 type LocalTableOptions[R any] struct {
-	Clock         timing.Clock
-	MarshalFunc   func(r R) ([]byte, error)
-	UnmarshalFunc func(data []byte, r *R) error
-	Password      string
+	Clock             timing.Clock
+	MarshalFunc       func(r R) ([]byte, error)
+	UnmarshalFunc     func(data []byte, r *R) error
+	Password          string
+	LocalCacheSize    int
+	RemoteCacheSize   int
+	DeletionCacheSize int
 }
 
 type LocalTable[R any] struct {
-	db       *sql.DB
-	Password string
+	db            *sql.DB
+	localCache    *lru.Cache[string, R]
+	remoteCache   *lru.Cache[string, R]
+	deletionCache *lru.Cache[string, bool]
+	Password      string
 	LocalTableOptions[R]
 }
 
@@ -32,12 +44,29 @@ func NewLocalTable[R any](db *sql.DB, optFns ...func(*LocalTableOptions[R])) *Lo
 	t := &LocalTable[R]{
 		db: db,
 	}
+	t.LocalCacheSize = defaultLocalTableCacheSize
+	t.RemoteCacheSize = defaultLocalTableCacheSize
+	t.DeletionCacheSize = defaultLocalTableCacheSize
 	for _, fn := range optFns {
 		fn(&t.LocalTableOptions)
 	}
 	if t.Clock == nil {
 		t.Clock = timing.LocalClock{}
 	}
+
+	if t.LocalCacheSize < minimumLocalTableCacheSize {
+		t.LocalCacheSize = minimumLocalTableCacheSize
+	}
+	if t.RemoteCacheSize < minimumLocalTableCacheSize {
+		t.RemoteCacheSize = minimumLocalTableCacheSize
+	}
+	if t.DeletionCacheSize < minimumLocalTableCacheSize {
+		t.DeletionCacheSize = minimumLocalTableCacheSize
+	}
+
+	t.localCache = must.Get(lru.New[string, R](t.LocalCacheSize))
+	t.remoteCache = must.Get(lru.New[string, R](t.RemoteCacheSize))
+	t.deletionCache = must.Get(lru.New[string, bool](t.DeletionCacheSize))
 
 	// table remote_record: localID, recordData, updateTime, synced
 	// table local_record: localID, recordData, createTime, updateTime
@@ -68,10 +97,12 @@ func (t *LocalTable[R]) SaveRemote(ctx context.Context, localID string, record R
 	// check delete_record, if it's deleted, then ignore
 	// if updateTime < remote_record.updateTime, then ignore
 	// save: localID, recordData, udpateTime(new), synced(true)
-	var exists bool
-	err := t.db.QueryRowContext(ctx, `SELECT EXISTS(SELECT * FROM deleted_record WHERE local_id=?)`, localID).Scan(&exists)
-	if err != nil {
-		return fmt.Errorf("query deleted_record: %w", err)
+	exists, _ := t.deletionCache.Get(localID)
+	if !exists {
+		err := t.db.QueryRowContext(ctx, `SELECT EXISTS(SELECT * FROM deleted_record WHERE local_id=?)`, localID).Scan(&exists)
+		if err != nil {
+			return fmt.Errorf("query deleted_record: %w", err)
+		}
 	}
 
 	if exists {
@@ -79,7 +110,7 @@ func (t *LocalTable[R]) SaveRemote(ctx context.Context, localID string, record R
 		return nil
 	}
 
-	err = t.db.QueryRowContext(ctx, `SELECT EXISTS(SELECT * FROM remote_record WHERE local_id=? AND update_time>?)`,
+	err := t.db.QueryRowContext(ctx, `SELECT EXISTS(SELECT * FROM remote_record WHERE local_id=? AND update_time>?)`,
 		localID, updateTime).Scan(&exists)
 	if err != nil {
 		return fmt.Errorf("query remote_record: %w", err)
@@ -99,11 +130,13 @@ func (t *LocalTable[R]) SaveRemote(ctx context.Context, localID string, record R
 	if err != nil {
 		return fmt.Errorf("replace into remote_record: %s,%w", localID, err)
 	}
+	t.remoteCache.Add(localID, record)
 
 	_, err = t.db.ExecContext(ctx, `DELETE FROM local_record WHERE local_id=? AND update_time<=?`, localID, updateTime)
 	if err != nil {
 		return fmt.Errorf("delete from local_record: %s, %w", localID, err)
 	}
+	t.localCache.Remove(localID)
 
 	return nil
 }
@@ -120,7 +153,7 @@ func (t *LocalTable[R]) SaveLocal(ctx context.Context, localID string, record R)
 	if err != nil {
 		return fmt.Errorf("replace into remote_record: %s,%w", localID, err)
 	}
-
+	t.localCache.Add(localID, record)
 	return nil
 }
 
@@ -132,6 +165,7 @@ func (t *LocalTable[R]) Delete(ctx context.Context, localID string) error {
 	if err != nil {
 		return fmt.Errorf("delete from local_record: %s, %w", localID, err)
 	}
+	t.localCache.Remove(localID)
 
 	var remoteData []byte
 	err = t.db.QueryRowContext(ctx, `SELECT data FROM remote_record WHERE local_id=?`, localID).Scan(&remoteData)
@@ -146,12 +180,15 @@ func (t *LocalTable[R]) Delete(ctx context.Context, localID string) error {
 			localID, remoteData, t.Clock.Now().Unix())
 		if err != nil {
 			return fmt.Errorf("replace into deleted_record: %s, %w", localID, err)
+		} else {
+			t.deletionCache.Add(localID, true)
 		}
 
 		_, err = t.db.ExecContext(ctx, `DELETE FROM remote_record WHERE local_id=?`, localID)
 		if err != nil {
 			return fmt.Errorf("delete from remote_record: %s, %w", localID, err)
 		}
+		t.remoteCache.Remove(localID)
 	}
 	return nil
 }
@@ -166,6 +203,7 @@ func (t *LocalTable[R]) Update(ctx context.Context, localID string, record R) er
 	if err != nil {
 		return fmt.Errorf("replace into remote_record: %s,%w", localID, err)
 	}
+	t.remoteCache.Add(localID, record)
 	return nil
 }
 
@@ -223,10 +261,22 @@ func (t *LocalTable[R]) RemoveDeletions(ctx context.Context, localIDs ...string)
 	if err != nil {
 		return fmt.Errorf("remove deleted_records: %w", err)
 	}
+	for _, id := range localIDs {
+		t.localCache.Remove(id)
+	}
 	return nil
 }
 
 func (t *LocalTable[R]) Get(ctx context.Context, localID string) (record R, err error) {
+	var ok bool
+	record, ok = t.remoteCache.Get(localID)
+	if ok {
+		return record, nil
+	}
+	record, ok = t.localCache.Get(localID)
+	if ok {
+		return record, nil
+	}
 	var data []byte
 	err = t.db.QueryRowContext(ctx, `SELECT data FROM remote_record WHERE local_id=?`, localID).Scan(&data)
 	switch {
@@ -235,7 +285,12 @@ func (t *LocalTable[R]) Get(ctx context.Context, localID string) (record R, err 
 	case err != nil:
 		return record, fmt.Errorf("query remote_record: %w", err)
 	default:
-		return t.decode(localID, data)
+		record, err = t.decode(localID, data)
+		if err != nil {
+			return record, err
+		}
+		t.remoteCache.Add(localID, record)
+		return record, nil
 	}
 
 	err = t.db.QueryRowContext(ctx, `SELECT data FROM local_record WHERE local_id=?`, localID).Scan(&data)
@@ -245,22 +300,40 @@ func (t *LocalTable[R]) Get(ctx context.Context, localID string) (record R, err 
 	case err != nil:
 		return record, fmt.Errorf("query local_record: %w", err)
 	default:
-		return t.decode(localID, data)
+		record, err = t.decode(localID, data)
+		if err != nil {
+			return record, err
+		}
+		t.localCache.Add(localID, record)
+		return record, nil
 	}
 
 	return record, errorx.NotExist
 }
 
 func (t *LocalTable[R]) scan(rows *sql.Rows, tableName string) ([]R, error) {
+	var cacheGetter func(string) (R, bool)
+	if tableName == "local_record" {
+		cacheGetter = t.localCache.Get
+	} else if tableName == "remote_record" {
+		cacheGetter = t.remoteCache.Get
+	}
+
 	var records []R
 	for rows.Next() {
 		var localID string
 		var data []byte
 
 		err := rows.Scan(&localID, &data)
-
 		if err != nil {
 			return nil, fmt.Errorf("scan %s: %w", tableName, err)
+		}
+
+		if cacheGetter != nil {
+			if r, ok := cacheGetter(localID); ok {
+				records = append(records, r)
+				continue
+			}
 		}
 
 		r, err := t.decode(localID, data)
