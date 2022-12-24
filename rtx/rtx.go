@@ -98,6 +98,14 @@ func Addr[T any](v T) *T {
 	return &v
 }
 
+func AddrList[T any](a []T) []*T {
+	l := make([]*T, len(a))
+	for i := range a {
+		l[i] = &a[i]
+	}
+	return l
+}
+
 func Dereference[T any](p *T) T {
 	if p != nil {
 		return *p

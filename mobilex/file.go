@@ -34,7 +34,7 @@ func (d *DirInfo) MustMakeDirs() {
 	}
 }
 
-func (d *DirInfo) Normalize()  {
+func (d *DirInfo) Normalize() {
 	filePrefix := "file:"
 	a := []*string{&d.Document, &d.Cache, &d.Temporary}
 	for _, p := range a {
