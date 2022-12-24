@@ -130,7 +130,7 @@ func IndexOf[E comparable](a []E, v E) int {
 	return -1
 }
 
-func Filter[E comparable](a []E, filter func(e E) bool) []E {
+func Filter[E any](a []E, filter func(e E) bool) []E {
 	res := make([]E, 0, len(a)/2)
 	for _, v := range a {
 		if filter(v) {
