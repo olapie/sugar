@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type DirInfo struct {
@@ -30,6 +31,18 @@ func (d *DirInfo) MustMakeDirs() {
 		MustMkdir(d.Temporary)
 	} else {
 		fmt.Println("Temporary directory is not specified")
+	}
+}
+
+func (d *DirInfo) Normalize()  {
+	filePrefix := "file:"
+	a := []*string{&d.Document, &d.Cache, &d.Temporary}
+	for _, p := range a {
+		if strings.HasPrefix(*p, filePrefix) {
+			*p = (*p)[len(filePrefix):]
+			*p = strings.Replace(*p, "///", "/", -1)
+			*p = strings.Replace(*p, "//", "/", -1)
+		}
 	}
 }
 
