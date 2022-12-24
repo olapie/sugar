@@ -37,36 +37,36 @@ type LocalTable[R any] struct {
 	remoteCache   *lru.Cache[string, R]
 	deletionCache *lru.Cache[string, bool]
 	Password      string
-	LocalTableOptions[R]
+	options       LocalTableOptions[R]
 }
 
 func NewLocalTable[R any](db *sql.DB, optFns ...func(*LocalTableOptions[R])) *LocalTable[R] {
 	t := &LocalTable[R]{
 		db: db,
 	}
-	t.LocalCacheSize = defaultLocalTableCacheSize
-	t.RemoteCacheSize = defaultLocalTableCacheSize
-	t.DeletionCacheSize = defaultLocalTableCacheSize
+	t.options.LocalCacheSize = defaultLocalTableCacheSize
+	t.options.RemoteCacheSize = defaultLocalTableCacheSize
+	t.options.DeletionCacheSize = defaultLocalTableCacheSize
 	for _, fn := range optFns {
-		fn(&t.LocalTableOptions)
+		fn(&t.options)
 	}
-	if t.Clock == nil {
-		t.Clock = timing.LocalClock{}
-	}
-
-	if t.LocalCacheSize < minimumLocalTableCacheSize {
-		t.LocalCacheSize = minimumLocalTableCacheSize
-	}
-	if t.RemoteCacheSize < minimumLocalTableCacheSize {
-		t.RemoteCacheSize = minimumLocalTableCacheSize
-	}
-	if t.DeletionCacheSize < minimumLocalTableCacheSize {
-		t.DeletionCacheSize = minimumLocalTableCacheSize
+	if t.options.Clock == nil {
+		t.options.Clock = timing.LocalClock{}
 	}
 
-	t.localCache = must.Get(lru.New[string, R](t.LocalCacheSize))
-	t.remoteCache = must.Get(lru.New[string, R](t.RemoteCacheSize))
-	t.deletionCache = must.Get(lru.New[string, bool](t.DeletionCacheSize))
+	if t.options.LocalCacheSize < minimumLocalTableCacheSize {
+		t.options.LocalCacheSize = minimumLocalTableCacheSize
+	}
+	if t.options.RemoteCacheSize < minimumLocalTableCacheSize {
+		t.options.RemoteCacheSize = minimumLocalTableCacheSize
+	}
+	if t.options.DeletionCacheSize < minimumLocalTableCacheSize {
+		t.options.DeletionCacheSize = minimumLocalTableCacheSize
+	}
+
+	t.localCache = must.Get(lru.New[string, R](t.options.LocalCacheSize))
+	t.remoteCache = must.Get(lru.New[string, R](t.options.RemoteCacheSize))
+	t.deletionCache = must.Get(lru.New[string, bool](t.options.DeletionCacheSize))
 
 	// table remote_record: localID, recordData, updateTime, synced
 	// table local_record: localID, recordData, createTime, updateTime
@@ -149,7 +149,7 @@ func (t *LocalTable[R]) SaveLocal(ctx context.Context, localID string, record R)
 	}
 
 	_, err = t.db.ExecContext(ctx, `REPLACE INTO local_record(local_id, data, update_time) VALUES(?,?,?)`,
-		localID, data, t.Clock.Now().Unix())
+		localID, data, t.options.Clock.Now().Unix())
 	if err != nil {
 		return fmt.Errorf("replace into remote_record: %s,%w", localID, err)
 	}
@@ -177,7 +177,7 @@ func (t *LocalTable[R]) Delete(ctx context.Context, localID string) error {
 		return fmt.Errorf("query remote_record: %s, %w", localID, err)
 	default:
 		_, err := t.db.ExecContext(ctx, `REPLACE INTO deleted_record(local_id, data, delete_time) VALUES (?,?,?)`,
-			localID, remoteData, t.Clock.Now().Unix())
+			localID, remoteData, t.options.Clock.Now().Unix())
 		if err != nil {
 			return fmt.Errorf("replace into deleted_record: %s, %w", localID, err)
 		} else {
@@ -199,7 +199,7 @@ func (t *LocalTable[R]) Update(ctx context.Context, localID string, record R) er
 		return fmt.Errorf("encode: %s, %w", localID, err)
 	}
 	_, err = t.db.ExecContext(ctx, `REPLACE INTO remote_record(local_id, data, update_time, synced) VALUES(?,?,?,1)`,
-		localID, data, t.Clock.Now().Unix())
+		localID, data, t.options.Clock.Now().Unix())
 	if err != nil {
 		return fmt.Errorf("replace into remote_record: %s,%w", localID, err)
 	}
@@ -348,8 +348,8 @@ func (t *LocalTable[R]) scan(rows *sql.Rows, tableName string) ([]R, error) {
 }
 
 func (t *LocalTable[R]) encode(localID string, r R) (data []byte, err error) {
-	if t.MarshalFunc != nil {
-		data, err = t.MarshalFunc(r)
+	if t.options.MarshalFunc != nil {
+		data, err = t.options.MarshalFunc(r)
 	} else {
 		data, err = bytex.Marshal(r)
 		if err != nil {
@@ -361,23 +361,23 @@ func (t *LocalTable[R]) encode(localID string, r R) (data []byte, err error) {
 		return
 	}
 
-	if t.Password == "" {
+	if t.options.Password == "" {
 		return
 	}
 
-	return olasec.Encrypt(data, t.Password+localID)
+	return olasec.Encrypt(data, t.options.Password+localID)
 }
 
 func (t *LocalTable[R]) decode(localID string, data []byte) (record R, err error) {
-	if t.Password != "" {
-		data, err = olasec.Decrypt(data, t.Password+localID)
+	if t.options.Password != "" {
+		data, err = olasec.Decrypt(data, t.options.Password+localID)
 		if err != nil {
 			return
 		}
 	}
 
-	if t.UnmarshalFunc != nil {
-		err := t.UnmarshalFunc(data, &record)
+	if t.options.UnmarshalFunc != nil {
+		err := t.options.UnmarshalFunc(data, &record)
 		return record, err
 	}
 

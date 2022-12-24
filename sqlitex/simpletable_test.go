@@ -11,13 +11,13 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func createTable[K sqlitex.IntOrString, M sqlitex.PrimaryKey[K]](t *testing.T, name string, newModel func() M) *sqlitex.SimpleTable[K, M] {
+func createTable[K sqlitex.SimpleKey, R sqlitex.SimpleTableRecord[K]](t *testing.T, name string) *sqlitex.SimpleTable[K, R] {
 	db, err := sql.Open("sqlite3", "file::memory:")
 	if err != nil {
 		t.Error(err)
 	}
 
-	tbl, err := sqlitex.NewSimpleTable[K](db, name, newModel)
+	tbl, err := sqlitex.NewSimpleTable[K, R](db, name)
 	testx.NoError(t, err)
 	return tbl
 }
@@ -59,7 +59,7 @@ func newStringItem() *StringItem {
 }
 
 func TestIntTable(t *testing.T) {
-	tbl := createTable[int64](t, "tbl"+types.RandomID().Pretty(), func() *IntItem { return new(IntItem) })
+	tbl := createTable[int64, *IntItem](t, "tbl"+types.RandomID().Pretty())
 	var items []*IntItem
 	item := newIntItem()
 	items = append(items, item)
@@ -99,7 +99,7 @@ func TestIntTable(t *testing.T) {
 }
 
 func TestStringTable(t *testing.T) {
-	tbl := createTable[string](t, "tbl"+types.RandomID().Pretty(), func() *StringItem { return new(StringItem) })
+	tbl := createTable[string, *StringItem](t, "tbl"+types.RandomID().Pretty())
 	var items []*StringItem
 	item := newStringItem()
 	items = append(items, item)

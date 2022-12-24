@@ -2,10 +2,10 @@ package sqlitex
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
-	"errors"
 
 	"code.olapie.com/sugar/must"
 )
@@ -19,12 +19,11 @@ func Open(fileName string) (*sql.DB, error) {
 				return nil, err
 			}
 		} else {
-			return nil,err
+			return nil, err
 		}
 	} else if !fi.IsDir() {
 		return nil, errors.New(dirname + " is not a directory")
 	}
-
 
 	_, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
