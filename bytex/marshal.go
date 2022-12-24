@@ -12,11 +12,12 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-func Marshal(i any) (data []byte, err error) {
+func Marshal(i any) ([]byte, error) {
 	if data, ok := i.([]byte); ok {
 		return data, nil
 	}
 
+	var data []byte
 	srcType := reflect.TypeOf(i)
 	dstType := reflect.TypeOf(data)
 	if srcType.AssignableTo(dstType) {
@@ -45,7 +46,7 @@ func Marshal(i any) (data []byte, err error) {
 		return m.GobEncode()
 	}
 	if m, ok := i.(proto.Message); ok {
-		data, err = proto.Marshal(m)
+		return proto.Marshal(m)
 	}
 
 	return nil, errors.New("cannot convert ")

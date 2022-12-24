@@ -22,7 +22,6 @@ type SimpleTableOptions[K SimpleKey, R SimpleTableRecord[K]] struct {
 	MarshalFunc   func(r R) ([]byte, error)
 	UnmarshalFunc func(data []byte, r *R) error
 	Password      string
-	CacheSize     int
 }
 
 type SimpleKey interface {
