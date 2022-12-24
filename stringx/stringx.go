@@ -7,12 +7,10 @@ import (
 	"regexp"
 	"strings"
 
+	"code.olapie.com/sugar/conv"
+	"code.olapie.com/sugar/rtx"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
-
-	"code.olapie.com/sugar/conv"
-
-	"code.olapie.com/sugar/rtx"
 )
 
 func Join(a any, sep string) (string, error) {
@@ -28,7 +26,7 @@ func TrimSpace[T ~string](s T) T {
 }
 
 var whitespaceRegexp = regexp.MustCompile(`[ \t\n\r]+`)
-var bulletRegexp = regexp.MustCompile(`[\d\.\*]*`)
+var bulletRegexp = regexp.MustCompile(`[\d.*]*`)
 
 // Squish returns the string
 // first removing all whitespace on both ends of the string,
