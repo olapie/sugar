@@ -3,15 +3,13 @@ package sqlitex
 import (
 	"code.olapie.com/sugar/bytex"
 	"code.olapie.com/sugar/olasec"
+	"code.olapie.com/sugar/sqlx"
+	"code.olapie.com/sugar/timing"
 	"database/sql"
 	"encoding/json"
 	"fmt"
 	"reflect"
 	"sync"
-	"time"
-
-	"code.olapie.com/sugar/sqlx"
-	"code.olapie.com/sugar/timing"
 )
 
 type SimpleTableRecord[T SimpleKey] interface {
@@ -47,10 +45,9 @@ type SimpleTable[K SimpleKey, R SimpleTableRecord[K]] struct {
 		deleteGreaterThan *sql.Stmt
 		deleteLessThan    *sql.Stmt
 	}
-	Now timing.Clock
 }
 
-func NewSimpleTable[K SimpleKey, R SimpleTableRecord[K]](db *sql.DB, name string) (*SimpleTable[K, R], error) {
+func NewSimpleTable[K SimpleKey, R SimpleTableRecord[K]](db *sql.DB, name string, optFns ...func(options *SimpleTableOptions[K, R])) (*SimpleTable[K, R], error) {
 	var zero K
 	var typ string
 	if reflect.ValueOf(zero).Kind() == reflect.String {
@@ -74,6 +71,14 @@ updated_at BIGINT
 		db:   db,
 	}
 
+	for _, fn := range optFns {
+		fn(&t.options)
+	}
+
+	if t.options.Clock == nil {
+		t.options.Clock = timing.LocalClock{}
+	}
+
 	t.stmts.insert = sqlx.MustPrepare(db, `INSERT INTO %s(id,data,updated_at) VALUES(?,?,?)`, name)
 	t.stmts.update = sqlx.MustPrepare(db, `UPDATE %s SET data=?,updated_at=? WHERE id=?`, name)
 	t.stmts.save = sqlx.MustPrepare(db, `REPLACE INTO %s(id,data,updated_at) VALUES(?,?,?)`, name)
@@ -87,37 +92,30 @@ updated_at BIGINT
 	return t, nil
 }
 
-func (t *SimpleTable[K, R]) now() int64 {
-	if t.Now != nil {
-		return t.Now.Now().Unix()
-	}
-	return time.Now().Unix()
-}
-
 func (t *SimpleTable[K, R]) Insert(v SimpleTableRecord[K]) error {
 	t.mu.Lock()
-	_, err := t.stmts.insert.Exec(v.PrimaryKey(), sqlx.JSON(v), t.now())
+	_, err := t.stmts.insert.Exec(v.PrimaryKey(), sqlx.JSON(v), t.options.Clock.Now())
 	t.mu.Unlock()
 	return err
 }
 
 func (t *SimpleTable[K, R]) Update(v SimpleTableRecord[K]) error {
 	t.mu.Lock()
-	_, err := t.stmts.update.Exec(v.PrimaryKey(), sqlx.JSON(v), t.now())
+	_, err := t.stmts.update.Exec(v.PrimaryKey(), sqlx.JSON(v), t.options.Clock.Now())
 	t.mu.Unlock()
 	return err
 }
 
 func (t *SimpleTable[K, R]) Save(v SimpleTableRecord[K]) error {
 	t.mu.Lock()
-	_, err := t.stmts.save.Exec(v.PrimaryKey(), sqlx.JSON(v), t.now())
+	_, err := t.stmts.save.Exec(v.PrimaryKey(), sqlx.JSON(v), t.options.Clock.Now())
 	t.mu.Unlock()
 	return err
 }
 
 func (t *SimpleTable[K, R]) Get(key K) (R, error) {
-	t.mu.RLock()
 	var data []byte
+	t.mu.RLock()
 	err := t.stmts.get.QueryRow(key).Scan(&data)
 	t.mu.RUnlock()
 	if err != nil {
@@ -187,17 +185,23 @@ func (t *SimpleTable[K, R]) readList(rows *sql.Rows) ([]R, error) {
 }
 
 func (t *SimpleTable[K, R]) Delete(key K) error {
+	t.mu.Lock()
 	_, err := t.stmts.delete.Exec(key)
+	t.mu.Unlock()
 	return err
 }
 
 func (t *SimpleTable[K, R]) DeleteGreaterThan(key K) error {
+	t.mu.Lock()
 	_, err := t.stmts.deleteGreaterThan.Exec(key)
+	t.mu.Unlock()
 	return err
 }
 
 func (t *SimpleTable[K, R]) DeleteLessThan(key K) error {
+	t.mu.Lock()
 	_, err := t.stmts.deleteLessThan.Exec(key)
+	t.mu.Unlock()
 	return err
 }
 
