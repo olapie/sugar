@@ -2,17 +2,18 @@ package sqlitex
 
 import (
 	"bytes"
+	"context"
+	"database/sql"
+	"encoding/json"
+	"errors"
+	"fmt"
+
 	"code.olapie.com/sugar/bytex"
 	"code.olapie.com/sugar/errorx"
 	"code.olapie.com/sugar/must"
 	"code.olapie.com/sugar/olasec"
 	"code.olapie.com/sugar/slicing"
 	"code.olapie.com/sugar/timing"
-	"context"
-	"database/sql"
-	"encoding/json"
-	"errors"
-	"fmt"
 	lru "github.com/hashicorp/golang-lru/v2"
 )
 

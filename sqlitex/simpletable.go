@@ -1,15 +1,16 @@
 package sqlitex
 
 import (
-	"code.olapie.com/sugar/bytex"
-	"code.olapie.com/sugar/olasec"
-	"code.olapie.com/sugar/sqlx"
-	"code.olapie.com/sugar/timing"
 	"database/sql"
 	"encoding/json"
 	"fmt"
 	"reflect"
 	"sync"
+
+	"code.olapie.com/sugar/bytex"
+	"code.olapie.com/sugar/olasec"
+	"code.olapie.com/sugar/sqlx"
+	"code.olapie.com/sugar/timing"
 )
 
 type SimpleTableRecord[T SimpleKey] interface {
