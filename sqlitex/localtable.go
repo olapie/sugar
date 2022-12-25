@@ -69,24 +69,27 @@ func NewLocalTable[R any](db *sql.DB, optFns ...func(*LocalTableOptions[R])) *Lo
 	t.remoteCache = must.Get(lru.New[string, R](t.options.RemoteCacheSize))
 	t.deletionCache = must.Get(lru.New[string, bool](t.options.DeletionCacheSize))
 
-	// table remote_record: localID, recordData, updateTime, synced
-	// table local_record: localID, recordData, createTime, updateTime
-	// table deleted_record: localID, deleteTime
+	// table remotes: localID, recordData, updateTime, synced
+	// table locals: localID, recordData, createTime, updateTime
+	// table deletions: localID, deleteTime
 
-	must.Get(db.Exec(`CREATE TABLE IF NOT EXISTS remote_record(
-    local_id VARCHAR PRIMARY KEY,
+	must.Get(db.Exec(`CREATE TABLE IF NOT EXISTS remotes(
+    id VARCHAR PRIMARY KEY,
+    category INTEGER DEFAULT 0,
     data BLOB,
     update_time INTEGER,
     synced BOOL DEFAULT FALSE
 )`))
-	must.Get(db.Exec(`CREATE TABLE IF NOT EXISTS local_record(
-    local_id VARCHAR PRIMARY KEY,
+	must.Get(db.Exec(`CREATE TABLE IF NOT EXISTS locals(
+    id VARCHAR PRIMARY KEY,
+    category INTEGER DEFAULT 0,
     data BLOB,
     create_time INTEGER,
     update_time INTEGER
 )`))
-	must.Get(db.Exec(`CREATE TABLE IF NOT EXISTS deleted_record(
-    local_id VARCHAR PRIMARY KEY,
+	must.Get(db.Exec(`CREATE TABLE IF NOT EXISTS deletions(
+    id VARCHAR PRIMARY KEY,
+    category INTEGER DEFAULT 0,
     data BLOB,
     delete_time INTEGER
 )`))
@@ -94,15 +97,15 @@ func NewLocalTable[R any](db *sql.DB, optFns ...func(*LocalTableOptions[R])) *Lo
 	return t
 }
 
-func (t *LocalTable[R]) SaveRemote(ctx context.Context, localID string, record R, updateTime int64) error {
+func (t *LocalTable[R]) SaveRemote(ctx context.Context, localID string, category int, record R, updateTime int64) error {
 	// check delete_record, if it's deleted, then ignore
-	// if updateTime < remote_record.updateTime, then ignore
+	// if updateTime < remotes.updateTime, then ignore
 	// save: localID, recordData, udpateTime(new), synced(true)
 	exists, _ := t.deletionCache.Get(localID)
 	if !exists {
-		err := t.db.QueryRowContext(ctx, `SELECT EXISTS(SELECT * FROM deleted_record WHERE local_id=?)`, localID).Scan(&exists)
+		err := t.db.QueryRowContext(ctx, `SELECT EXISTS(SELECT * FROM deletions WHERE id=?)`, localID).Scan(&exists)
 		if err != nil {
-			return fmt.Errorf("query deleted_record: %w", err)
+			return fmt.Errorf("query deletions: %w", err)
 		}
 	}
 
@@ -111,10 +114,10 @@ func (t *LocalTable[R]) SaveRemote(ctx context.Context, localID string, record R
 		return nil
 	}
 
-	err := t.db.QueryRowContext(ctx, `SELECT EXISTS(SELECT * FROM remote_record WHERE local_id=? AND update_time>?)`,
+	err := t.db.QueryRowContext(ctx, `SELECT EXISTS(SELECT * FROM remotes WHERE id=? AND update_time>?)`,
 		localID, updateTime).Scan(&exists)
 	if err != nil {
-		return fmt.Errorf("query remote_record: %w", err)
+		return fmt.Errorf("query remotes: %w", err)
 	}
 
 	if exists {
@@ -127,67 +130,69 @@ func (t *LocalTable[R]) SaveRemote(ctx context.Context, localID string, record R
 		return fmt.Errorf("encode: %s, %w", localID, err)
 	}
 
-	_, err = t.db.ExecContext(ctx, `REPLACE INTO remote_record(local_id, data, update_time, synced) VALUES(?,?,?,1)`, localID, data, updateTime)
+	_, err = t.db.ExecContext(ctx, `REPLACE INTO remotes(id, category, data, update_time, synced) VALUES(?,?,?,?,1)`,
+		localID, category, data, updateTime)
 	if err != nil {
-		return fmt.Errorf("replace into remote_record: %s,%w", localID, err)
+		return fmt.Errorf("replace into remotes: %s,%w", localID, err)
 	}
 	t.remoteCache.Add(localID, record)
 
-	_, err = t.db.ExecContext(ctx, `DELETE FROM local_record WHERE local_id=? AND update_time<=?`, localID, updateTime)
+	_, err = t.db.ExecContext(ctx, `DELETE FROM locals WHERE id=? AND update_time<=?`, localID, updateTime)
 	if err != nil {
-		return fmt.Errorf("delete from local_record: %s, %w", localID, err)
+		return fmt.Errorf("delete from locals: %s, %w", localID, err)
 	}
 	t.localCache.Remove(localID)
 
 	return nil
 }
 
-func (t *LocalTable[R]) SaveLocal(ctx context.Context, localID string, record R) error {
-	// replace local_record
+func (t *LocalTable[R]) SaveLocal(ctx context.Context, localID string, category int, record R) error {
+	// replace locals
 	data, err := t.encode(localID, record)
 	if err != nil {
 		return fmt.Errorf("encode: %s, %w", localID, err)
 	}
 
-	_, err = t.db.ExecContext(ctx, `REPLACE INTO local_record(local_id, data, update_time) VALUES(?,?,?)`,
-		localID, data, t.options.Clock.Now().Unix())
+	_, err = t.db.ExecContext(ctx, `REPLACE INTO locals(id,category, data, update_time) VALUES(?,?,?,?)`,
+		localID, category, data, t.options.Clock.Now().Unix())
 	if err != nil {
-		return fmt.Errorf("replace into remote_record: %s,%w", localID, err)
+		return fmt.Errorf("replace into remotes: %s,%w", localID, err)
 	}
 	t.localCache.Add(localID, record)
 	return nil
 }
 
 func (t *LocalTable[R]) Delete(ctx context.Context, localID string) error {
-	// delete from local_record
-	// delete from remote_record
+	// delete from locals
+	// delete from remotes
 	// save in delete_record
-	_, err := t.db.ExecContext(ctx, `DELETE FROM local_record WHERE local_id=?`, localID)
+	_, err := t.db.ExecContext(ctx, `DELETE FROM locals WHERE id=?`, localID)
 	if err != nil {
-		return fmt.Errorf("delete from local_record: %s, %w", localID, err)
+		return fmt.Errorf("delete from locals: %s, %w", localID, err)
 	}
 	t.localCache.Remove(localID)
 
 	var remoteData []byte
-	err = t.db.QueryRowContext(ctx, `SELECT data FROM remote_record WHERE local_id=?`, localID).Scan(&remoteData)
+	var category int
+	err = t.db.QueryRowContext(ctx, `SELECT category, data FROM remotes WHERE id=?`, localID).Scan(&category, &remoteData)
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
 		// don't need to keep deleted record as it doesn't exist remotely
 		break
 	case err != nil:
-		return fmt.Errorf("query remote_record: %s, %w", localID, err)
+		return fmt.Errorf("query remotes: %s, %w", localID, err)
 	default:
-		_, err := t.db.ExecContext(ctx, `REPLACE INTO deleted_record(local_id, data, delete_time) VALUES (?,?,?)`,
-			localID, remoteData, t.options.Clock.Now().Unix())
+		_, err := t.db.ExecContext(ctx, `REPLACE INTO deletions(id, category, data, delete_time) VALUES (?,?,?,?)`,
+			localID, category, remoteData, t.options.Clock.Now().Unix())
 		if err != nil {
-			return fmt.Errorf("replace into deleted_record: %s, %w", localID, err)
+			return fmt.Errorf("replace into deletions: %s, %w", localID, err)
 		} else {
 			t.deletionCache.Add(localID, true)
 		}
 
-		_, err = t.db.ExecContext(ctx, `DELETE FROM remote_record WHERE local_id=?`, localID)
+		_, err = t.db.ExecContext(ctx, `DELETE FROM remotes WHERE id=?`, localID)
 		if err != nil {
-			return fmt.Errorf("delete from remote_record: %s, %w", localID, err)
+			return fmt.Errorf("delete from remotes: %s, %w", localID, err)
 		}
 		t.remoteCache.Remove(localID)
 	}
@@ -228,9 +233,9 @@ func (t *LocalTable[R]) IsRemote(ctx context.Context, localID string) (bool, err
 		return true, nil
 	}
 	var exists bool
-	err := t.db.QueryRowContext(ctx, `SELECT EXISTS(SELECT * FROM remote_record WHERE local_id=?)`, localID).Scan(&exists)
+	err := t.db.QueryRowContext(ctx, `SELECT EXISTS(SELECT * FROM remotes WHERE id=?)`, localID).Scan(&exists)
 	if err != nil {
-		return false, fmt.Errorf("query remote_record: %w", err)
+		return false, fmt.Errorf("query remotes: %w", err)
 	}
 	return exists, nil
 }
@@ -240,22 +245,22 @@ func (t *LocalTable[R]) IsLocal(ctx context.Context, localID string) (bool, erro
 		return true, nil
 	}
 	var exists bool
-	err := t.db.QueryRowContext(ctx, `SELECT EXISTS(SELECT * FROM local_record WHERE local_id=?)`, localID).Scan(&exists)
+	err := t.db.QueryRowContext(ctx, `SELECT EXISTS(SELECT * FROM locals WHERE id=?)`, localID).Scan(&exists)
 	if err != nil {
-		return false, fmt.Errorf("query remote_record: %w", err)
+		return false, fmt.Errorf("query remotes: %w", err)
 	}
 	return exists, nil
 }
 
 func (t *LocalTable[R]) List(ctx context.Context) ([]R, error) {
-	remoteIDs, remotes, err := t.list(ctx, "remote_record", "")
+	remoteIDs, remotes, err := t.list(ctx, "remotes", "")
 	if err != nil {
-		return nil, fmt.Errorf("failed listing remote_record: %w", err)
+		return nil, fmt.Errorf("failed listing remotes: %w", err)
 	}
 
-	localIDs, locals, err := t.list(ctx, "local_record", "")
+	localIDs, locals, err := t.list(ctx, "locals", "")
 	if err != nil {
-		return nil, fmt.Errorf("failed listing local_record: %w", err)
+		return nil, fmt.Errorf("failed listing locals: %w", err)
 	}
 
 	ids := types.NewSet[string](len(remoteIDs) + len(localIDs))
@@ -274,22 +279,22 @@ func (t *LocalTable[R]) List(ctx context.Context) ([]R, error) {
 }
 
 func (t *LocalTable[R]) ListRemotes(ctx context.Context) ([]R, error) {
-	_, l, err := t.list(ctx, "remote_record", "")
+	_, l, err := t.list(ctx, "remotes", "")
 	return l, err
 }
 
 func (t *LocalTable[R]) ListUpdates(ctx context.Context) ([]R, error) {
-	_, l, err := t.list(ctx, "remote_record", "synced=0")
+	_, l, err := t.list(ctx, "remotes", "synced=0")
 	return l, err
 }
 
 func (t *LocalTable[R]) ListLocals(ctx context.Context) ([]R, error) {
-	_, l, err := t.list(ctx, "local_record", "")
+	_, l, err := t.list(ctx, "locals", "")
 	return l, err
 }
 
 func (t *LocalTable[R]) ListDeletions(ctx context.Context) ([]R, error) {
-	_, l, err := t.list(ctx, "deleted_record", "")
+	_, l, err := t.list(ctx, "deletions", "")
 	return l, err
 }
 
@@ -307,9 +312,9 @@ func (t *LocalTable[R]) RemoveDeletions(ctx context.Context, localIDs ...string)
 	args := slicing.MustTransform(localIDs, func(a string) any {
 		return any(a)
 	})
-	_, err := t.db.ExecContext(ctx, `DELETE FROM deleted_record WHERE local_id IN `+buf.String(), args...)
+	_, err := t.db.ExecContext(ctx, `DELETE FROM deletions WHERE id IN `+buf.String(), args...)
 	if err != nil {
-		return fmt.Errorf("remove deleted_records: %w", err)
+		return fmt.Errorf("remove deletionss: %w", err)
 	}
 	for _, id := range localIDs {
 		t.localCache.Remove(id)
@@ -328,12 +333,12 @@ func (t *LocalTable[R]) Get(ctx context.Context, localID string) (record R, err 
 		return record, nil
 	}
 	var data []byte
-	err = t.db.QueryRowContext(ctx, `SELECT data FROM remote_record WHERE local_id=?`, localID).Scan(&data)
+	err = t.db.QueryRowContext(ctx, `SELECT data FROM remotes WHERE id=?`, localID).Scan(&data)
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
 		break
 	case err != nil:
-		return record, fmt.Errorf("query remote_record: %w", err)
+		return record, fmt.Errorf("query remotes: %w", err)
 	default:
 		record, err = t.decode(localID, data)
 		if err != nil {
@@ -343,12 +348,12 @@ func (t *LocalTable[R]) Get(ctx context.Context, localID string) (record R, err 
 		return record, nil
 	}
 
-	err = t.db.QueryRowContext(ctx, `SELECT data FROM local_record WHERE local_id=?`, localID).Scan(&data)
+	err = t.db.QueryRowContext(ctx, `SELECT data FROM locals WHERE id=?`, localID).Scan(&data)
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
 		break
 	case err != nil:
-		return record, fmt.Errorf("query local_record: %w", err)
+		return record, fmt.Errorf("query locals: %w", err)
 	default:
 		record, err = t.decode(localID, data)
 		if err != nil {
@@ -362,7 +367,7 @@ func (t *LocalTable[R]) Get(ctx context.Context, localID string) (record R, err 
 }
 
 func (t *LocalTable[R]) EncryptPlainData(ctx context.Context) error {
-	tableNames := []string{"remote_record", "local_record", "deleted_record"}
+	tableNames := []string{"remotes", "locals", "deletions"}
 	for _, name := range tableNames {
 		m, err := t.encryptTable(ctx, name)
 		if err != nil {
@@ -376,6 +381,27 @@ func (t *LocalTable[R]) EncryptPlainData(ctx context.Context) error {
 	return nil
 }
 
+func (t *LocalTable[R]) Migrate() error {
+	_, err := t.db.Exec(`INSERT INTO remotes(id,data,update_time,synced) 
+SELECT id,data,update_time,synced FROM remote_record`)
+	if err != nil {
+		return err
+	}
+
+	_, err = t.db.Exec(`INSERT INTO locals(id,data,create_time,update_time) 
+SELECT id,data,create_time,update_time FROM local_record`)
+	if err != nil {
+		return err
+	}
+
+	_, err = t.db.Exec(`INSERT INTO deletions(id,data,delete_time) 
+SELECT id,data,delete_time FROM delete_record`)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (t *LocalTable[R]) updateLocal(ctx context.Context, localID string, record R, optionalData *[]byte) error {
 	if optionalData == nil {
 		data, err := t.encode(localID, record)
@@ -384,10 +410,10 @@ func (t *LocalTable[R]) updateLocal(ctx context.Context, localID string, record 
 		}
 		optionalData = &data
 	}
-	_, err := t.db.ExecContext(ctx, `UPDATE local_record SET data=?, update_time=? WHERE local_id=?`,
+	_, err := t.db.ExecContext(ctx, `UPDATE locals SET data=?, update_time=? WHERE id=?`,
 		*optionalData, t.options.Clock.Now().Unix(), localID)
 	if err != nil {
-		return fmt.Errorf("update local_record: %w", err)
+		return fmt.Errorf("update locals: %w", err)
 	}
 	t.localCache.Add(localID, record)
 	return nil
@@ -401,19 +427,19 @@ func (t *LocalTable[R]) updateRemote(ctx context.Context, localID string, record
 		}
 		optionalData = &data
 	}
-	_, err := t.db.ExecContext(ctx, `UPDATE remote_record SET data=?, update_time=?, synced=0 WHERE local_id=?`,
+	_, err := t.db.ExecContext(ctx, `UPDATE remotes SET data=?, update_time=?, synced=0 WHERE id=?`,
 		*optionalData, t.options.Clock.Now().Unix(), localID)
 	if err != nil {
-		return fmt.Errorf("update remote_record: %w", err)
+		return fmt.Errorf("update remotes: %w", err)
 	}
 	t.remoteCache.Add(localID, record)
 	return nil
 }
 
 func (t *LocalTable[R]) encryptTable(ctx context.Context, tableName string) (map[string][]byte, error) {
-	rows, err := t.db.QueryContext(ctx, `SELECT local_id, data FROM `+tableName)
+	rows, err := t.db.QueryContext(ctx, `SELECT id, data FROM `+tableName)
 	if err != nil {
-		return nil, fmt.Errorf("query local_record: %w", err)
+		return nil, fmt.Errorf("query locals: %w", err)
 	}
 	defer rows.Close()
 	idToData := make(map[string][]byte)
@@ -439,7 +465,7 @@ func (t *LocalTable[R]) encryptTable(ctx context.Context, tableName string) (map
 }
 
 func (t *LocalTable[R]) writeEncryptedData(ctx context.Context, tableName string, idToData map[string][]byte) error {
-	query := fmt.Sprintf(`UPDATE %s SET data=? WHERE local_id=?`, tableName)
+	query := fmt.Sprintf(`UPDATE %s SET data=? WHERE id=?`, tableName)
 	for id, data := range idToData {
 		_, err := t.db.ExecContext(ctx, query, data, id)
 		if err != nil {
@@ -454,7 +480,7 @@ func (t *LocalTable[R]) list(ctx context.Context, tableName string, where string
 	if where != "" {
 		where = " where " + where
 	}
-	query := `SELECT local_id, data FROM ` + tableName + where
+	query := `SELECT id, data FROM ` + tableName + where
 	rows, err := t.db.QueryContext(ctx, query)
 	if err != nil {
 		return nil, nil, fmt.Errorf("execute query: %s, %w", query, err)
@@ -469,9 +495,9 @@ func (t *LocalTable[R]) scan(rows *sql.Rows, tableName string) ([]string, []R, e
 		Get(key string) (R, bool)
 	}
 
-	if tableName == "local_record" {
+	if tableName == "locals" {
 		cache = t.localCache
-	} else if tableName == "remote_record" {
+	} else if tableName == "remotes" {
 		cache = t.remoteCache
 	}
 
