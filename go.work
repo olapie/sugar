@@ -5,4 +5,5 @@ use (
 	./postgresx
 	./sqlitex
 	./tools/ecdsakey
+	./tools/iconcrop
 )
