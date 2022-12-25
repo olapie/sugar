@@ -2,6 +2,7 @@ package sqlitex
 
 import (
 	"bytes"
+	"code.olapie.com/sugar/types"
 	"context"
 	"database/sql"
 	"encoding/json"
@@ -196,51 +197,100 @@ func (t *LocalTable[R]) Delete(ctx context.Context, localID string) error {
 func (t *LocalTable[R]) Update(ctx context.Context, localID string, record R) error {
 	data, err := t.encode(localID, record)
 	if err != nil {
-		return fmt.Errorf("encode: %s, %w", localID, err)
+		return fmt.Errorf("encode record: %w", err)
 	}
-	_, err = t.db.ExecContext(ctx, `REPLACE INTO remote_record(local_id, data, update_time, synced) VALUES(?,?,?,1)`,
-		localID, data, t.options.Clock.Now().Unix())
+
+	if isRemote, err := t.IsRemote(ctx, localID); err != nil {
+		return fmt.Errorf("failed checking remote: %w", err)
+	} else if isRemote {
+		return t.updateRemote(ctx, localID, record, &data)
+	}
+
+	if isLocal, err := t.IsRemote(ctx, localID); err != nil {
+		return fmt.Errorf("failed checking remote: %w", err)
+	} else if isLocal {
+		return t.updateLocal(ctx, localID, record, &data)
+	}
+
+	return errorx.NotExist
+}
+
+func (t *LocalTable[R]) UpdateLocal(ctx context.Context, localID string, record R) error {
+	return t.updateLocal(ctx, localID, record, nil)
+}
+
+func (t *LocalTable[R]) UpdateRemote(ctx context.Context, localID string, record R) error {
+	return t.updateRemote(ctx, localID, record, nil)
+}
+
+func (t *LocalTable[R]) IsRemote(ctx context.Context, localID string) (bool, error) {
+	if t.remoteCache.Contains(localID) {
+		return true, nil
+	}
+	var exists bool
+	err := t.db.QueryRowContext(ctx, `SELECT EXISTS(SELECT * FROM remote_record WHERE local_id=?)`, localID).Scan(&exists)
 	if err != nil {
-		return fmt.Errorf("replace into remote_record: %s,%w", localID, err)
+		return false, fmt.Errorf("query remote_record: %w", err)
 	}
-	t.remoteCache.Add(localID, record)
-	return nil
+	return exists, nil
+}
+
+func (t *LocalTable[R]) IsLocal(ctx context.Context, localID string) (bool, error) {
+	if t.localCache.Contains(localID) {
+		return true, nil
+	}
+	var exists bool
+	err := t.db.QueryRowContext(ctx, `SELECT EXISTS(SELECT * FROM local_record WHERE local_id=?)`, localID).Scan(&exists)
+	if err != nil {
+		return false, fmt.Errorf("query remote_record: %w", err)
+	}
+	return exists, nil
+}
+
+func (t *LocalTable[R]) List(ctx context.Context) ([]R, error) {
+	remoteIDs, remotes, err := t.list(ctx, "remote_record", "")
+	if err != nil {
+		return nil, fmt.Errorf("failed listing remote_record: %w", err)
+	}
+
+	localIDs, locals, err := t.list(ctx, "local_record", "")
+	if err != nil {
+		return nil, fmt.Errorf("failed listing local_record: %w", err)
+	}
+
+	ids := types.NewSet[string](len(remoteIDs) + len(localIDs))
+	for _, id := range remoteIDs {
+		ids.Add(id)
+	}
+
+	l := remotes
+	for i, v := range locals {
+		if ids.Contains(localIDs[i]) {
+			continue
+		}
+		l = append(l, v)
+	}
+	return l, nil
 }
 
 func (t *LocalTable[R]) ListRemotes(ctx context.Context) ([]R, error) {
-	rows, err := t.db.QueryContext(ctx, `SELECT local_id, data FROM remote_record`)
-	if err != nil {
-		return nil, fmt.Errorf("query remote_record: %w", err)
-	}
-	defer rows.Close()
-	return t.scan(rows, "remote_record")
+	_, l, err := t.list(ctx, "remote_record", "")
+	return l, err
 }
 
 func (t *LocalTable[R]) ListUpdates(ctx context.Context) ([]R, error) {
-	rows, err := t.db.QueryContext(ctx, `SELECT local_id, data FROM remote_record WHERE synced=0`)
-	if err != nil {
-		return nil, fmt.Errorf("query remote_record: %w", err)
-	}
-	defer rows.Close()
-	return t.scan(rows, "remote_record")
+	_, l, err := t.list(ctx, "remote_record", "synced=0")
+	return l, err
 }
 
 func (t *LocalTable[R]) ListLocals(ctx context.Context) ([]R, error) {
-	rows, err := t.db.QueryContext(ctx, `SELECT local_id, data FROM local_record`)
-	if err != nil {
-		return nil, fmt.Errorf("query local_record: %w", err)
-	}
-	defer rows.Close()
-	return t.scan(rows, "local_record")
+	_, l, err := t.list(ctx, "local_record", "")
+	return l, err
 }
 
 func (t *LocalTable[R]) ListDeletions(ctx context.Context) ([]R, error) {
-	rows, err := t.db.QueryContext(ctx, `SELECT local_id, data FROM deleted_record`)
-	if err != nil {
-		return nil, fmt.Errorf("query deleted_record: %w", err)
-	}
-	defer rows.Close()
-	return t.scan(rows, "remote_record")
+	_, l, err := t.list(ctx, "deleted_record", "")
+	return l, err
 }
 
 func (t *LocalTable[R]) RemoveDeletions(ctx context.Context, localIDs ...string) error {
@@ -326,6 +376,40 @@ func (t *LocalTable[R]) EncryptPlainData(ctx context.Context) error {
 	return nil
 }
 
+func (t *LocalTable[R]) updateLocal(ctx context.Context, localID string, record R, optionalData *[]byte) error {
+	if optionalData == nil {
+		data, err := t.encode(localID, record)
+		if err != nil {
+			return fmt.Errorf("encode record: %s, %w", localID, err)
+		}
+		optionalData = &data
+	}
+	_, err := t.db.ExecContext(ctx, `UPDATE local_record SET data=?, update_time=? WHERE local_id=?`,
+		*optionalData, t.options.Clock.Now().Unix(), localID)
+	if err != nil {
+		return fmt.Errorf("update local_record: %w", err)
+	}
+	t.localCache.Add(localID, record)
+	return nil
+}
+
+func (t *LocalTable[R]) updateRemote(ctx context.Context, localID string, record R, optionalData *[]byte) error {
+	if optionalData == nil {
+		data, err := t.encode(localID, record)
+		if err != nil {
+			return fmt.Errorf("encode: %s, %w", localID, err)
+		}
+		optionalData = &data
+	}
+	_, err := t.db.ExecContext(ctx, `UPDATE remote_record SET data=?, update_time=?, synced=0 WHERE local_id=?`,
+		*optionalData, t.options.Clock.Now().Unix(), localID)
+	if err != nil {
+		return fmt.Errorf("update remote_record: %w", err)
+	}
+	t.remoteCache.Add(localID, record)
+	return nil
+}
+
 func (t *LocalTable[R]) encryptTable(ctx context.Context, tableName string) (map[string][]byte, error) {
 	rows, err := t.db.QueryContext(ctx, `SELECT local_id, data FROM `+tableName)
 	if err != nil {
@@ -366,7 +450,20 @@ func (t *LocalTable[R]) writeEncryptedData(ctx context.Context, tableName string
 	return nil
 }
 
-func (t *LocalTable[R]) scan(rows *sql.Rows, tableName string) ([]R, error) {
+func (t *LocalTable[R]) list(ctx context.Context, tableName string, where string) ([]string, []R, error) {
+	if where != "" {
+		where = " where " + where
+	}
+	query := `SELECT local_id, data FROM ` + tableName + where
+	rows, err := t.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, nil, fmt.Errorf("execute query: %s, %w", query, err)
+	}
+	defer rows.Close()
+	return t.scan(rows, tableName)
+}
+
+func (t *LocalTable[R]) scan(rows *sql.Rows, tableName string) ([]string, []R, error) {
 	var cache interface {
 		Add(key string, value R) bool
 		Get(key string) (R, bool)
@@ -378,6 +475,7 @@ func (t *LocalTable[R]) scan(rows *sql.Rows, tableName string) ([]R, error) {
 		cache = t.remoteCache
 	}
 
+	var ids []string
 	var records []R
 	for rows.Next() {
 		var localID string
@@ -385,11 +483,12 @@ func (t *LocalTable[R]) scan(rows *sql.Rows, tableName string) ([]R, error) {
 
 		err := rows.Scan(&localID, &data)
 		if err != nil {
-			return nil, fmt.Errorf("scan %s: %w", tableName, err)
+			return nil, nil, fmt.Errorf("scan %s: %w", tableName, err)
 		}
 
 		if cache != nil {
 			if r, ok := cache.Get(localID); ok {
+				ids = append(ids, localID)
 				records = append(records, r)
 				continue
 			}
@@ -397,13 +496,17 @@ func (t *LocalTable[R]) scan(rows *sql.Rows, tableName string) ([]R, error) {
 
 		r, err := t.decode(localID, data)
 		if err != nil {
-			return nil, fmt.Errorf("decode: %w", err)
+			return nil, nil, fmt.Errorf("decode: %w", err)
 		}
-		cache.Add(localID, r)
+
+		if cache != nil {
+			cache.Add(localID, r)
+		}
+		ids = append(ids, localID)
 		records = append(records, r)
 	}
 
-	return records, nil
+	return ids, records, nil
 }
 
 func (t *LocalTable[R]) encode(localID string, r R) (data []byte, err error) {

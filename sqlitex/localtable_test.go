@@ -1,6 +1,7 @@
 package sqlitex_test
 
 import (
+	"code.olapie.com/sugar/uuidx"
 	"context"
 	"math/rand"
 	"os"
@@ -154,6 +155,82 @@ func TestLocalTable_SaveLocal(t *testing.T) {
 		deletes, err := table.ListDeletions(ctx)
 		testx.NoError(t, err)
 		testx.Equal(t, 0, len(deletes))
+	})
+}
+
+func TestLocalTable_Update(t *testing.T) {
+	ctx := context.TODO()
+	t.Run("UpdateRemote", func(t *testing.T) {
+		table := setupLocalTable(t)
+		item := newLocalTableItem()
+		id := uuidx.NewShortString()
+		err := table.SaveRemote(ctx, id, item, time.Now().Unix())
+		testx.NoError(t, err)
+		got, err := table.Get(ctx, id)
+		testx.NoError(t, err)
+		testx.Equal(t, item, got)
+
+		item.Text = testx.RandomString(20)
+		err = table.UpdateRemote(ctx, id, item)
+		testx.NoError(t, err)
+		got, err = table.Get(ctx, id)
+		testx.NoError(t, err)
+		testx.Equal(t, item, got)
+	})
+
+	t.Run("UpdateLocal", func(t *testing.T) {
+		table := setupLocalTable(t)
+		item := newLocalTableItem()
+		id := uuidx.NewShortString()
+		err := table.SaveLocal(ctx, id, item)
+		testx.NoError(t, err)
+		got, err := table.Get(ctx, id)
+		testx.NoError(t, err)
+		testx.Equal(t, item, got)
+
+		item.Text = testx.RandomString(20)
+		err = table.UpdateLocal(ctx, id, item)
+		testx.NoError(t, err)
+		got, err = table.Get(ctx, id)
+		testx.NoError(t, err)
+		testx.Equal(t, item, got)
+	})
+
+	t.Run("Update", func(t *testing.T) {
+		table := setupLocalTable(t)
+		t.Run("Remote", func(t *testing.T) {
+			item := newLocalTableItem()
+			id := uuidx.NewShortString()
+			err := table.SaveRemote(ctx, id, item, time.Now().Unix())
+			testx.NoError(t, err)
+			got, err := table.Get(ctx, id)
+			testx.NoError(t, err)
+			testx.Equal(t, item, got)
+
+			item.Text = testx.RandomString(20)
+			err = table.Update(ctx, id, item)
+			testx.NoError(t, err)
+			got, err = table.Get(ctx, id)
+			testx.NoError(t, err)
+			testx.Equal(t, item, got)
+		})
+
+		t.Run("Local", func(t *testing.T) {
+			item := newLocalTableItem()
+			id := uuidx.NewShortString()
+			err := table.SaveLocal(ctx, id, item)
+			testx.NoError(t, err)
+			got, err := table.Get(ctx, id)
+			testx.NoError(t, err)
+			testx.Equal(t, item, got)
+
+			item.Text = testx.RandomString(20)
+			err = table.UpdateLocal(ctx, id, item)
+			testx.NoError(t, err)
+			got, err = table.Get(ctx, id)
+			testx.NoError(t, err)
+			testx.Equal(t, item, got)
+		})
 	})
 }
 
