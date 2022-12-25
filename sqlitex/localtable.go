@@ -37,7 +37,6 @@ type LocalTable[R any] struct {
 	localCache    *lru.Cache[string, R]
 	remoteCache   *lru.Cache[string, R]
 	deletionCache *lru.Cache[string, bool]
-	Password      string
 	options       LocalTableOptions[R]
 }
 
@@ -312,12 +311,71 @@ func (t *LocalTable[R]) Get(ctx context.Context, localID string) (record R, err 
 	return record, errorx.NotExist
 }
 
+func (t *LocalTable[R]) EncryptPlainData(ctx context.Context) error {
+	tableNames := []string{"remote_record", "local_record", "deleted_record"}
+	for _, name := range tableNames {
+		m, err := t.encryptTable(ctx, name)
+		if err != nil {
+			return fmt.Errorf("encryptTable: %s, %w", name, err)
+		}
+		err = t.writeEncryptedData(ctx, name, m)
+		if err != nil {
+			return fmt.Errorf("writeEncryptedData: %s, %w", name, err)
+		}
+	}
+	return nil
+}
+
+func (t *LocalTable[R]) encryptTable(ctx context.Context, tableName string) (map[string][]byte, error) {
+	rows, err := t.db.QueryContext(ctx, `SELECT local_id, data FROM `+tableName)
+	if err != nil {
+		return nil, fmt.Errorf("query local_record: %w", err)
+	}
+	defer rows.Close()
+	idToData := make(map[string][]byte)
+	for rows.Next() {
+		var localID string
+		var data []byte
+		err := rows.Scan(&localID, &data)
+		if err != nil {
+			return nil, fmt.Errorf("scan %s: %w", tableName, err)
+		}
+
+		if olasec.IsEncrypted(data) {
+			continue
+		}
+
+		data, err = olasec.Encrypt(data, t.options.Password+localID)
+		if err != nil {
+			return nil, fmt.Errorf("encrypt %s: %w", tableName, err)
+		}
+		idToData[localID] = data
+	}
+	return idToData, nil
+}
+
+func (t *LocalTable[R]) writeEncryptedData(ctx context.Context, tableName string, idToData map[string][]byte) error {
+	query := fmt.Sprintf(`UPDATE %s SET data=? WHERE local_id=?`, tableName)
+	for id, data := range idToData {
+		_, err := t.db.ExecContext(ctx, query, data, id)
+		if err != nil {
+			return err
+		}
+		fmt.Println("Updated encrypted data", tableName, id)
+	}
+	return nil
+}
+
 func (t *LocalTable[R]) scan(rows *sql.Rows, tableName string) ([]R, error) {
-	var cacheGetter func(string) (R, bool)
+	var cache interface {
+		Add(key string, value R) bool
+		Get(key string) (R, bool)
+	}
+
 	if tableName == "local_record" {
-		cacheGetter = t.localCache.Get
+		cache = t.localCache
 	} else if tableName == "remote_record" {
-		cacheGetter = t.remoteCache.Get
+		cache = t.remoteCache
 	}
 
 	var records []R
@@ -330,8 +388,8 @@ func (t *LocalTable[R]) scan(rows *sql.Rows, tableName string) ([]R, error) {
 			return nil, fmt.Errorf("scan %s: %w", tableName, err)
 		}
 
-		if cacheGetter != nil {
-			if r, ok := cacheGetter(localID); ok {
+		if cache != nil {
+			if r, ok := cache.Get(localID); ok {
 				records = append(records, r)
 				continue
 			}
@@ -341,7 +399,7 @@ func (t *LocalTable[R]) scan(rows *sql.Rows, tableName string) ([]R, error) {
 		if err != nil {
 			return nil, fmt.Errorf("decode: %w", err)
 		}
-
+		cache.Add(localID, r)
 		records = append(records, r)
 	}
 
