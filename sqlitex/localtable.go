@@ -252,13 +252,17 @@ func (t *LocalTable[R]) IsLocal(ctx context.Context, localID string) (bool, erro
 	return exists, nil
 }
 
-func (t *LocalTable[R]) List(ctx context.Context) ([]R, error) {
-	remoteIDs, remotes, err := t.list(ctx, "remotes", "")
+func (t *LocalTable[R]) List(ctx context.Context, category *int) ([]R, error) {
+	var where string
+	if category != nil {
+		where = fmt.Sprintf("category=%d", *category)
+	}
+	remoteIDs, remotes, err := t.list(ctx, "remotes", where)
 	if err != nil {
 		return nil, fmt.Errorf("failed listing remotes: %w", err)
 	}
 
-	localIDs, locals, err := t.list(ctx, "locals", "")
+	localIDs, locals, err := t.list(ctx, "locals", where)
 	if err != nil {
 		return nil, fmt.Errorf("failed listing locals: %w", err)
 	}
@@ -381,26 +385,27 @@ func (t *LocalTable[R]) EncryptPlainData(ctx context.Context) error {
 	return nil
 }
 
-func (t *LocalTable[R]) Migrate() error {
-	_, err := t.db.Exec(`INSERT INTO remotes(id,data,update_time,synced) 
-SELECT id,data,update_time,synced FROM remote_record`)
-	if err != nil {
-		return err
-	}
-
-	_, err = t.db.Exec(`INSERT INTO locals(id,data,create_time,update_time) 
-SELECT id,data,create_time,update_time FROM local_record`)
-	if err != nil {
-		return err
-	}
-
-	_, err = t.db.Exec(`INSERT INTO deletions(id,data,delete_time) 
-SELECT id,data,delete_time FROM delete_record`)
-	if err != nil {
-		return err
-	}
-	return nil
-}
+//
+//func (t *LocalTable[R]) Migrate() error {
+//	_, err := t.db.Exec(`REPLACE INTO remotes(id,data,update_time,synced)
+//SELECT local_id,data,update_time,synced FROM remote_record`)
+//	if err != nil {
+//		return err
+//	}
+//
+//	_, err = t.db.Exec(`REPLACE INTO locals(id,data,create_time,update_time)
+//SELECT local_id,data,create_time,update_time FROM local_record`)
+//	if err != nil {
+//		return err
+//	}
+//
+//	_, err = t.db.Exec(`REPLACE INTO deletions(id,data,delete_time)
+//SELECT local_id,data,delete_time FROM deleted_record`)
+//	if err != nil {
+//		return err
+//	}
+//	return nil
+//}
 
 func (t *LocalTable[R]) updateLocal(ctx context.Context, localID string, record R, optionalData *[]byte) error {
 	if optionalData == nil {
