@@ -229,7 +229,7 @@ func (t *LocalTable[R]) ListUpdates(ctx context.Context) ([]R, error) {
 func (t *LocalTable[R]) ListLocals(ctx context.Context) ([]R, error) {
 	rows, err := t.db.QueryContext(ctx, `SELECT local_id, data FROM local_record`)
 	if err != nil {
-		return nil, fmt.Errorf("query deleted_record: %w", err)
+		return nil, fmt.Errorf("query local_record: %w", err)
 	}
 	defer rows.Close()
 	return t.scan(rows, "local_record")
