@@ -1,9 +1,12 @@
 package mobilex
 
 import (
+	"code.olapie.com/sugar/testx"
 	"fmt"
+	"github.com/google/uuid"
 	"sort"
 	"strings"
+	"time"
 
 	"code.olapie.com/sugar/mobilex/nomobile"
 )
@@ -293,5 +296,66 @@ func buildFileTreeNode(parent *FileTreeNode, id string, idToEntry map[string]nom
 
 	for _, subID := range entry.SubIDs() {
 		buildFileTreeNode(node, subID, idToEntry, result)
+	}
+}
+
+var _ nomobile.FileEntry = (*mockFileEntry)(nil)
+
+type mockFileEntry struct {
+	id       string
+	name     string
+	isDir    bool
+	size     int64
+	modTime  int64
+	mimeType string
+	subIDs   []string
+}
+
+func (m *mockFileEntry) GetID() string {
+	return m.id
+}
+
+func (m *mockFileEntry) Name() string {
+	return m.name
+}
+
+func (m *mockFileEntry) IsDir() bool {
+	return m.isDir
+}
+
+func (m *mockFileEntry) Size() int64 {
+	return m.size
+}
+
+func (m *mockFileEntry) ModTime() int64 {
+	return m.modTime
+}
+
+func (m *mockFileEntry) MIMEType() string {
+	return m.mimeType
+}
+
+func (m *mockFileEntry) SubIDs() []string {
+	return m.subIDs
+}
+
+func NewMockFileInfo(isDir bool) FileInfo {
+	if isDir {
+		return &FileTreeNode{
+			entry: &mockFileEntry{
+				id:      uuid.NewString(),
+				name:    "dir" + testx.RandomString(10),
+				isDir:   true,
+				modTime: time.Now().Unix(),
+				subIDs:  []string{uuid.NewString(), uuid.NewString()},
+			},
+		}
+	}
+	return &FileTreeNode{
+		entry: &mockFileEntry{
+			id:      uuid.NewString(),
+			name:    "file" + testx.RandomString(10),
+			modTime: time.Now().Unix(),
+		},
 	}
 }
