@@ -284,7 +284,7 @@ func (t *LocalTable[R]) List(ctx context.Context, category *int) ([]R, error) {
 }
 
 func (t *LocalTable[R]) ListExclusive(ctx context.Context, category int) ([]R, error) {
-	where := fmt.Sprintf("category=%d", category)
+	where := fmt.Sprintf("category != %d", category)
 	remoteIDs, remotes, err := t.list(ctx, "remotes", where)
 	if err != nil {
 		return nil, fmt.Errorf("failed listing remotes: %w", err)

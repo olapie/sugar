@@ -1,14 +1,13 @@
 package mobilex
 
 import (
+	"code.olapie.com/sugar/mobilex/nomobile"
 	"code.olapie.com/sugar/testx"
 	"fmt"
 	"github.com/google/uuid"
 	"sort"
 	"strings"
 	"time"
-
-	"code.olapie.com/sugar/mobilex/nomobile"
 )
 
 type FileInfo interface {
@@ -28,10 +27,13 @@ type FileInfo interface {
 
 	FilesCount() int
 	GetFile(i int) FileInfo
-	AddSub(sub FileInfo)
+
+	AddSub(sub FileInfo, appendFlag bool)
 	RemoveSub(sub FileInfo)
+
 	Move(id, dirID string)
 	Find(id string) FileInfo
+
 	SortSubs()
 }
 
@@ -142,15 +144,23 @@ func (f *FileTreeNode) GetFile(i int) FileInfo {
 	return f.files[i]
 }
 
-func (f *FileTreeNode) AddSub(sub FileInfo) {
+func (f *FileTreeNode) AddSub(sub FileInfo, appendFlag bool) {
 	node := sub.(*FileTreeNode)
 	if node.parent != nil {
 		panic(fmt.Sprintf("%s is in dir %s", node.GetID(), node.parent.GetID()))
 	}
 	if node.IsDir() {
-		f.dirs = append(f.dirs, node)
+		if appendFlag {
+			f.dirs = append(f.dirs, node)
+		} else {
+			f.dirs = append([]*FileTreeNode{node}, f.dirs...)
+		}
 	} else {
-		f.files = append(f.files, node)
+		if appendFlag {
+			f.files = append(f.files, node)
+		} else {
+			f.files = append([]*FileTreeNode{node}, f.files...)
+		}
 	}
 	node.parent = f
 }
@@ -177,7 +187,7 @@ func (f *FileTreeNode) RemoveSub(sub FileInfo) {
 func (f *FileTreeNode) Move(id, dirID string) {
 	fi := f.Find(id)
 	f.RemoveSub(fi)
-	f.Find(dirID).(*FileTreeNode).AddSub(fi)
+	f.Find(dirID).(*FileTreeNode).AddSub(fi, true)
 }
 
 // Find searches a descendant node
@@ -271,7 +281,7 @@ func buildFileTreeNode(parent *FileTreeNode, id string, idToEntry map[string]nom
 	node := result[id]
 	if node != nil {
 		if parent != nil {
-			parent.AddSub(node)
+			parent.AddSub(node, true)
 		}
 		return
 	}
@@ -287,7 +297,7 @@ func buildFileTreeNode(parent *FileTreeNode, id string, idToEntry map[string]nom
 		entry: entry,
 	}
 	if parent != nil {
-		parent.AddSub(node)
+		parent.AddSub(node, true)
 	}
 	result[node.GetID()] = node
 	if !node.IsDir() {
