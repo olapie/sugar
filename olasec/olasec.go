@@ -2,10 +2,11 @@ package olasec
 
 import (
 	"bytes"
-	"code.olapie.com/sugar/errorx"
 	"fmt"
 	"io"
 	"os"
+
+	"code.olapie.com/sugar/errorx"
 )
 
 // MagicNumberV1 is a defined 4-byte number to identify file type

@@ -1,13 +1,14 @@
 package olasec_test
 
 import (
-	"code.olapie.com/sugar/olasec"
 	"crypto/rand"
 	"io"
 	"os"
 	"path/filepath"
 	"testing"
 	"time"
+
+	"code.olapie.com/sugar/olasec"
 
 	"code.olapie.com/sugar/hashing"
 	"code.olapie.com/sugar/testx"

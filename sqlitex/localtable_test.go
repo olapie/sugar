@@ -1,12 +1,13 @@
 package sqlitex_test
 
 import (
-	"code.olapie.com/sugar/uuidx"
 	"context"
 	"math/rand"
 	"os"
 	"testing"
 	"time"
+
+	"code.olapie.com/sugar/uuidx"
 
 	"code.olapie.com/sugar/sqlitex"
 	"code.olapie.com/sugar/testx"

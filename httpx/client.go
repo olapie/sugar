@@ -1,11 +1,12 @@
 package httpx
 
 import (
-	"code.olapie.com/sugar/errorx"
 	"context"
 	"fmt"
 	"io"
 	"net/http"
+
+	"code.olapie.com/sugar/errorx"
 )
 
 func DoWithResponse(ctx context.Context, method, url string, body io.Reader) (*http.Response, error) {

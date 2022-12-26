@@ -2,10 +2,11 @@ package olasec_test
 
 import (
 	"bytes"
-	"code.olapie.com/sugar/olasec"
 	"io"
 	"testing"
 	"time"
+
+	"code.olapie.com/sugar/olasec"
 
 	"code.olapie.com/sugar/hashing"
 	"code.olapie.com/sugar/testx"

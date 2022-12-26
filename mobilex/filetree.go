@@ -1,10 +1,11 @@
 package mobilex
 
 import (
-	"code.olapie.com/sugar/mobilex/nomobile"
 	"fmt"
 	"sort"
 	"strings"
+
+	"code.olapie.com/sugar/mobilex/nomobile"
 )
 
 type FileInfo interface {
@@ -31,7 +32,7 @@ type FileInfo interface {
 	SortSubs()
 }
 
-var _ FileInfo = (*fileTreeNode)(nil)
+var _ FileInfo = (*FileTreeNode)(nil)
 
 var _ nomobile.FileEntry = (*virtualEntry)(nil)
 
@@ -69,76 +70,77 @@ func (v *virtualEntry) SubIDs() []string {
 	return v.SubEntryIDs
 }
 
-type fileTreeNode struct {
+type FileTreeNode struct {
 	entry  nomobile.FileEntry
-	parent *fileTreeNode
-	dirs   []*fileTreeNode
-	files  []*fileTreeNode
+	parent *FileTreeNode
+	dirs   []*FileTreeNode
+	files  []*FileTreeNode
 }
 
-func (f *fileTreeNode) Entry() nomobile.FileEntry {
+func (f *FileTreeNode) Entry() nomobile.FileEntry {
 	return f.entry
 }
-func (f *fileTreeNode) ParentID() string {
+
+func (f *FileTreeNode) ParentID() string {
 	if f.parent == nil {
 		return ""
 	}
 	return f.parent.GetID()
 }
 
-func (f *fileTreeNode) GetID() string {
+func (f *FileTreeNode) GetID() string {
 	return f.entry.GetID()
 }
 
-func (f fileTreeNode) Name() string {
+func (f FileTreeNode) Name() string {
 	return f.entry.Name()
 }
 
-func (f fileTreeNode) IsDir() bool {
+func (f FileTreeNode) IsDir() bool {
 	return f.entry.IsDir()
 }
 
-func (f fileTreeNode) Size() int64 {
+func (f FileTreeNode) Size() int64 {
 	return f.entry.Size()
 }
 
-func (f fileTreeNode) ModTime() int64 {
+func (f FileTreeNode) ModTime() int64 {
 	return f.entry.ModTime()
 }
 
-func (f fileTreeNode) MIMEType() string {
+func (f FileTreeNode) MIMEType() string {
 	return f.entry.MIMEType()
 }
 
-func (f *fileTreeNode) SubsCount() int {
+func (f *FileTreeNode) SubsCount() int {
 	return len(f.dirs) + len(f.files)
 }
 
-func (f *fileTreeNode) GetSub(i int) FileInfo {
+func (f *FileTreeNode) GetSub(i int) FileInfo {
 	if i < len(f.dirs) {
 		return f.dirs[i]
 	}
 	return f.files[i-len(f.dirs)]
 }
 
-func (f *fileTreeNode) DirsCount() int {
+func (f *FileTreeNode) DirsCount() int {
 	return len(f.dirs)
 }
 
-func (f *fileTreeNode) GetDir(i int) FileInfo {
+func (f *FileTreeNode) GetDir(i int) FileInfo {
 	return f.dirs[i]
 }
 
-func (f *fileTreeNode) FilesCount() int {
+func (f *FileTreeNode) FilesCount() int {
 	return len(f.files)
 }
 
-func (f *fileTreeNode) GetFile(i int) FileInfo {
+func (f *FileTreeNode) GetFile(i int) FileInfo {
 	return f.files[i]
 }
 
-func (f *fileTreeNode) AddSub(sub FileInfo) {
-	node := sub.(*fileTreeNode)
+func (f *FileTreeNode) AddSub(sub FileInfo) {
+	node := sub.(*FileTreeNode)
 	if node.parent != nil {
 		panic(fmt.Sprintf("%s is in dir %s", node.GetID(), node.parent.GetID()))
 	}
@@ -150,8 +152,8 @@ func (f *fileTreeNode) AddSub(sub FileInfo) {
 	node.parent = f
 }
 
-func (f *fileTreeNode) RemoveSub(sub FileInfo) {
-	node := sub.(*fileTreeNode)
+func (f *FileTreeNode) RemoveSub(sub FileInfo) {
+	node := sub.(*FileTreeNode)
 	node.parent = nil
 	for i, v := range f.dirs {
 		if v.GetID() == node.GetID() {
@@ -169,14 +171,14 @@ func (f *fileTreeNode) RemoveSub(sub FileInfo) {
 }
 
 // Move file id to directory
-func (f *fileTreeNode) Move(id, dirID string) {
+func (f *FileTreeNode) Move(id, dirID string) {
 	fi := f.Find(id)
 	f.RemoveSub(fi)
-	f.Find(dirID).(*fileTreeNode).AddSub(fi)
+	f.Find(dirID).(*FileTreeNode).AddSub(fi)
 }
 
 // Find searches a descendant node
-func (f *fileTreeNode) Find(id string) FileInfo {
+func (f *FileTreeNode) Find(id string) FileInfo {
 	if f.GetID() == id {
 		return f
 	}
@@ -196,7 +198,7 @@ func (f *fileTreeNode) Find(id string) FileInfo {
 	return nil
 }
 
-func (f *fileTreeNode) SortSubs() {
+func (f *FileTreeNode) SortSubs() {
 	for _, dir := range f.dirs {
 		dir.SortSubs()
 	}
@@ -218,7 +220,7 @@ func (f *fileTreeNode) SortSubs() {
 }
 
 func NewVirtualDir(id, name string) FileInfo {
-	return &fileTreeNode{
+	return &FileTreeNode{
 		entry: &virtualEntry{
 			ID:        id,
 			EntryName: name,
@@ -227,13 +229,13 @@ func NewVirtualDir(id, name string) FileInfo {
 }
 
 func FileInfoFromEntry(entry nomobile.FileEntry) FileInfo {
-	return &fileTreeNode{
+	return &FileTreeNode{
 		entry: entry,
 	}
 }
 
 func BuildFileTree(entries []nomobile.FileEntry) FileInfo {
-	root := NewVirtualDir("", "").(*fileTreeNode)
+	root := NewVirtualDir("", "").(*FileTreeNode)
 	if len(entries) == 0 {
 		return root
 	}
@@ -243,7 +245,7 @@ func BuildFileTree(entries []nomobile.FileEntry) FileInfo {
 		idToEntry[f.GetID()] = f
 	}
 
-	idToNode := make(map[string]*fileTreeNode)
+	idToNode := make(map[string]*FileTreeNode)
 	for _, e := range entries {
 		buildFileTreeNode(nil, e.GetID(), idToEntry, idToNode)
 	}
@@ -262,7 +264,7 @@ func BuildFileTree(entries []nomobile.FileEntry) FileInfo {
 	return root
 }
 
-func buildFileTreeNode(parent *fileTreeNode, id string, idToEntry map[string]nomobile.FileEntry, result map[string]*fileTreeNode) {
+func buildFileTreeNode(parent *FileTreeNode, id string, idToEntry map[string]nomobile.FileEntry, result map[string]*FileTreeNode) {
 	node := result[id]
 	if node != nil {
 		if parent != nil {
@@ -278,7 +280,7 @@ func buildFileTreeNode(parent *fileTreeNode, id string, idToEntry map[string]nom
 	}
 	delete(idToEntry, id)
 
-	node = &fileTreeNode{
+	node = &FileTreeNode{
 		entry: entry,
 	}
 	if parent != nil {

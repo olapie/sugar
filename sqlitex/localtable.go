@@ -2,12 +2,13 @@ package sqlitex
 
 import (
 	"bytes"
-	"code.olapie.com/sugar/types"
 	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
+
+	"code.olapie.com/sugar/types"
 
 	"code.olapie.com/sugar/bytex"
 	"code.olapie.com/sugar/errorx"
@@ -281,7 +282,6 @@ func (t *LocalTable[R]) List(ctx context.Context, category *int) ([]R, error) {
 	}
 	return l, nil
 }
-
 
 func (t *LocalTable[R]) ListExclusive(ctx context.Context, category int) ([]R, error) {
 	where := fmt.Sprintf("category=%d", category)

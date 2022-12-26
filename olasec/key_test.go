@@ -2,9 +2,10 @@ package olasec
 
 import (
 	"bytes"
+	"testing"
+
 	"code.olapie.com/sugar/slicing"
 	"code.olapie.com/sugar/testx"
-	"testing"
 )
 
 func TestDeriveKey(t *testing.T) {
