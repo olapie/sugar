@@ -218,6 +218,7 @@ func BuildFileTree(entries []FileEntry) *fileTreeNode {
 		}
 	}
 
+	root.SortSubs()
 	return root
 }
 
