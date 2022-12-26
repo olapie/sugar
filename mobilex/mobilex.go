@@ -1,6 +1,7 @@
 package mobilex
 
 import (
+	"code.olapie.com/sugar/conv"
 	"net/http"
 	"time"
 
@@ -97,4 +98,8 @@ func (c *AuthErrorChecker) Check(err error) {
 	if code == http.StatusUnauthorized {
 		go c.h.NeedSignIn()
 	}
+}
+
+func GetSizeString(n int64) string {
+	return conv.SizeToHumanReadable(n)
 }
