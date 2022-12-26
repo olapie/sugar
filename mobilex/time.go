@@ -17,3 +17,7 @@ type Time = timing.Time
 func NowTime() *Time {
 	return (*Time)(timing.NewTime())
 }
+
+func TimeWithUnix(seconds int64) *Time {
+	return timing.TimeWithUnix(seconds)
+}
