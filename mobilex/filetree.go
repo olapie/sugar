@@ -1,22 +1,14 @@
 package mobilex
 
 import (
+	"code.olapie.com/sugar/mobilex/nomobile"
 	"fmt"
 	"sort"
 	"strings"
 )
 
-type FileEntry interface {
-	GetID() string
-	Name() string
-	IsDir() bool
-	Size() int64
-	ModTime() int64
-	MIMEType() string
-	SubIDs() []string
-}
-
 type FileInfo interface {
+	ParentID() string
 	GetID() string
 	Name() string
 	IsDir() bool
@@ -32,11 +24,16 @@ type FileInfo interface {
 
 	FilesCount() int
 	GetFile(i int) FileInfo
+	AddSub(sub FileInfo)
+	RemoveSub(sub FileInfo)
+	Move(id, dirID string)
+	Find(id string) FileInfo
+	SortSubs()
 }
 
 var _ FileInfo = (*fileTreeNode)(nil)
 
-var _ FileEntry = (*virtualEntry)(nil)
+var _ nomobile.FileEntry = (*virtualEntry)(nil)
 
 type virtualEntry struct {
 	ID          string
@@ -73,10 +70,20 @@ func (v *virtualEntry) SubIDs() []string {
 }
 
 type fileTreeNode struct {
-	entry  FileEntry
+	entry  nomobile.FileEntry
 	parent *fileTreeNode
 	dirs   []*fileTreeNode
 	files  []*fileTreeNode
+}
+
+func (f *fileTreeNode) Entry() nomobile.FileEntry {
+	return f.entry
+}
+func (f *fileTreeNode) ParentID() string {
+	if f.parent == nil {
+		return ""
+	}
+	return f.parent.GetID()
 }
 
 func (f *fileTreeNode) GetID() string {
@@ -219,13 +226,19 @@ func NewVirtualDir(id, name string) FileInfo {
 	}
 }
 
-func BuildFileTree(entries []FileEntry) FileInfo {
+func FileInfoFromEntry(entry nomobile.FileEntry) FileInfo {
+	return &fileTreeNode{
+		entry: entry,
+	}
+}
+
+func BuildFileTree(entries []nomobile.FileEntry) FileInfo {
 	root := NewVirtualDir("", "").(*fileTreeNode)
 	if len(entries) == 0 {
 		return root
 	}
 
-	idToEntry := make(map[string]FileEntry)
+	idToEntry := make(map[string]nomobile.FileEntry)
 	for _, f := range entries {
 		idToEntry[f.GetID()] = f
 	}
@@ -249,7 +262,7 @@ func BuildFileTree(entries []FileEntry) FileInfo {
 	return root
 }
 
-func buildFileTreeNode(parent *fileTreeNode, id string, idToEntry map[string]FileEntry, result map[string]*fileTreeNode) {
+func buildFileTreeNode(parent *fileTreeNode, id string, idToEntry map[string]nomobile.FileEntry, result map[string]*fileTreeNode) {
 	node := result[id]
 	if node != nil {
 		if parent != nil {

@@ -282,6 +282,34 @@ func (t *LocalTable[R]) List(ctx context.Context, category *int) ([]R, error) {
 	return l, nil
 }
 
+
+func (t *LocalTable[R]) ListExclusive(ctx context.Context, category int) ([]R, error) {
+	where := fmt.Sprintf("category=%d", category)
+	remoteIDs, remotes, err := t.list(ctx, "remotes", where)
+	if err != nil {
+		return nil, fmt.Errorf("failed listing remotes: %w", err)
+	}
+
+	localIDs, locals, err := t.list(ctx, "locals", where)
+	if err != nil {
+		return nil, fmt.Errorf("failed listing locals: %w", err)
+	}
+
+	ids := types.NewSet[string](len(remoteIDs) + len(localIDs))
+	for _, id := range remoteIDs {
+		ids.Add(id)
+	}
+
+	l := remotes
+	for i, v := range locals {
+		if ids.Contains(localIDs[i]) {
+			continue
+		}
+		l = append(l, v)
+	}
+	return l, nil
+}
+
 func (t *LocalTable[R]) ListRemotes(ctx context.Context) ([]R, error) {
 	_, l, err := t.list(ctx, "remotes", "")
 	return l, err
