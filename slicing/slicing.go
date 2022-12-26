@@ -139,3 +139,7 @@ func Filter[E any](a []E, filter func(e E) bool) []E {
 	}
 	return res
 }
+
+func Single[T any](v T) []T {
+	return []T{v}
+}
