@@ -36,53 +36,71 @@ type FileInfo interface {
 
 var _ FileInfo = (*fileTreeNode)(nil)
 
+var _ FileEntry = (*virtualEntry)(nil)
+
+type virtualEntry struct {
+	ID          string
+	EntryName   string
+	SubEntryIDs []string
+}
+
+func (v *virtualEntry) GetID() string {
+	return v.ID
+}
+
+func (v *virtualEntry) Name() string {
+	return v.EntryName
+}
+
+func (v *virtualEntry) IsDir() bool {
+	return true
+}
+
+func (v *virtualEntry) Size() int64 {
+	return 0
+}
+
+func (v *virtualEntry) ModTime() int64 {
+	return 0
+}
+
+func (v *virtualEntry) MIMEType() string {
+	return ""
+}
+
+func (v *virtualEntry) SubIDs() []string {
+	return v.SubEntryIDs
+}
+
 type fileTreeNode struct {
-	info   FileEntry
+	entry  FileEntry
 	parent *fileTreeNode
 	dirs   []*fileTreeNode
 	files  []*fileTreeNode
 }
 
 func (f *fileTreeNode) GetID() string {
-	if f.info == nil {
-		return ""
-	}
-	return f.info.GetID()
+	return f.entry.GetID()
 }
 
 func (f fileTreeNode) Name() string {
-	if f.info == nil {
-		return ""
-	}
-	return f.info.Name()
+	return f.entry.Name()
 }
 
 func (f fileTreeNode) IsDir() bool {
-	if f.info == nil {
-		return true
-	}
-	return f.info.IsDir()
+	return f.entry.IsDir()
 }
 
 func (f fileTreeNode) Size() int64 {
-	if f.info == nil {
-		return 0
-	}
-	return f.info.Size()
+	return f.entry.Size()
 }
 
 func (f fileTreeNode) ModTime() int64 {
-	if f.info == nil {
-		return 0
-	}
-	return f.info.ModTime()
+	return f.entry.ModTime()
 }
 
 func (f fileTreeNode) MIMEType() string {
-	if f.info == nil {
-		return ""
-	}
-	return f.info.MIMEType()
+	return f.entry.MIMEType()
 }
 
 func (f *fileTreeNode) SubsCount() int {
@@ -192,8 +210,17 @@ func (f *fileTreeNode) SortSubs() {
 	})
 }
 
-func BuildFileTree(entries []FileEntry) *fileTreeNode {
-	root := new(fileTreeNode)
+func NewVirtualDir(id, name string) FileInfo {
+	return &fileTreeNode{
+		entry: &virtualEntry{
+			ID:        id,
+			EntryName: name,
+		},
+	}
+}
+
+func BuildFileTree(entries []FileEntry) FileInfo {
+	root := NewVirtualDir("", "").(*fileTreeNode)
 	if len(entries) == 0 {
 		return root
 	}
@@ -239,7 +266,7 @@ func buildFileTreeNode(parent *fileTreeNode, id string, idToEntry map[string]Fil
 	delete(idToEntry, id)
 
 	node = &fileTreeNode{
-		info: entry,
+		entry: entry,
 	}
 	if parent != nil {
 		parent.AddSub(node)
