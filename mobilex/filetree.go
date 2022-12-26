@@ -172,6 +172,9 @@ func (f *fileTreeNode) Find(id string) FileInfo {
 }
 
 func (f *fileTreeNode) SortSubs() {
+	for _, dir := range f.dirs {
+		dir.SortSubs()
+	}
 	sort.Slice(f.dirs, func(i, j int) bool {
 		fi, fj := f.dirs[i], f.dirs[j]
 		if fi.ModTime() == fj.ModTime() {
@@ -214,6 +217,7 @@ func BuildFileTree(entries []FileEntry) *fileTreeNode {
 			}
 		}
 	}
+
 	return root
 }
 
