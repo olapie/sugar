@@ -1,6 +1,10 @@
 package mobilex
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+	"strings"
+)
 
 type FileEntry interface {
 	GetID() string
@@ -165,6 +169,24 @@ func (f *fileTreeNode) Find(id string) FileInfo {
 	}
 
 	return nil
+}
+
+func (f *fileTreeNode) SortSubs() {
+	sort.Slice(f.dirs, func(i, j int) bool {
+		fi, fj := f.dirs[i], f.dirs[j]
+		if fi.ModTime() == fj.ModTime() {
+			return strings.ToLower(fi.Name()) < strings.ToLower(fj.Name())
+		}
+		return fi.ModTime() < fj.ModTime()
+	})
+
+	sort.Slice(f.files, func(i, j int) bool {
+		fi, fj := f.files[i], f.files[j]
+		if fi.ModTime() == fj.ModTime() {
+			return strings.ToLower(fi.Name()) < strings.ToLower(fj.Name())
+		}
+		return fi.ModTime() < fj.ModTime()
+	})
 }
 
 func BuildFileTree(entries []FileEntry) *fileTreeNode {
