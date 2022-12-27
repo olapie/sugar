@@ -107,6 +107,20 @@ func Decrypt(data []byte, password string) ([]byte, error) {
 	return w.Bytes(), nil
 }
 
+// DecryptInPlace will write decrypted data into parameter data
+// input data parameter will be modified after decrypting
+func DecryptInPlace(data []byte, password string) ([]byte, error) {
+	if len(data) < HeaderSize {
+		return nil, ErrKey
+	}
+	stream := getCipherStream(password)
+	if !stream.ValidatePassword(data[:HeaderSize]) {
+		return nil, ErrKey
+	}
+	stream.XORKeyStream(data[HeaderSize:], data[HeaderSize:])
+	return data[HeaderSize:], nil
+}
+
 func ReEncrypt(data []byte, oldPassword, newPassword string) ([]byte, error) {
 	raw, err := Decrypt(data, oldPassword)
 	if err != nil {
