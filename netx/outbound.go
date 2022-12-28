@@ -6,24 +6,25 @@ import (
 )
 
 // GetOutboundIP returns preferred outbound ip of this machine
-func GetOutboundIP() (net.IP, error) {
+func GetOutboundIP() net.IP {
 	conn, err := net.Dial("udp", "8.8.8.8:80")
 	if err != nil {
-		return nil, err
+		fmt.Println("net.Dial:", err)
+		return nil
 	}
 	localAddr := conn.LocalAddr().(*net.UDPAddr)
 	if err = conn.Close(); err != nil {
-		return nil, err
+		fmt.Println("conn.Close:", err)
+		return nil
 	}
-	return localAddr.IP, nil
+	return localAddr.IP
 }
 
 // GetOutboundIPString returns preferred outbound ip of this machine
 func GetOutboundIPString() string {
-	ip, err := GetOutboundIP()
-	if err != nil {
-		fmt.Println(err)
-		return ""
+	ip := GetOutboundIP()
+	if ip != nil {
+		return ip.String()
 	}
-	return ip.String()
+	return ""
 }

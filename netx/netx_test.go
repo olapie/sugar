@@ -1,20 +1,20 @@
 package netx_test
 
 import (
+	"code.olapie.com/sugar/netx"
+	"code.olapie.com/sugar/testx"
 	"net"
 	"testing"
 	"time"
-
-	"code.olapie.com/sugar/netx"
-	"code.olapie.com/sugar/testx"
 )
 
 func TestMulticast(t *testing.T) {
-	ifi, _, err := netx.GetPrivateIP4()
-	if err != nil {
-		t.Fatal(err)
+	ifi := netx.GetPrivateIPv4Interface()
+	if ifi == nil {
+		t.Log("No PrivateIPv4Interface")
+		t.FailNow()
 	}
-	multiIP := netx.GetMulticastIP4String(ifi)
+	multiIP := netx.GetMulticastIPv4String(ifi)
 	if multiIP == "" {
 		t.Fatal("no multi ip")
 	}
@@ -62,4 +62,28 @@ func TestMulticast(t *testing.T) {
 	testx.Equal(t, packet, buf)
 	t.Log(packet)
 	t.Log(buf)
+}
+
+func TestGetBroadcastIPv4(t *testing.T) {
+	ifi := netx.GetPrivateIPv4Interface()
+	if ifi == nil {
+		t.Log("No PrivateIPv4Interface")
+		t.FailNow()
+	}
+	ip := netx.GetBroadcastIPv4(ifi)
+	t.Log(ip.String())
+
+	udpAddr, err := net.ResolveUDPAddr("udp", ip.String()+":7819")
+	if err != nil {
+		t.Fatal(err)
+	}
+	conn, err := net.DialUDP("udp", nil, udpAddr)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer conn.Close()
+	_, err = conn.Write(testx.RandomBytes(10))
+	if err != nil {
+		t.Fatal(err)
+	}
 }
