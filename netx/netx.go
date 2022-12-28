@@ -141,6 +141,9 @@ func GetPrivateIPv4Interface() *net.Interface {
 // Class B: 255.255.0.0
 // Class C: 255.255.255.0
 func GetBroadcastIPv4(ifi *net.Interface) net.IP {
+	if ifi == nil {
+		return nil
+	}
 	ipNet := GetPrivateIPv4Net(ifi)
 	ip4 := ipNet.IP.To4()
 	if ip4 == nil {

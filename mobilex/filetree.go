@@ -34,7 +34,8 @@ type FileInfo interface {
 	Move(id, dirID string)
 	Find(id string) FileInfo
 
-	SortSubs()
+	SortSubsByModTime(asc bool)
+	SortSubsByName(asc bool)
 }
 
 var _ FileInfo = (*FileTreeNode)(nil)
@@ -211,16 +212,16 @@ func (f *FileTreeNode) Find(id string) FileInfo {
 	return nil
 }
 
-func (f *FileTreeNode) SortSubs() {
+func (f *FileTreeNode) SortSubsByModTime(asc bool) {
 	for _, dir := range f.dirs {
-		dir.SortSubs()
+		dir.SortSubsByModTime(asc)
 	}
 	sort.Slice(f.dirs, func(i, j int) bool {
 		fi, fj := f.dirs[i], f.dirs[j]
 		if fi.ModTime() == fj.ModTime() {
 			return strings.ToLower(fi.Name()) < strings.ToLower(fj.Name())
 		}
-		return fi.ModTime() < fj.ModTime()
+		return asc == (fi.ModTime() < fj.ModTime())
 	})
 
 	sort.Slice(f.files, func(i, j int) bool {
@@ -228,7 +229,28 @@ func (f *FileTreeNode) SortSubs() {
 		if fi.ModTime() == fj.ModTime() {
 			return strings.ToLower(fi.Name()) < strings.ToLower(fj.Name())
 		}
-		return fi.ModTime() < fj.ModTime()
+		return asc == (fi.ModTime() < fj.ModTime())
+	})
+}
+
+func (f *FileTreeNode) SortSubsByName(asc bool) {
+	for _, dir := range f.dirs {
+		dir.SortSubsByName(asc)
+	}
+	sort.Slice(f.dirs, func(i, j int) bool {
+		fi, fj := f.dirs[i], f.dirs[j]
+		if fi.Name() == fj.Name() {
+			return asc == (fi.ModTime() < fj.ModTime())
+		}
+		return asc == (fi.Name() == fj.Name())
+	})
+
+	sort.Slice(f.files, func(i, j int) bool {
+		fi, fj := f.files[i], f.files[j]
+		if fi.Name() == fj.Name() {
+			return asc == (fi.ModTime() < fj.ModTime())
+		}
+		return asc == (fi.Name() == fj.Name())
 	})
 }
 
@@ -273,7 +295,7 @@ func BuildFileTree(entries []nomobile.FileEntry) FileInfo {
 		}
 	}
 
-	root.SortSubs()
+	root.SortSubsByModTime(false)
 	return root
 }
 
