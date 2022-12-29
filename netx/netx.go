@@ -164,8 +164,8 @@ func CalculateBroadcastIPv4(ip4 []byte, maskOnes int) []byte {
 	}
 	n := binary.BigEndian.Uint32(ip4)
 	mask := uint32(1) << (zeros - 1)
-	n &= ^mask
-	n |= (1 << zeros) - 1
+	n &= ^mask            // get subnet id
+	n |= (1 << zeros) - 1 // make all other bits be 1
 	return binary.BigEndian.AppendUint32(nil, n)
 }
 
