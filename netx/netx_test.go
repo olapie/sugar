@@ -1,11 +1,12 @@
 package netx_test
 
 import (
-	"code.olapie.com/sugar/netx"
-	"code.olapie.com/sugar/testx"
 	"net"
 	"testing"
 	"time"
+
+	"code.olapie.com/sugar/netx"
+	"code.olapie.com/sugar/testx"
 )
 
 func TestMulticast(t *testing.T) {

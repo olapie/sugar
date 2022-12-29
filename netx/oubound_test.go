@@ -1,8 +1,9 @@
 package netx_test
 
 import (
-	"code.olapie.com/sugar/netx"
 	"testing"
+
+	"code.olapie.com/sugar/netx"
 )
 
 func TestGetOutboundIPString(t *testing.T) {

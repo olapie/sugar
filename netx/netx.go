@@ -1,12 +1,13 @@
 package netx
 
 import (
-	"code.olapie.com/sugar/conv"
 	"encoding/binary"
 	"fmt"
 	"net"
 	"sort"
 	"strings"
+
+	"code.olapie.com/sugar/conv"
 )
 
 func ListMacAddresses() []string {
