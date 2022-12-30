@@ -1,9 +1,9 @@
-module code.olapie.com/sugar/imaging
+module code.olapie.com/sugar/ximage
 
 go 1.19
 
 require (
-	code.olapie.com/sugar v1.7.2
+	code.olapie.com/sugar/v2 v2.0.2
 	github.com/disintegration/imaging v1.6.2
 )
 
