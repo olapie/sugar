@@ -1,4 +1,4 @@
-module code.olapie.com/sugar/ximage
+module code.olapie.com/sugar/v2/ximage
 
 go 1.19
 
