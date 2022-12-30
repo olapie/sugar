@@ -7,8 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"code.olapie.com/sugar/uuidx"
-
+	"code.olapie.com/sugar/base62"
 	"code.olapie.com/sugar/sqlitex"
 	"code.olapie.com/sugar/testx"
 	"code.olapie.com/sugar/types"
@@ -52,14 +51,14 @@ func TestLocalTable_SaveRemote(t *testing.T) {
 	table := setupLocalTable(t)
 	item := newLocalTableItem()
 	localID := uuid.NewString()
-	err := table.SaveRemote(ctx, localID, item, time.Now().Unix())
+	err := table.SaveRemote(ctx, localID, 0, item, time.Now().Unix())
 	testx.NoError(t, err)
 	record, err := table.Get(ctx, localID)
 	testx.NoError(t, err)
 	testx.Equal(t, item, record)
 
 	item.Text = time.Now().String() + "new"
-	err = table.SaveRemote(ctx, localID, item, time.Now().Unix())
+	err = table.SaveRemote(ctx, localID, 0, item, time.Now().Unix())
 	testx.NoError(t, err)
 	record, err = table.Get(ctx, localID)
 	testx.NoError(t, err)
@@ -100,14 +99,14 @@ func TestLocalTable_SaveLocal(t *testing.T) {
 	t.Run("SyncedRemote", func(t *testing.T) {
 		item := newLocalTableItem()
 		localID := uuid.NewString()
-		err := table.SaveLocal(ctx, localID, item)
+		err := table.SaveLocal(ctx, localID, 0, item)
 		testx.NoError(t, err)
 		record, err := table.Get(ctx, localID)
 		testx.NoError(t, err)
 		testx.Equal(t, item, record)
 
 		item.Text = time.Now().String() + "new"
-		err = table.SaveLocal(ctx, localID, item)
+		err = table.SaveLocal(ctx, localID, 0, item)
 		testx.NoError(t, err)
 		record, err = table.Get(ctx, localID)
 		testx.NoError(t, err)
@@ -118,7 +117,7 @@ func TestLocalTable_SaveLocal(t *testing.T) {
 		testx.Equal(t, 1, len(locals))
 
 		remoteItem := newLocalTableItem()
-		err = table.SaveRemote(ctx, localID, remoteItem, time.Now().Unix())
+		err = table.SaveRemote(ctx, localID, 0, remoteItem, time.Now().Unix())
 		testx.NoError(t, err)
 
 		locals, err = table.ListLocals(ctx)
@@ -129,14 +128,14 @@ func TestLocalTable_SaveLocal(t *testing.T) {
 	t.Run("DeleteLocal", func(t *testing.T) {
 		item := newLocalTableItem()
 		localID := uuid.NewString()
-		err := table.SaveLocal(ctx, localID, item)
+		err := table.SaveLocal(ctx, localID, 0, item)
 		testx.NoError(t, err)
 		record, err := table.Get(ctx, localID)
 		testx.NoError(t, err)
 		testx.Equal(t, item, record)
 
 		item.Text = time.Now().String() + "new"
-		err = table.SaveLocal(ctx, localID, item)
+		err = table.SaveLocal(ctx, localID, 0, item)
 		testx.NoError(t, err)
 		record, err = table.Get(ctx, localID)
 		testx.NoError(t, err)
@@ -164,8 +163,8 @@ func TestLocalTable_Update(t *testing.T) {
 	t.Run("UpdateRemote", func(t *testing.T) {
 		table := setupLocalTable(t)
 		item := newLocalTableItem()
-		id := uuidx.NewShortString()
-		err := table.SaveRemote(ctx, id, item, time.Now().Unix())
+		id := base62.NewUUIDString()
+		err := table.SaveRemote(ctx, id, 0, item, time.Now().Unix())
 		testx.NoError(t, err)
 		got, err := table.Get(ctx, id)
 		testx.NoError(t, err)
@@ -182,8 +181,8 @@ func TestLocalTable_Update(t *testing.T) {
 	t.Run("UpdateLocal", func(t *testing.T) {
 		table := setupLocalTable(t)
 		item := newLocalTableItem()
-		id := uuidx.NewShortString()
-		err := table.SaveLocal(ctx, id, item)
+		id := base62.NewUUIDString()
+		err := table.SaveLocal(ctx, id, 0, item)
 		testx.NoError(t, err)
 		got, err := table.Get(ctx, id)
 		testx.NoError(t, err)
@@ -201,8 +200,8 @@ func TestLocalTable_Update(t *testing.T) {
 		table := setupLocalTable(t)
 		t.Run("Remote", func(t *testing.T) {
 			item := newLocalTableItem()
-			id := uuidx.NewShortString()
-			err := table.SaveRemote(ctx, id, item, time.Now().Unix())
+			id := base62.NewUUIDString()
+			err := table.SaveRemote(ctx, id, 0, item, time.Now().Unix())
 			testx.NoError(t, err)
 			got, err := table.Get(ctx, id)
 			testx.NoError(t, err)
@@ -218,8 +217,8 @@ func TestLocalTable_Update(t *testing.T) {
 
 		t.Run("Local", func(t *testing.T) {
 			item := newLocalTableItem()
-			id := uuidx.NewShortString()
-			err := table.SaveLocal(ctx, id, item)
+			id := base62.NewUUIDString()
+			err := table.SaveLocal(ctx, id, 0, item)
 			testx.NoError(t, err)
 			got, err := table.Get(ctx, id)
 			testx.NoError(t, err)
@@ -241,7 +240,7 @@ func BenchmarkLocalTable_SaveLocal(b *testing.B) {
 	for i := 0; i < 100; i++ {
 		item := newLocalTableItem()
 		localID := uuid.NewString()
-		err := table.SaveLocal(ctx, localID, item)
+		err := table.SaveLocal(ctx, localID, 0, item)
 		testx.NoError(b, err)
 	}
 
@@ -249,7 +248,7 @@ func BenchmarkLocalTable_SaveLocal(b *testing.B) {
 	for i := 0; i < 100; i++ {
 		item := newLocalTableItem()
 		localID := uuid.NewString()
-		err := table.SaveRemote(ctx, localID, item, time.Now().Unix())
+		err := table.SaveRemote(ctx, localID, 0, item, time.Now().Unix())
 		testx.NoError(b, err)
 		ids = append(ids, localID)
 	}
@@ -261,7 +260,7 @@ func BenchmarkLocalTable_SaveLocal(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		item := newLocalTableItem()
 		localID := uuid.NewString()
-		table.SaveLocal(ctx, localID, item)
+		table.SaveLocal(ctx, localID, 0, item)
 	}
 
 	for i := 0; i < b.N; i++ {
@@ -275,7 +274,7 @@ func BenchmarkLocalTable_Get(b *testing.B) {
 	for i := 0; i < 100; i++ {
 		item := newLocalTableItem()
 		localID := uuid.NewString()
-		err := table.SaveLocal(ctx, localID, item)
+		err := table.SaveLocal(ctx, localID, 0, item)
 		testx.NoError(b, err)
 	}
 
@@ -283,7 +282,7 @@ func BenchmarkLocalTable_Get(b *testing.B) {
 	for i := 0; i < 100; i++ {
 		item := newLocalTableItem()
 		localID := uuid.NewString()
-		err := table.SaveRemote(ctx, localID, item, time.Now().Unix())
+		err := table.SaveRemote(ctx, localID, 0, item, time.Now().Unix())
 		testx.NoError(b, err)
 		ids = append(ids, localID)
 	}
@@ -303,7 +302,7 @@ func BenchmarkLocalTable_ListLocals(b *testing.B) {
 	for i := 0; i < 100; i++ {
 		item := newLocalTableItem()
 		localID := uuid.NewString()
-		err := table.SaveLocal(ctx, localID, item)
+		err := table.SaveLocal(ctx, localID, 0, item)
 		testx.NoError(b, err)
 	}
 
@@ -311,7 +310,7 @@ func BenchmarkLocalTable_ListLocals(b *testing.B) {
 	for i := 0; i < 100; i++ {
 		item := newLocalTableItem()
 		localID := uuid.NewString()
-		err := table.SaveRemote(ctx, localID, item, time.Now().Unix())
+		err := table.SaveRemote(ctx, localID, 0, item, time.Now().Unix())
 		testx.NoError(b, err)
 		ids = append(ids, localID)
 	}
@@ -331,7 +330,7 @@ func BenchmarkLocalTable_ListRemotes(b *testing.B) {
 	for i := 0; i < 100; i++ {
 		item := newLocalTableItem()
 		localID := uuid.NewString()
-		err := table.SaveLocal(ctx, localID, item)
+		err := table.SaveLocal(ctx, localID, 0, item)
 		testx.NoError(b, err)
 	}
 
@@ -339,7 +338,7 @@ func BenchmarkLocalTable_ListRemotes(b *testing.B) {
 	for i := 0; i < 100; i++ {
 		item := newLocalTableItem()
 		localID := uuid.NewString()
-		err := table.SaveRemote(ctx, localID, item, time.Now().Unix())
+		err := table.SaveRemote(ctx, localID, 0, item, time.Now().Unix())
 		testx.NoError(b, err)
 		ids = append(ids, localID)
 	}

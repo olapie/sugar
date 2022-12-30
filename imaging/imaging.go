@@ -46,17 +46,17 @@ func Resize(origin []byte, width, height, quality int, resizer Resizer) (resized
 	case "jpeg", "jpg":
 		err = jpeg.Encode(buf, resizedImg, &jpeg.Options{Quality: quality})
 		if err != nil {
-			return nil, fmt.Errorf("cannot encode jpeg: %w", err)
+			return nil, fmt.Errorf("failed encoding jpeg: %w", err)
 		}
 	case "png":
 		err = png.Encode(buf, resizedImg)
 		if err != nil {
-			return nil, fmt.Errorf("cannot encode png: %w", err)
+			return nil, fmt.Errorf("failed encoding png: %w", err)
 		}
 	case "gif":
 		err = gif.Encode(buf, resizedImg, nil)
 		if err != nil {
-			return nil, fmt.Errorf("cannot encode gif: %w", err)
+			return nil, fmt.Errorf("failed encoding gif: %w", err)
 		}
 	default:
 		return nil, fmt.Errorf("unsupport image format: %s", typ)
