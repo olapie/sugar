@@ -9,7 +9,7 @@ import (
 	"image/jpeg"
 	_ "image/png"
 
-	"code.olapie.com/sugar/xerror"
+	"code.olapie.com/sugar/v2/xerror"
 	"github.com/disintegration/imaging"
 )
 

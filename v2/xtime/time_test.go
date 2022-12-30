@@ -3,7 +3,7 @@ package xtime_test
 import (
 	"testing"
 
-	"code.olapie.com/sugar/xtime"
+	"code.olapie.com/sugar/v2/xtime"
 )
 
 func TestLenOfMonth(t *testing.T) {

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"code.olapie.com/sugar/xerror"
+	"code.olapie.com/sugar/v2/xerror"
 )
 
 func TestAppend(t *testing.T) {

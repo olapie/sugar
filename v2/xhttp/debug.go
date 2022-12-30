@@ -3,7 +3,7 @@ package xhttp
 import (
 	"context"
 
-	"code.olapie.com/sugar/xurl"
+	"code.olapie.com/sugar/v2/xurl"
 )
 
 const dateEndpoint = "ola-debug/date"

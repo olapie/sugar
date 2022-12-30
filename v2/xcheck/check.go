@@ -6,9 +6,9 @@ import (
 	"regexp"
 	"time"
 
-	"code.olapie.com/sugar/xruntime"
+	"code.olapie.com/sugar/v2/xruntime"
 
-	"code.olapie.com/sugar/conv"
+	"code.olapie.com/sugar/v2/conv"
 )
 
 type NumberOrString interface {

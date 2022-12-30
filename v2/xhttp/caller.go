@@ -10,10 +10,10 @@ import (
 	"net/url"
 	"reflect"
 
-	"code.olapie.com/sugar/xcheck"
-	"code.olapie.com/sugar/xerror"
-	"code.olapie.com/sugar/xruntime"
-	"code.olapie.com/sugar/xurl"
+	"code.olapie.com/sugar/v2/xcheck"
+	"code.olapie.com/sugar/v2/xerror"
+	"code.olapie.com/sugar/v2/xruntime"
+	"code.olapie.com/sugar/v2/xurl"
 	"github.com/google/uuid"
 )
 

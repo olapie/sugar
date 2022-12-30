@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"code.olapie.com/sugar/xnetwork"
-	"code.olapie.com/sugar/xtest"
+	"code.olapie.com/sugar/v2/xnetwork"
+	"code.olapie.com/sugar/v2/xtest"
 )
 
 func TestMulticast(t *testing.T) {

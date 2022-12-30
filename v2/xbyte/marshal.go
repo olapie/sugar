@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"code.olapie.com/sugar/xruntime"
+	"code.olapie.com/sugar/v2/xruntime"
 	"google.golang.org/protobuf/proto"
 )
 

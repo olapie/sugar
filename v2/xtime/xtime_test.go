@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"code.olapie.com/sugar/xtest"
-	"code.olapie.com/sugar/xtime"
+	"code.olapie.com/sugar/v2/xtest"
+	"code.olapie.com/sugar/v2/xtime"
 )
 
 func TestToDuration(t *testing.T) {

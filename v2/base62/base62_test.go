@@ -1,8 +1,8 @@
 package base62_test
 
 import (
-	"code.olapie.com/sugar/base62"
-	"code.olapie.com/sugar/xtest"
+	"code.olapie.com/sugar/v2/base62"
+	"code.olapie.com/sugar/v2/xtest"
 	"encoding/base64"
 	"github.com/google/uuid"
 	"strings"

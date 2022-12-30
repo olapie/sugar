@@ -1,6 +1,6 @@
 package mob
 
-import "code.olapie.com/sugar/olasec"
+import "code.olapie.com/sugar/v2/olasec"
 
 func Encrypt(data []byte, passphrase string) []byte {
 	content, _ := olasec.Encrypt(data, passphrase)

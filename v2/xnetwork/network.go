@@ -7,7 +7,7 @@ import (
 	"sort"
 	"strings"
 
-	"code.olapie.com/sugar/conv"
+	"code.olapie.com/sugar/v2/conv"
 )
 
 func ListMacAddresses() []string {

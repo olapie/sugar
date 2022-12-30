@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 
-	"code.olapie.com/sugar/conv"
-	"code.olapie.com/sugar/xruntime"
+	"code.olapie.com/sugar/v2/conv"
+	"code.olapie.com/sugar/v2/xruntime"
 )
 
 // Get eliminates nil err and panics if err isn't nil

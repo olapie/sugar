@@ -6,7 +6,7 @@ import (
 	"strings"
 	"syscall"
 
-	"code.olapie.com/sugar/must"
+	"code.olapie.com/sugar/v2/must"
 	"golang.org/x/crypto/ssh/terminal"
 	"golang.org/x/term"
 )

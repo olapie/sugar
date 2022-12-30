@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"code.olapie.com/sugar/xmap"
+	"code.olapie.com/sugar/v2/xmap"
 )
 
 type Map[K comparable, V any] struct {

@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"time"
 
-	"code.olapie.com/sugar/conv"
-	"code.olapie.com/sugar/xstring"
-	"code.olapie.com/sugar/xtime"
+	"code.olapie.com/sugar/v2/conv"
+	"code.olapie.com/sugar/v2/xstring"
+	"code.olapie.com/sugar/v2/xtime"
 	"github.com/google/uuid"
 )
 

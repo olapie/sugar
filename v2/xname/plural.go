@@ -4,8 +4,8 @@ import (
 	"regexp"
 	"strings"
 
-	"code.olapie.com/sugar/xname/internal/plurals"
-	"code.olapie.com/sugar/xstring"
+	"code.olapie.com/sugar/v2/xname/internal/plurals"
+	"code.olapie.com/sugar/v2/xstring"
 )
 
 type replacement struct {

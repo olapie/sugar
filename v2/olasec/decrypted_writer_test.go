@@ -6,10 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"code.olapie.com/sugar/olasec"
+	"code.olapie.com/sugar/v2/olasec"
 
-	"code.olapie.com/sugar/xhash"
-	"code.olapie.com/sugar/xtest"
+	"code.olapie.com/sugar/v2/xhash"
+	"code.olapie.com/sugar/v2/xtest"
 )
 
 func TestDecryptedWriter(t *testing.T) {

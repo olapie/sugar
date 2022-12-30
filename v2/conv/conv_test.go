@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"code.olapie.com/sugar/conv"
-	"code.olapie.com/sugar/xtest"
+	"code.olapie.com/sugar/v2/conv"
+	"code.olapie.com/sugar/v2/xtest"
 )
 
 func TestToBool(t *testing.T) {

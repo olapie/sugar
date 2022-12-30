@@ -7,7 +7,7 @@ import (
 	"sync"
 	"unsafe"
 
-	"code.olapie.com/sugar/xname"
+	"code.olapie.com/sugar/v2/xname"
 )
 
 var _regexpVariable = regexp.MustCompile("^[_a-zA-Z]\\w*$")

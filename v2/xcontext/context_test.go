@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	"code.olapie.com/sugar/xcontext"
-	"code.olapie.com/sugar/xtest"
-	"code.olapie.com/sugar/xtype"
+	"code.olapie.com/sugar/v2/xcontext"
+	"code.olapie.com/sugar/v2/xtest"
+	"code.olapie.com/sugar/v2/xtype"
 )
 
 func TestGetLogin(t *testing.T) {

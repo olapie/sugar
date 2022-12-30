@@ -7,8 +7,8 @@ import (
 	"regexp"
 	"strings"
 
-	"code.olapie.com/sugar/conv"
-	"code.olapie.com/sugar/xruntime"
+	"code.olapie.com/sugar/v2/conv"
+	"code.olapie.com/sugar/v2/xruntime"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )

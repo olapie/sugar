@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"code.olapie.com/sugar/xbyte"
-	"code.olapie.com/sugar/xtest"
+	"code.olapie.com/sugar/v2/xbyte"
+	"code.olapie.com/sugar/v2/xtest"
 )
 
 type customByteSlice []byte

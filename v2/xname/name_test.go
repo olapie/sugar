@@ -3,8 +3,8 @@ package xname_test
 import (
 	"testing"
 
-	"code.olapie.com/sugar/xname"
-	"code.olapie.com/sugar/xtest"
+	"code.olapie.com/sugar/v2/xname"
+	"code.olapie.com/sugar/v2/xtest"
 )
 
 func TestSnakeToCamel(t *testing.T) {

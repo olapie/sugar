@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"code.olapie.com/sugar/conv"
-	"code.olapie.com/sugar/xtime"
+	"code.olapie.com/sugar/v2/conv"
+	"code.olapie.com/sugar/v2/xtime"
 )
 
 // M is a special map which provides convenient methods

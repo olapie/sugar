@@ -4,9 +4,9 @@ import (
 	"strings"
 	"testing"
 
-	"code.olapie.com/sugar/xname"
-	"code.olapie.com/sugar/xname/internal/plurals"
-	"code.olapie.com/sugar/xstring"
+	"code.olapie.com/sugar/v2/xname"
+	"code.olapie.com/sugar/v2/xname/internal/plurals"
+	"code.olapie.com/sugar/v2/xstring"
 )
 
 var replacements = map[string]string{

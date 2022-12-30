@@ -3,7 +3,7 @@ package nomobile
 import (
 	"errors"
 
-	"code.olapie.com/sugar/xerror"
+	"code.olapie.com/sugar/v2/xerror"
 )
 
 type Result[T any] struct {

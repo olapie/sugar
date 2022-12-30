@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"code.olapie.com/sugar/conv"
-	"code.olapie.com/sugar/xruntime"
+	"code.olapie.com/sugar/v2/conv"
+	"code.olapie.com/sugar/v2/xruntime"
 )
 
 var timeFormats = []string{

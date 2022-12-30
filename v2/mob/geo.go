@@ -1,7 +1,7 @@
 package mob
 
 import (
-	"code.olapie.com/sugar/xtype"
+	"code.olapie.com/sugar/v2/xtype"
 )
 
 type Point xtype.Point

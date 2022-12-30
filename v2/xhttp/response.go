@@ -11,8 +11,8 @@ import (
 	"strconv"
 	"sync"
 
-	"code.olapie.com/sugar/xassign"
-	"code.olapie.com/sugar/xerror"
+	"code.olapie.com/sugar/v2/xassign"
+	"code.olapie.com/sugar/v2/xerror"
 )
 
 type UnmarshalFunc func([]byte, any) error

@@ -1,6 +1,6 @@
 package mob
 
-import "code.olapie.com/sugar/xtime"
+import "code.olapie.com/sugar/v2/xtime"
 
 func GetDateTimeString(t int64) string {
 	tm := xtime.TimeWithUnix(t)

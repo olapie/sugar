@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"code.olapie.com/sugar/xtime"
+	"code.olapie.com/sugar/v2/xtime"
 )
 
 func TestRange_SplitInDay(t *testing.T) {

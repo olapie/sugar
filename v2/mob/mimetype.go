@@ -3,7 +3,7 @@ package mob
 import (
 	"strings"
 
-	"code.olapie.com/sugar/xhttp"
+	"code.olapie.com/sugar/v2/xhttp"
 )
 
 func IsTextFile(f FileInfo) bool {

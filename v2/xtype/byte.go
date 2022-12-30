@@ -1,7 +1,7 @@
 package xtype
 
 import (
-	"code.olapie.com/sugar/conv"
+	"code.olapie.com/sugar/v2/conv"
 )
 
 type ByteUnit int64

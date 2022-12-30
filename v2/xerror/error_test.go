@@ -3,7 +3,7 @@ package xerror_test
 import (
 	"testing"
 
-	"code.olapie.com/sugar/xerror"
+	"code.olapie.com/sugar/v2/xerror"
 )
 
 func TestFromString(t *testing.T) {

@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"code.olapie.com/sugar/must"
-	"code.olapie.com/sugar/xassign"
-	"code.olapie.com/sugar/xjson"
+	"code.olapie.com/sugar/v2/must"
+	"code.olapie.com/sugar/v2/xassign"
+	"code.olapie.com/sugar/v2/xjson"
 )
 
 type Image struct {

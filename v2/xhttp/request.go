@@ -7,7 +7,7 @@ import (
 	"io"
 	"net/http"
 
-	"code.olapie.com/sugar/xerror"
+	"code.olapie.com/sugar/v2/xerror"
 )
 
 func DoRequest(req *http.Request) (*http.Response, error) {

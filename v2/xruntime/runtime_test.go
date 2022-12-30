@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"code.olapie.com/sugar/xruntime"
-	"code.olapie.com/sugar/xtest"
+	"code.olapie.com/sugar/v2/xruntime"
+	"code.olapie.com/sugar/v2/xtest"
 )
 
 func TestIndirectKind(t *testing.T) {

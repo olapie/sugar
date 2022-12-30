@@ -16,10 +16,10 @@ import (
 	"strconv"
 	"time"
 
-	"code.olapie.com/sugar/conv"
-	"code.olapie.com/sugar/xcontext"
-	"code.olapie.com/sugar/xerror"
-	"code.olapie.com/sugar/xmath"
+	"code.olapie.com/sugar/v2/conv"
+	"code.olapie.com/sugar/v2/xcontext"
+	"code.olapie.com/sugar/v2/xerror"
+	"code.olapie.com/sugar/v2/xmath"
 	"github.com/google/uuid"
 )
 
@@ -102,11 +102,11 @@ type PublicKey interface {
 func Verify[K PublicKey](ctx context.Context, req *http.Request, pub *K) bool {
 	ts := req.Header.Get(KeyTimestamp)
 	if ts == "" {
-		fmt.Printf("[sugar/xhttp] missing %s in header\n", KeyTimestamp)
+		fmt.Printf("[sugar/v2/xhttp] missing %s in header\n", KeyTimestamp)
 	}
 	t, err := strconv.ParseInt(ts, 0, 64)
 	if err != nil {
-		fmt.Printf("[sugar/xhttp] strconv.ParseInt: %s, %v\n", ts, err)
+		fmt.Printf("[sugar/v2/xhttp] strconv.ParseInt: %s, %v\n", ts, err)
 		return false
 	}
 
@@ -117,7 +117,7 @@ func Verify[K PublicKey](ctx context.Context, req *http.Request, pub *K) bool {
 	signature := req.Header.Get(KeySignature)
 	sign, err := base64.StdEncoding.DecodeString(signature)
 	if err != nil {
-		fmt.Printf("[sugar/xhttp] base64.DecodeString: %s, %v\n", signature, err)
+		fmt.Printf("[sugar/v2/xhttp] base64.DecodeString: %s, %v\n", signature, err)
 		return false
 	}
 	hash := getMessageHashForSigning(req)

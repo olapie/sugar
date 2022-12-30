@@ -10,7 +10,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"code.olapie.com/sugar/conv"
+	"code.olapie.com/sugar/v2/conv"
 )
 
 const prettyTableSize = 34

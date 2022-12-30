@@ -3,7 +3,7 @@ package xjson_test
 import (
 	"testing"
 
-	"code.olapie.com/sugar/xjson"
+	"code.olapie.com/sugar/v2/xjson"
 )
 
 func TestJSONExample(t *testing.T) {

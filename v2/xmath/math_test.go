@@ -3,8 +3,8 @@ package xmath_test
 import (
 	"testing"
 
-	"code.olapie.com/sugar/xmath"
-	"code.olapie.com/sugar/xtest"
+	"code.olapie.com/sugar/v2/xmath"
+	"code.olapie.com/sugar/v2/xtest"
 )
 
 func TestMax(t *testing.T) {

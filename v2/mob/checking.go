@@ -4,8 +4,8 @@ import (
 	"strings"
 	"unicode"
 
-	"code.olapie.com/sugar/xcheck"
-	"code.olapie.com/sugar/xtime"
+	"code.olapie.com/sugar/v2/xcheck"
+	"code.olapie.com/sugar/v2/xtime"
 )
 
 func IsEmailAddress(s string) bool {

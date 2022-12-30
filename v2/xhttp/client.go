@@ -6,7 +6,7 @@ import (
 	"io"
 	"net/http"
 
-	"code.olapie.com/sugar/xerror"
+	"code.olapie.com/sugar/v2/xerror"
 )
 
 func DoWithResponse(ctx context.Context, method, url string, body io.Reader) (*http.Response, error) {

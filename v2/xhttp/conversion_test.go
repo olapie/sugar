@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"testing"
 
-	"code.olapie.com/sugar/xhttp"
-	"code.olapie.com/sugar/xtest"
-	"code.olapie.com/sugar/xtype"
+	"code.olapie.com/sugar/v2/xhttp"
+	"code.olapie.com/sugar/v2/xtest"
+	"code.olapie.com/sugar/v2/xtype"
 )
 
 func TestToMap(t *testing.T) {

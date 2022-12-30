@@ -3,8 +3,8 @@ package xslice_test
 import (
 	"testing"
 
-	"code.olapie.com/sugar/xslice"
-	"code.olapie.com/sugar/xtest"
+	"code.olapie.com/sugar/v2/xslice"
+	"code.olapie.com/sugar/v2/xtest"
 )
 
 func TestReverse(t *testing.T) {

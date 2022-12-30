@@ -3,8 +3,8 @@ package xmap_test
 import (
 	"testing"
 
-	"code.olapie.com/sugar/xmap"
-	"code.olapie.com/sugar/xtest"
+	"code.olapie.com/sugar/v2/xmap"
+	"code.olapie.com/sugar/v2/xtest"
 )
 
 func TestToEnvMap(t *testing.T) {

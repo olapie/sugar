@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"code.olapie.com/sugar/xruntime"
+	"code.olapie.com/sugar/v2/xruntime"
 )
 
 func Clone[T any](a []T) []T {

@@ -9,12 +9,12 @@ import (
 	"reflect"
 	"strings"
 
-	"code.olapie.com/sugar/conv"
-	"code.olapie.com/sugar/xcheck"
-	"code.olapie.com/sugar/xmap"
-	"code.olapie.com/sugar/xruntime"
-	"code.olapie.com/sugar/xstring"
-	"code.olapie.com/sugar/xtype"
+	"code.olapie.com/sugar/v2/conv"
+	"code.olapie.com/sugar/v2/xcheck"
+	"code.olapie.com/sugar/v2/xmap"
+	"code.olapie.com/sugar/v2/xruntime"
+	"code.olapie.com/sugar/v2/xstring"
+	"code.olapie.com/sugar/v2/xtype"
 )
 
 func Join(a ...string) string {

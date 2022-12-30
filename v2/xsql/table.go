@@ -8,8 +8,8 @@ import (
 	"reflect"
 	"strings"
 
-	"code.olapie.com/sugar/xname"
-	"code.olapie.com/sugar/xruntime"
+	"code.olapie.com/sugar/v2/xname"
+	"code.olapie.com/sugar/v2/xruntime"
 )
 
 type tablexname interface {

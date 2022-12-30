@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"text/template"
 
-	"code.olapie.com/sugar/must"
+	"code.olapie.com/sugar/v2/must"
 )
 
 var Debug = false

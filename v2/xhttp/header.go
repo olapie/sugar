@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"code.olapie.com/sugar/must"
+	"code.olapie.com/sugar/v2/must"
 )
 
 const (

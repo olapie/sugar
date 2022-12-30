@@ -13,8 +13,8 @@ import (
 	"strings"
 	"unsafe"
 
-	"code.olapie.com/sugar/xerror"
-	"code.olapie.com/sugar/xruntime"
+	"code.olapie.com/sugar/v2/xerror"
+	"code.olapie.com/sugar/v2/xruntime"
 )
 
 // ToBool converts i to bool

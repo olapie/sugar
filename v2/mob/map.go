@@ -1,8 +1,8 @@
 package mob
 
 import (
-	"code.olapie.com/sugar/mob/nomobile"
-	"code.olapie.com/sugar/xtype"
+	"code.olapie.com/sugar/v2/mob/nomobile"
+	"code.olapie.com/sugar/v2/xtype"
 )
 
 type Map struct {

@@ -3,8 +3,8 @@ package xtype_test
 import (
 	"testing"
 
-	"code.olapie.com/sugar/xtest"
-	"code.olapie.com/sugar/xtype"
+	"code.olapie.com/sugar/v2/xtest"
+	"code.olapie.com/sugar/v2/xtype"
 )
 
 func TestM_AddStruct(t *testing.T) {

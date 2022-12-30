@@ -3,7 +3,7 @@ package xmap
 import (
 	"strings"
 
-	"code.olapie.com/sugar/conv"
+	"code.olapie.com/sugar/v2/conv"
 )
 
 func Int[K comparable, V any](m map[K]V, k K) (int, bool) {

@@ -9,10 +9,10 @@ import (
 	"log"
 	"reflect"
 
-	"code.olapie.com/sugar/conv"
-	"code.olapie.com/sugar/xerror"
-	"code.olapie.com/sugar/xname"
-	"code.olapie.com/sugar/xruntime"
+	"code.olapie.com/sugar/v2/conv"
+	"code.olapie.com/sugar/v2/xerror"
+	"code.olapie.com/sugar/v2/xname"
+	"code.olapie.com/sugar/v2/xruntime"
 )
 
 // Assign fill src's underlying value and fields with dst

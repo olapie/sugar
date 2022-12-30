@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"sync"
 
-	"code.olapie.com/sugar/xname"
+	"code.olapie.com/sugar/v2/xname"
 )
 
 var mu sync.RWMutex

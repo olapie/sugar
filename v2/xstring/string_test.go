@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"code.olapie.com/sugar/xstring"
-	"code.olapie.com/sugar/xtest"
+	"code.olapie.com/sugar/v2/xstring"
+	"code.olapie.com/sugar/v2/xtest"
 )
 
 func TestSquish(t *testing.T) {

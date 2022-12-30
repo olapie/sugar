@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"strings"
 
-	"code.olapie.com/sugar/xtype"
+	"code.olapie.com/sugar/v2/xtype"
 )
 
 type MapOutput interface {
