@@ -2,10 +2,10 @@ syntax = "proto3";
 
 package types;
 
-option go_package = "code.olapie.com/types";
+option go_package = "code.olapie.com/sugar/v2/xtype";
 
 message Void {
-    
+
 }
 
 message Point {
@@ -30,10 +30,22 @@ message Money {
     string amount = 2;
 }
 
+message PhoneNumber {
+    int32 code = 1;
+    int64 number = 2;
+    string extension = 3;
+}
+
 message FullName {
     string first = 1;
     string middle = 2;
     string last = 3;
+}
+
+enum Gender {
+    UNKNOWN = 0;
+    MALE = 1;
+    FEMALE = 2;
 }
 
 message PhotoID {
@@ -92,10 +104,52 @@ message Address {
     string postal_code = 3;
 }
 
+message Image  {
+    string url = 1;
+    int32 width = 2;
+    int32 height = 3;
+    string format = 4;
+    int32 size = 5;
+    string name = 6;
+    string thumbnail = 7;
+    bytes data = 8;
+}
+
+message Video  {
+    string url = 1;
+    string format = 2;
+    int32 duration = 3;
+    int32 size = 4;
+    Image  image = 5;
+    string name = 6;
+    bytes data = 7;
+}
+
+message Audio  {
+    string url = 1;
+    string format = 2;
+    int32 duration = 3;
+    int32 size = 4;
+    string name = 5;
+    bytes data = 6;
+}
+
 message File  {
     string url = 1;
     string name = 2;
     int32 size = 3;
     string format = 4;
     bytes data = 5;
+}
+
+message WebPage  {
+    string title = 1;
+    string summary = 2;
+    Image image = 3;
+    string url = 4;
+}
+
+message StringPair {
+    string v1 = 1;
+    string v2 = 2;
 }
