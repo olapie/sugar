@@ -16,6 +16,11 @@ const (
 	Degree      = EarthCircle * 1000 / 360
 )
 
+type Point struct {
+	X float64 `json:"x"`
+	Y float64 `json:"y"`
+}
+
 func NewPoint(x, y float64) *Point {
 	return &Point{X: x, Y: y}
 }
