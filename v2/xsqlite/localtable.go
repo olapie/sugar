@@ -407,6 +407,20 @@ func (t *LocalTable[R]) Get(ctx context.Context, localID string) (record R, err 
 	return record, xerror.NotExist
 }
 
+func (t *LocalTable[R]) CleanLocals(ctx context.Context) error {
+	res, err := t.db.ExecContext(ctx, `DELETE FROM locals WHERE id IN (SELECT id FROM remotes)`)
+	if err != nil {
+		return err
+	}
+	n, err := res.RowsAffected()
+	if err != nil {
+		fmt.Println("failed getting affected rows count", err)
+	} else {
+		fmt.Printf("deleted %d locals which have been saved remotely\n", n)
+	}
+	return nil
+}
+
 func (t *LocalTable[R]) EncryptPlainData(ctx context.Context) error {
 	tableNames := []string{"remotes", "locals", "deletions"}
 	for _, name := range tableNames {
