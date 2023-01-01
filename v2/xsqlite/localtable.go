@@ -330,21 +330,30 @@ func (t *LocalTable[R]) ListDeletions(ctx context.Context) ([]R, error) {
 	return l, err
 }
 
+func (t *LocalTable[R]) BatchGetRemotes(ctx context.Context, localIDs ...string) ([]R, error) {
+	if len(localIDs) == 0 {
+		return nil, nil
+	}
+	condition, args := t.getCatchIDsCondition(localIDs...)
+	_, l, err := t.list(ctx, "remotes", "id IN "+condition, args...)
+	return l, err
+}
+
+func (t *LocalTable[R]) BatchGetLocals(ctx context.Context, localIDs ...string) ([]R, error) {
+	if len(localIDs) == 0 {
+		return nil, nil
+	}
+	condition, args := t.getCatchIDsCondition(localIDs...)
+	_, l, err := t.list(ctx, "locals", "id IN "+condition, args...)
+	return l, err
+}
+
 func (t *LocalTable[R]) RemoveDeletions(ctx context.Context, localIDs ...string) error {
 	if len(localIDs) == 0 {
 		return nil
 	}
-	var buf bytes.Buffer
-	buf.WriteByte('(')
-	for range localIDs {
-		buf.WriteString("?,")
-	}
-	buf.Truncate(len(localIDs) * 2)
-	buf.WriteByte(')')
-	args := xslice.MustTransform(localIDs, func(a string) any {
-		return any(a)
-	})
-	_, err := t.db.ExecContext(ctx, `DELETE FROM deletions WHERE id IN `+buf.String(), args...)
+	condition, args := t.getCatchIDsCondition(localIDs...)
+	_, err := t.db.ExecContext(ctx, `DELETE FROM deletions WHERE id IN `+condition, args...)
 	if err != nil {
 		return fmt.Errorf("remove deletionss: %w", err)
 	}
@@ -509,12 +518,12 @@ func (t *LocalTable[R]) writeEncryptedData(ctx context.Context, tableName string
 	return nil
 }
 
-func (t *LocalTable[R]) list(ctx context.Context, tableName string, where string) ([]string, []R, error) {
+func (t *LocalTable[R]) list(ctx context.Context, tableName string, where string, args ...any) ([]string, []R, error) {
 	if where != "" {
 		where = " where " + where
 	}
 	query := `SELECT id, data FROM ` + tableName + where
-	rows, err := t.db.QueryContext(ctx, query)
+	rows, err := t.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, nil, fmt.Errorf("execute query: %s, %w", query, err)
 	}
@@ -607,4 +616,21 @@ func (t *LocalTable[R]) decode(localID string, data []byte) (record R, err error
 		err = json.Unmarshal(data, &record)
 	}
 	return
+}
+
+func (t *LocalTable[R]) getCatchIDsCondition(ids ...string) (string, []any) {
+	if len(ids) == 0 {
+		return "", nil
+	}
+	var buf bytes.Buffer
+	buf.WriteByte('(')
+	for range ids {
+		buf.WriteString("?,")
+	}
+	buf.Truncate(len(ids) * 2)
+	buf.WriteByte(')')
+	args := xslice.MustTransform(ids, func(a string) any {
+		return any(a)
+	})
+	return buf.String(), args
 }
