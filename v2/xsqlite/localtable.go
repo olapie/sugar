@@ -363,6 +363,11 @@ func (t *LocalTable[R]) RemoveDeletions(ctx context.Context, localIDs ...string)
 	return nil
 }
 
+func (t *LocalTable[R]) RemoveAllRemotes(ctx context.Context) error {
+	_, err := t.db.ExecContext(ctx, `DELETE FROM remotes`)
+	return err
+}
+
 func (t *LocalTable[R]) Get(ctx context.Context, localID string) (record R, err error) {
 	var ok bool
 	record, ok = t.remoteCache.Get(localID)
