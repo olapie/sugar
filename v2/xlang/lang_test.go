@@ -36,7 +36,7 @@ func TestSetLang(t *testing.T) {
 }
 
 func TestLoadEmbed(t *testing.T) {
-	err := LoadEmbed(testdataFS, "testdata")
+	err := LoadFS(testdataFS, "testdata")
 	if err != nil {
 		t.Fatal("load embed testdata", err)
 	}

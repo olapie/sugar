@@ -1,20 +1,31 @@
 package xlang
 
 import (
-	"embed"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/fs"
 	"path/filepath"
 	"strings"
 
 	"golang.org/x/text/language"
-	"gopkg.in/yaml.v3"
 )
 
 var langName = "en"
 var defaultLangName = "en"
 var localizedStrings = map[string]map[string]string{}
+
+type UnmarshalFunc = func([]byte, any) error
+
+var unmarshalFuncMap = map[string]UnmarshalFunc{".json": json.Unmarshal}
+
+func SetUnmarshalFunc(extension string, fn UnmarshalFunc) {
+	unmarshalFuncMap[extension] = fn
+}
+
+func GetUnmarshalFunc(extension string, fn UnmarshalFunc) UnmarshalFunc {
+	return unmarshalFuncMap[extension]
+}
 
 func SetLang(s string) error {
 	t, err := language.Parse(s)
@@ -47,31 +58,32 @@ func SetLocalizedStrings(strings map[string]map[string]string) {
 	localizedStrings = strings
 }
 
-func LoadEmbed(fs embed.FS, dirname string) error {
-	entries, err := fs.ReadDir(dirname)
+type ReadDirFileFS interface {
+	fs.ReadDirFS
+	fs.ReadFileFS
+}
+
+func LoadFS(readFS ReadDirFileFS, dirname string) error {
+	entries, err := readFS.ReadDir(dirname)
 	if err != nil {
 		return fmt.Errorf("fs.ReadDir: %w", err)
 	}
 
 	for _, e := range entries {
 		filename := filepath.Join(dirname, e.Name())
-		ext := filepath.Ext(e.Name())
-		data, err := fs.ReadFile(filepath.Join(dirname, e.Name()))
+		data, err := readFS.ReadFile(filename)
 		if err != nil {
 			return fmt.Errorf("fs.ReadFile: %s, %w", filename, err)
 		}
 		var m map[string]string
-		switch ext {
-		case ".json":
-			if err := json.Unmarshal(data, &m); err != nil {
-				return fmt.Errorf("json.Unmarshal: %w", err)
-			}
-		case ".yaml", ".yml":
-			if err := yaml.Unmarshal(data, &m); err != nil {
-				return fmt.Errorf("yaml.Unmarshal: %w", err)
-			}
-		default:
+		ext := filepath.Ext(e.Name())
+		fn := unmarshalFuncMap[ext]
+		if fn == nil {
 			return errors.New("unsupported file type")
+		}
+
+		if err = fn(data, &m); err != nil {
+			return fmt.Errorf("unmarshal: %w", err)
 		}
 
 		lang := e.Name()[:strings.Index(e.Name(), ".")]
@@ -79,7 +91,6 @@ func LoadEmbed(fs embed.FS, dirname string) error {
 		if err != nil {
 			return fmt.Errorf("language.Parse: %s, %w", lang, err)
 		}
-
 		if current := localizedStrings[t.String()]; current == nil {
 			localizedStrings[t.String()] = m
 		} else {
