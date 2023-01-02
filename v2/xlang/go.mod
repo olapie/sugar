@@ -1,4 +1,4 @@
-module code.olapie.com/sugar/xlang
+module code.olapie.com/sugar/v2/xlang
 
 go 1.19
 
