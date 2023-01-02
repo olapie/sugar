@@ -118,3 +118,7 @@ func Translate(s string) string {
 	}
 	return s
 }
+
+func IsChinese() bool {
+	return langName[:2] == "zh"
+}
