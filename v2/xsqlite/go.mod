@@ -3,7 +3,7 @@ module code.olapie.com/sugar/v2/xsqlite
 go 1.19
 
 require (
-	code.olapie.com/sugar/v2 v2.0.2
+	code.olapie.com/sugar/v2 v2.0.7
 	github.com/google/uuid v1.3.0
 	github.com/hashicorp/golang-lru/v2 v2.0.1
 	github.com/mattn/go-sqlite3 v1.14.16
