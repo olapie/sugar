@@ -1,7 +1,6 @@
 package xtime
 
 import (
-	"code.olapie.com/sugar/v2/xlang"
 	"database/sql"
 	"database/sql/driver"
 	"encoding/json"
@@ -9,6 +8,8 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	"code.olapie.com/sugar/v2/xlang"
 )
 
 var (

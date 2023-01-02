@@ -1,12 +1,13 @@
 package base62_test
 
 import (
-	"code.olapie.com/sugar/base62"
-	"code.olapie.com/sugar/testx"
 	"encoding/base64"
-	"github.com/google/uuid"
 	"strings"
 	"testing"
+
+	"code.olapie.com/sugar/base62"
+	"code.olapie.com/sugar/testx"
+	"github.com/google/uuid"
 )
 
 func TestEncodeToString(t *testing.T) {

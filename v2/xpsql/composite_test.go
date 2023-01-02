@@ -1,9 +1,10 @@
 package xpsql_test
 
 import (
-	"code.olapie.com/sugar/v2/xpsql"
 	"fmt"
 	"testing"
+
+	"code.olapie.com/sugar/v2/xpsql"
 )
 
 func TestParseCompositeFields(t *testing.T) {
