@@ -1,6 +1,7 @@
 package xtime
 
 import (
+	"code.olapie.com/sugar/v2/xlang"
 	"time"
 )
 
@@ -48,14 +49,10 @@ const (
 )
 
 var enWeekdaySymbols = [7]string{"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}
-var hansWeekdaySymbols = [7]string{"周日", "周一", "周二", "周三", "周四", "周五", "周六"}
 
 func GetWeekdaySymbol(d int) string {
 	d = d % 7
-	if IsSimplifiedChinese() {
-		return hansWeekdaySymbols[d]
-	}
-	return enWeekdaySymbols[d]
+	return xlang.Translate(enWeekdaySymbols[d])
 }
 
 func abs[T ~int64](num T) T {

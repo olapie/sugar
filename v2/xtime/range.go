@@ -1,6 +1,7 @@
 package xtime
 
 import (
+	"code.olapie.com/sugar/v2/xlang"
 	"database/sql"
 	"database/sql/driver"
 	"encoding/json"
@@ -357,7 +358,6 @@ func (r *Range) PrevRepeat(repeat Repeat) *Range {
 }
 
 func (r *Range) RelativeText() string {
-	hans := IsSimplifiedChinese()
 	begin, end := r.BeginT(), r.EndT()
 	beginText := begin.Date().ShortText()
 	if !begin.IsBeginOfDay() {
@@ -370,22 +370,13 @@ func (r *Range) RelativeText() string {
 	if r.InDay() {
 		switch {
 		case r.IsAllDay():
-			if hans {
-				return beginText + "全天"
-			}
-			return beginText + " all day"
+			return beginText + "" + xlang.Translate("all day")
 		case begin.Equals(end):
 			return beginText
 		case begin.IsBeginOfDay():
-			if hans {
-				return endText + " 结束"
-			}
-			return endText + " ends"
+			return endText + " " + xlang.Translate("ends")
 		case end.IsEndOfDay():
-			if hans {
-				return beginText + " 开始"
-			}
-			return beginText + " begins"
+			return beginText + " " + xlang.Translate("begins")
 		default:
 			return beginText + " - " + strings.ToLower(end.TimeText())
 		}

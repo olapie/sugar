@@ -1,6 +1,7 @@
 package xtime
 
 import (
+	"code.olapie.com/sugar/v2/xlang"
 	"fmt"
 	"sync"
 	"time"
@@ -146,13 +147,7 @@ func (m *Month) String() string {
 
 func (m *Month) RelativeText() string {
 	if m.Year == time.Now().Year() {
-		if IsSimplifiedChinese() {
-			return fmt.Sprintf("%d月", m.Month)
-		}
-		return time.Month(m.Month).String()[:3]
-	}
-	if IsSimplifiedChinese() {
-		return fmt.Sprintf("%d年%d月", m.Year, m.Month)
+		return xlang.Translate(time.Month(m.Month).String()[:3])
 	}
 	return fmt.Sprintf("%s %d", time.Month(m.Month).String()[:3], m.Year)
 }
