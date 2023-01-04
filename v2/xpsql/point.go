@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"code.olapie.com/sugar/v2/xpsql/internal/composite"
 	"code.olapie.com/sugar/v2/xtype"
 )
 
@@ -41,7 +42,7 @@ func (p *pointScanner) Scan(src any) error {
 		return nil
 	}
 
-	fields, err := ParseCompositeFields(s)
+	fields, err := composite.ParseFields(s)
 	if err != nil {
 		return fmt.Errorf("parse composite fields %s: %w", s, err)
 	}

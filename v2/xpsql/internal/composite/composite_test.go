@@ -1,15 +1,13 @@
-package xpsql_test
+package composite
 
 import (
 	"fmt"
 	"testing"
-
-	"code.olapie.com/sugar/v2/xpsql"
 )
 
-func TestParseCompositeFields(t *testing.T) {
+func TestParseFields(t *testing.T) {
 	t.Run("Single", func(t *testing.T) {
-		res, err := xpsql.ParseCompositeFields("(abc)")
+		res, err := ParseFields("(abc)")
 		if err != nil {
 			t.Error(err)
 		}
@@ -18,14 +16,14 @@ func TestParseCompositeFields(t *testing.T) {
 			t.Errorf("Expect [abc] got %v", res)
 		}
 
-		_, err = xpsql.ParseCompositeFields("(abc\")")
+		_, err = ParseFields("(abc\")")
 		if err == nil {
 			t.Error("Expect error")
 		}
 	})
 
 	t.Run("Multiple", func(t *testing.T) {
-		res, err := xpsql.ParseCompositeFields("(abc,123)")
+		res, err := ParseFields("(abc,123)")
 		if err != nil {
 			t.Error(err)
 		}
@@ -36,7 +34,7 @@ func TestParseCompositeFields(t *testing.T) {
 			t.Errorf("Expect %s, got %s", expect, got)
 		}
 
-		res, err = xpsql.ParseCompositeFields("(abc,)")
+		res, err = ParseFields("(abc,)")
 		if err != nil {
 			t.Error(err)
 		}
@@ -48,7 +46,7 @@ func TestParseCompositeFields(t *testing.T) {
 	})
 
 	t.Run("Embedded", func(t *testing.T) {
-		res, err := xpsql.ParseCompositeFields("(abc,123,\"(19,20)\")")
+		res, err := ParseFields("(abc,123,\"(19,20)\")")
 		if err != nil {
 			t.Error(err)
 		}
@@ -58,7 +56,7 @@ func TestParseCompositeFields(t *testing.T) {
 			t.Errorf("Expect %s, got %s", expect, got)
 		}
 
-		res, err = xpsql.ParseCompositeFields("(\"(19,20)\",abc,123,)")
+		res, err = ParseFields("(\"(19,20)\",abc,123,)")
 		if err != nil {
 			t.Error(err)
 		}
@@ -70,7 +68,7 @@ func TestParseCompositeFields(t *testing.T) {
 	})
 
 	t.Run("Quoted", func(t *testing.T) {
-		res, err := xpsql.ParseCompositeFields("(\"abc\"\", \",123)")
+		res, err := ParseFields("(\"abc\"\", \",123)")
 		if err != nil {
 			t.Error(err)
 		}

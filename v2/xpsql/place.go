@@ -5,6 +5,7 @@ import (
 	"database/sql/driver"
 	"fmt"
 
+	"code.olapie.com/sugar/v2/xpsql/internal/composite"
 	"code.olapie.com/sugar/v2/xtype"
 )
 
@@ -34,7 +35,7 @@ func (ps *placeScanner) Scan(src any) error {
 	if s == "" {
 		return nil
 	}
-	fields, err := ParseCompositeFields(s)
+	fields, err := composite.ParseFields(s)
 	if err != nil {
 		return fmt.Errorf("parse composite fields %s: %w", s, err)
 	}
@@ -75,5 +76,5 @@ func (pv *placeValuer) Value() (driver.Value, error) {
 	fields := []string{pv.v.Code, pv.v.Name}
 	locStr, _ := loc.(string)
 	fields = append(fields, locStr)
-	return ToCompositeString(fields), nil
+	return composite.FieldsToString(fields), nil
 }

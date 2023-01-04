@@ -3,15 +3,16 @@ package xpsql
 import (
 	"database/sql"
 	"database/sql/driver"
+	"fmt"
 
 	"code.olapie.com/sugar/v2/xtype"
 )
 
-type supportedxtype interface {
+type supportedScanTypes interface {
 	*xtype.Point | *xtype.Place | *xtype.PhoneNumber | *xtype.FullName | *xtype.Money | map[string]string
 }
 
-func Scan[T supportedxtype](v *T) sql.Scanner {
+func Scan[T supportedScanTypes](v *T) sql.Scanner {
 	switch val := any(v).(type) {
 	case **xtype.Point:
 		return &pointScanner{v: val}
@@ -26,11 +27,11 @@ func Scan[T supportedxtype](v *T) sql.Scanner {
 	case *map[string]string:
 		return &hstoreScanner{m: val}
 	default:
-		panic("unsupported type")
+		panic(fmt.Sprintf("unsupported scan type: %T", v))
 	}
 }
 
-func Value[T supportedxtype](v T) driver.Valuer {
+func Value[T supportedScanTypes](v T) driver.Valuer {
 	switch val := any(v).(type) {
 	case *xtype.Point:
 		return &pointValuer{v: val}
@@ -45,6 +46,6 @@ func Value[T supportedxtype](v T) driver.Valuer {
 	case map[string]string:
 		return mapToHstore(val)
 	default:
-		panic("unsupported type")
+		panic(fmt.Sprintf("unsupported scan type: %T", v))
 	}
 }

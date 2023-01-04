@@ -1,47 +1,27 @@
-package xpsql
+package composite
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"strings"
 )
 
-type compositeScanState int
+type parsingState int
 
 const (
-	compositeScanInit compositeScanState = iota
-	compositeScanField
-	compositeScanQuoted
+	parsingInit parsingState = iota
+	parsingField
+	parsingQuoted
 )
 
-func ToCompositeString(fields ...any) string {
-	var builder strings.Builder
-	builder.WriteString("(")
-	n := len(fields)
-	for i, field := range fields {
-		switch v := field.(type) {
-		case string:
-			builder.WriteString(escapeCompositeField(v))
-		case []byte:
-			builder.WriteString(escapeCompositeField(string(v)))
-		default:
-			builder.WriteString(escapeCompositeField(fmt.Sprint(v)))
-		}
-		if i < n-1 {
-			builder.WriteRune(',')
-		}
-	}
-	builder.WriteString(")")
-	return builder.String()
-}
-
-func ParseCompositeFields(column string) ([]string, error) {
-	if len(column) == 0 {
-		return nil, fmt.Errorf("empty column")
+func ParseFields(column string) ([]string, error) {
+	if column == "" {
+		return nil, errors.New("empty column")
 	}
 
 	fields := make([]string, 0, 2)
-	state := compositeScanInit
+	state := parsingInit
 	var field bytes.Buffer
 	chars := []rune(column)
 	n := len(chars)
@@ -50,18 +30,18 @@ Loop:
 	for i := 0; i < n; i++ {
 		c := chars[i]
 		switch state {
-		case compositeScanInit:
+		case parsingInit:
 			if c != '(' {
 				//errPos = i
 				//break Loop
 				continue
 			}
-			state = compositeScanField
-		case compositeScanField:
+			state = parsingField
+		case parsingField:
 			switch c {
 			case '"':
 				if field.Len() == 0 {
-					state = compositeScanQuoted
+					state = parsingQuoted
 				} else {
 					if i == len(chars)-1 || chars[i+1] != '"' {
 						errPos = i
@@ -83,7 +63,7 @@ Loop:
 			default:
 				field.WriteRune(c)
 			}
-		case compositeScanQuoted:
+		case parsingQuoted:
 			switch c {
 			case '"':
 				if i == len(chars)-1 {
@@ -98,7 +78,7 @@ Loop:
 				case ',':
 					fields = append(fields, field.String())
 					field.Reset()
-					state = compositeScanField
+					state = parsingField
 				case ')':
 					fields = append(fields, field.String())
 					if i != len(chars)-1 {
@@ -118,22 +98,28 @@ Loop:
 	return nil, fmt.Errorf("syntax error at %d", errPos)
 }
 
-func MakeSQLPlaceholder(prefix string, num int) string {
-	var b strings.Builder
-	for i := 1; i <= num; i++ {
-		if i > 1 {
-			b.WriteString(",")
+func FieldsToString(fields ...any) string {
+	var builder strings.Builder
+	builder.WriteString("(")
+	n := len(fields)
+	for i, field := range fields {
+		switch v := field.(type) {
+		case string:
+			builder.WriteString(EscapeField(v))
+		case []byte:
+			builder.WriteString(EscapeField(string(v)))
+		default:
+			builder.WriteString(EscapeField(fmt.Sprint(v)))
 		}
-		b.WriteString(fmt.Sprintf("%s%d", prefix, i))
+		if i < n-1 {
+			builder.WriteRune(',')
+		}
 	}
-	return b.String()
+	builder.WriteString(")")
+	return builder.String()
 }
 
-func MakePlaceholder(num int) string {
-	return MakeSQLPlaceholder("$", num)
-}
-
-func escapeCompositeField(s string) string {
+func EscapeField(s string) string {
 	s = strings.Replace(s, ",", "\\,", -1)
 	s = strings.Replace(s, "(", "\\(", -1)
 	s = strings.Replace(s, ")", "\\)", -1)
