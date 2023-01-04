@@ -8,15 +8,14 @@ import (
 	"errors"
 	"fmt"
 
-	"code.olapie.com/sugar/v2/xtype"
-
 	"code.olapie.com/sugar/v2/must"
 	"code.olapie.com/sugar/v2/olasec"
 	"code.olapie.com/sugar/v2/xbyte"
 	"code.olapie.com/sugar/v2/xerror"
 	"code.olapie.com/sugar/v2/xslice"
 	"code.olapie.com/sugar/v2/xtime"
-	lru "github.com/hashicorp/golang-lru/v2"
+	"code.olapie.com/sugar/v2/xtype"
+	"github.com/hashicorp/golang-lru/v2"
 )
 
 const (
