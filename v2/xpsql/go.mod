@@ -3,7 +3,7 @@ module code.olapie.com/sugar/v2/xpsql
 go 1.19
 
 require (
-	code.olapie.com/sugar/v2 v2.0.2
+	code.olapie.com/sugar/v2 v2.0.7
 	github.com/lib/pq v1.10.7
 )
 
