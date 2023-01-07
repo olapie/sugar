@@ -8,20 +8,25 @@ import (
 	"github.com/nyaruka/phonenumbers"
 )
 
-func (x *PhoneNumber) ToString() string {
-	return fmt.Sprintf("+%d%d", x.Code, x.Number)
+type PhoneNumber struct {
+	Code   int32 `json:"code,omitempty"`
+	Number int64 `json:"number,omitempty"`
 }
 
-func (x *PhoneNumber) InternationalFormat() string {
-	pn, err := phonenumbers.Parse(x.ToString(), "")
+func (pn *PhoneNumber) String() string {
+	return fmt.Sprintf("+%d%d", pn.Code, pn.Number)
+}
+
+func (pn *PhoneNumber) InternationalFormat() string {
+	n, err := phonenumbers.Parse(pn.String(), "")
 	if err != nil {
 		return ""
 	}
-	return phonenumbers.Format(pn, phonenumbers.INTERNATIONAL)
+	return phonenumbers.Format(n, phonenumbers.INTERNATIONAL)
 }
 
-func (x *PhoneNumber) MaskString() string {
-	nnBytes := []byte(fmt.Sprint(x.Number))
+func (pn *PhoneNumber) MaskString() string {
+	nnBytes := []byte(fmt.Sprint(pn.Number))
 	maskLen := (len(nnBytes) + 2) / 3
 	start := len(nnBytes) - 2*maskLen
 	for i := 0; i < maskLen; i++ {
@@ -29,15 +34,10 @@ func (x *PhoneNumber) MaskString() string {
 	}
 
 	nn := string(nnBytes)
-
-	if len(x.Extension) == 0 {
-		return fmt.Sprintf("+%d%s", x.Code, nn)
-	}
-
-	return fmt.Sprintf("+%d%s-%s", x.Code, nn, x.Extension)
+	return fmt.Sprintf("+%d%s", pn.Code, nn)
 }
 
-func (x *PhoneNumber) AccountType() string {
+func (pn *PhoneNumber) AccountType() string {
 	return "phone_number"
 }
 
@@ -53,9 +53,8 @@ func NewPhoneNumber(s string) (*PhoneNumber, error) {
 	}
 
 	return &PhoneNumber{
-		Code:      int32(pn.GetCountryCode()),
-		Number:    int64(pn.GetNationalNumber()),
-		Extension: pn.GetExtension(),
+		Code:   pn.GetCountryCode(),
+		Number: int64(pn.GetNationalNumber()),
 	}, nil
 }
 
