@@ -30,6 +30,12 @@ message Money {
     string amount = 2;
 }
 
+message PhoneNumber {
+    int32 code = 1;
+    int64 number = 2;
+    string extension = 3;
+}
+
 message FullName {
     string first = 1;
     string middle = 2;
