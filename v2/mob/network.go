@@ -42,7 +42,7 @@ func IsNetworkReachable() bool {
 
 func checkNetwork(ips ...string) bool {
 	for _, ip := range ips {
-		conn, err := net.DialTimeout("tcp", ip+":80", time.Second*2)
+		conn, err := net.DialTimeout("tcp", ip+":53", time.Second*2)
 		if err == nil {
 			conn.Close()
 			return true
