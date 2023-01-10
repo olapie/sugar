@@ -5,10 +5,12 @@ import (
 )
 
 const (
-	Plain    = "text/plain"
-	HTML     = "text/html"
-	XML2     = "text/xml"
-	CSS      = "text/css"
+	Plain      = "text/plain"
+	HTML       = "text/html"
+	XML2       = "text/xml"
+	CSS        = "text/css"
+	Javascript = "text/javascript" // application/javascript is obsolete
+
 	XML      = "application/xml"
 	XHTML    = "application/xhtml+xml"
 	Protobuf = "application/x-protobuf"
