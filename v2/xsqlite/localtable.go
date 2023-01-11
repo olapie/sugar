@@ -253,7 +253,7 @@ func (t *LocalTable[R]) IsLocal(ctx context.Context, localID string) (bool, erro
 	return exists, nil
 }
 
-func (t *LocalTable[R]) List(ctx context.Context, categories []int) ([]R, error) {
+func (t *LocalTable[R]) List(ctx context.Context, categories ...int) ([]R, error) {
 	var where string
 	if len(categories) > 0 {
 		if len(categories) == 1 {
