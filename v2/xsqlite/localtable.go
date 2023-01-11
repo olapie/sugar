@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 
 	"code.olapie.com/sugar/v2/must"
 	"code.olapie.com/sugar/v2/olasec"
@@ -252,10 +253,17 @@ func (t *LocalTable[R]) IsLocal(ctx context.Context, localID string) (bool, erro
 	return exists, nil
 }
 
-func (t *LocalTable[R]) List(ctx context.Context, category *int) ([]R, error) {
+func (t *LocalTable[R]) List(ctx context.Context, categories []int) ([]R, error) {
 	var where string
-	if category != nil {
-		where = fmt.Sprintf("category=%d", *category)
+	if len(categories) > 0 {
+		if len(categories) == 1 {
+			where = fmt.Sprintf("category=%d", categories[0])
+		} else {
+			joinedCategories := strings.Join(xslice.MustTransform(categories, func(a int) string {
+				return fmt.Sprint(a)
+			}), ",")
+			where = fmt.Sprintf("category in (%s)", joinedCategories)
+		}
 	}
 	remoteIDs, remotes, err := t.list(ctx, "remotes", where)
 	if err != nil {
@@ -282,8 +290,18 @@ func (t *LocalTable[R]) List(ctx context.Context, category *int) ([]R, error) {
 	return l, nil
 }
 
-func (t *LocalTable[R]) ListExclusive(ctx context.Context, category int) ([]R, error) {
-	where := fmt.Sprintf("category != %d", category)
+func (t *LocalTable[R]) ListExclusive(ctx context.Context, categories ...int) ([]R, error) {
+	var where string
+	if len(categories) > 0 {
+		if len(categories) == 1 {
+			where = fmt.Sprintf("category!=%d", categories[0])
+		} else {
+			joinedCategories := strings.Join(xslice.MustTransform(categories, func(a int) string {
+				return fmt.Sprint(a)
+			}), ",")
+			where = fmt.Sprintf("category not in (%s)", joinedCategories)
+		}
+	}
 	remoteIDs, remotes, err := t.list(ctx, "remotes", where)
 	if err != nil {
 		return nil, fmt.Errorf("failed listing remotes: %w", err)
