@@ -36,7 +36,7 @@ func TestSetLang(t *testing.T) {
 }
 
 func TestLoadEmbed(t *testing.T) {
-	err := LoadFS(testdataFS, "testdata")
+	err := LoadLocalizedStringsFromFS(testdataFS, "testdata")
 	if err != nil {
 		t.Fatal("load embed testdata", err)
 	}
@@ -44,14 +44,14 @@ func TestLoadEmbed(t *testing.T) {
 	if err != nil {
 		t.Fatal("set language", err)
 	}
-	if tr := Translate("noodle"); tr != "麵" {
+	if tr := Localize("noodle"); tr != "麵" {
 		t.Fatal("noodle is incorrect", tr)
 	}
-	if tr := Translate("noodles"); tr != "noodles" {
+	if tr := Localize("noodles"); tr != "noodles" {
 		t.Fatal("noodles shouldn't have any translation")
 	}
 	SetLang("zh-hant")
-	if tr := Translate("noodle"); tr != "面" {
+	if tr := Localize("noodle"); tr != "面" {
 		t.Fatal("noodle is incorrect", tr)
 	}
 }

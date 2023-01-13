@@ -11,9 +11,20 @@ import (
 	"golang.org/x/text/language"
 )
 
-var langName = "en"
-var defaultLangName = "en"
-var localizedStrings = map[string]map[string]string{}
+type keyToString = map[string]string
+type globalData struct {
+	// e.g. en-US, zh-CN
+	Language string
+	// e.g. en, zh-Hans
+	PrimaryLanguage  string
+	LocalizedStrings map[string]keyToString
+}
+
+var global globalData
+
+func init() {
+	global.LocalizedStrings = make(map[string]keyToString)
+}
 
 type UnmarshalFunc = func([]byte, any) error
 
@@ -32,30 +43,43 @@ func SetLang(s string) error {
 	if err != nil {
 		return fmt.Errorf("failed parsing %s, %w", s, err)
 	}
-	langName = t.String()
+	global.Language = t.String()
 	switch {
 	case t == language.Chinese:
-		defaultLangName = language.SimplifiedChinese.String()
+		global.PrimaryLanguage = language.SimplifiedChinese.String()
 	case t.Parent() == language.Chinese:
 		script, _ := t.Script()
 		hans, _ := language.SimplifiedChinese.Script()
 		if script.String() == hans.String() {
-			defaultLangName = language.SimplifiedChinese.String()
+			global.PrimaryLanguage = language.SimplifiedChinese.String()
 		} else {
-			defaultLangName = language.TraditionalChinese.String()
+			global.PrimaryLanguage = language.TraditionalChinese.String()
 		}
 	case t == language.English || t.Parent() == language.English:
-		defaultLangName = language.English.String()
+		global.PrimaryLanguage = language.English.String()
 	}
 	return nil
 }
 
 func GetLang() string {
-	return langName
+	return global.Language
+}
+
+func AddLocalizedStrings(m map[string]map[string]string) {
+	for lang, k2s := range m {
+		lm := global.LocalizedStrings[lang]
+		if len(lm) == 0 {
+			global.LocalizedStrings[lang] = k2s
+			continue
+		}
+		for k, s := range k2s {
+			lm[k] = s
+		}
+	}
 }
 
 func SetLocalizedStrings(strings map[string]map[string]string) {
-	localizedStrings = strings
+	global.LocalizedStrings = strings
 }
 
 type ReadDirFileFS interface {
@@ -63,7 +87,7 @@ type ReadDirFileFS interface {
 	fs.ReadFileFS
 }
 
-func LoadFS(readFS ReadDirFileFS, dirname string) error {
+func LoadLocalizedStringsFromFS(readFS ReadDirFileFS, dirname string) error {
 	entries, err := readFS.ReadDir(dirname)
 	if err != nil {
 		return fmt.Errorf("fs.ReadDir: %w", err)
@@ -91,8 +115,9 @@ func LoadFS(readFS ReadDirFileFS, dirname string) error {
 		if err != nil {
 			return fmt.Errorf("language.Parse: %s, %w", lang, err)
 		}
-		if current := localizedStrings[t.String()]; current == nil {
-			localizedStrings[t.String()] = m
+
+		if current := global.LocalizedStrings[t.String()]; current == nil {
+			global.LocalizedStrings[t.String()] = m
 		} else {
 			for k, v := range m {
 				current[k] = v
@@ -102,23 +127,32 @@ func LoadFS(readFS ReadDirFileFS, dirname string) error {
 	return nil
 }
 
-func Translate(s string) string {
-	if m := localizedStrings[langName]; len(m) > 0 {
-		tr := m[s]
+// Localize returns localized string with given key
+func Localize(key string) string {
+	if m := global.LocalizedStrings[global.Language]; len(m) > 0 {
+		tr := m[key]
 		if tr != "" {
 			return tr
 		}
 	}
 
-	if m := localizedStrings[defaultLangName]; len(m) > 0 {
-		tr := m[s]
+	if m := global.LocalizedStrings[global.PrimaryLanguage]; len(m) > 0 {
+		tr := m[key]
 		if tr != "" {
 			return tr
 		}
 	}
-	return s
+	return key
 }
 
 func IsChinese() bool {
-	return langName[:2] == "zh"
+	return global.Language[:2] == "zh"
+}
+
+func IsSimplifiedChinese() bool {
+	return global.PrimaryLanguage == language.SimplifiedChinese.String()
+}
+
+func IsTraditionalChinese() bool {
+	return global.PrimaryLanguage == language.SimplifiedChinese.String()
 }
