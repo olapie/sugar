@@ -83,7 +83,7 @@ updated_at BIGINT
 	t.stmts.update = xsql.MustPrepare(db, `UPDATE %s SET data=?,updated_at=? WHERE id=?`, name)
 	t.stmts.save = xsql.MustPrepare(db, `REPLACE INTO %s(id,data,updated_at) VALUES(?,?,?)`, name)
 	t.stmts.get = xsql.MustPrepare(db, `SELECT data FROM %s WHERE id=?`, name)
-	t.stmts.listAll = xsql.MustPrepare(db, `SELECT id,data FROM %s`, name)
+	t.stmts.listAll = xsql.MustPrepare(db, `SELECT id,data FROM %s ORDER BY updated_at`, name)
 	t.stmts.listGreaterThan = xsql.MustPrepare(db, `SELECT id,data FROM %s WHERE id>? ORDER BY id ASC LIMIT ?`, name)
 	t.stmts.listLessThan = xsql.MustPrepare(db, `SELECT id,data FROM %s WHERE id<? ORDER BY id DESC LIMIT ?`, name)
 	t.stmts.delete = xsql.MustPrepare(db, `DELETE FROM %s WHERE id=?`, name)
