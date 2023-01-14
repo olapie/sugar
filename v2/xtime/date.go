@@ -178,11 +178,11 @@ func (d *Date) ShortText() string {
 	if abs(d.t.Sub(time.Now())) <= 2*Day {
 		switch {
 		case d.IsYesterday():
-			return xlang.Translate("Yesterday")
+			return xlang.Localize("Yesterday")
 		case d.IsToday():
-			return xlang.Translate("Today")
+			return xlang.Localize("Today")
 		case d.IsTomorrow():
-			return xlang.Translate("Tomorrow")
+			return xlang.Localize("Tomorrow")
 		}
 	}
 	return fmt.Sprintf("%s %s", GetWeekdaySymbol(d.weekday), d.PrettyText())
@@ -192,11 +192,11 @@ func (d *Date) LongText() string {
 	if abs(d.t.Sub(time.Now())) <= 2*Day {
 		switch {
 		case d.IsYesterday():
-			return xlang.Translate("Yesterday") + " " + d.PrettyText()
+			return xlang.Localize("Yesterday") + " " + d.PrettyText()
 		case d.IsToday():
-			return xlang.Translate("Today") + " " + d.PrettyText()
+			return xlang.Localize("Today") + " " + d.PrettyText()
 		case d.IsTomorrow():
-			return xlang.Translate("Tomorrow") + " " + d.PrettyText()
+			return xlang.Localize("Tomorrow") + " " + d.PrettyText()
 		}
 	}
 	return fmt.Sprintf("%s %s", GetWeekdaySymbol(d.weekday), d.PrettyText())

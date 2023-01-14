@@ -53,7 +53,7 @@ var enWeekdaySymbols = [7]string{"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
 
 func GetWeekdaySymbol(d int) string {
 	d = d % 7
-	return xlang.Translate(enWeekdaySymbols[d])
+	return xlang.Localize(enWeekdaySymbols[d])
 }
 
 func abs[T ~int64](num T) T {

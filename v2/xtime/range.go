@@ -371,13 +371,13 @@ func (r *Range) RelativeText() string {
 	if r.InDay() {
 		switch {
 		case r.IsAllDay():
-			return beginText + "" + xlang.Translate("all day")
+			return beginText + "" + xlang.Localize("all day")
 		case begin.Equals(end):
 			return beginText
 		case begin.IsBeginOfDay():
-			return endText + " " + xlang.Translate("ends")
+			return endText + " " + xlang.Localize("ends")
 		case end.IsEndOfDay():
-			return beginText + " " + xlang.Translate("begins")
+			return beginText + " " + xlang.Localize("begins")
 		default:
 			return beginText + " - " + strings.ToLower(end.TimeText())
 		}

@@ -148,7 +148,7 @@ func (m *Month) String() string {
 
 func (m *Month) RelativeText() string {
 	if m.Year == time.Now().Year() {
-		return xlang.Translate(time.Month(m.Month).String()[:3])
+		return xlang.Localize(time.Month(m.Month).String()[:3])
 	}
 	return fmt.Sprintf("%s %d", time.Month(m.Month).String()[:3], m.Year)
 }
