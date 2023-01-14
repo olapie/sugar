@@ -10,10 +10,9 @@ type DeviceInfo struct {
 	Model      string `json:"model,omitempty"`
 	ModelType  string `json:"model_type,omitempty"`
 	Language   string `json:"language,omitempty"`
+	SysName    string `json:"sys_name,omitempty"`
 	SysVersion string `json:"sys_version,omitempty"`
 	Carrier    string `json:"carrier,omitempty"`
-
-	AppVersion string `json:"app_version,omitempty"`
 }
 
 func NewDeviceInfo() *DeviceInfo {
@@ -27,4 +26,13 @@ func (d *DeviceInfo) Attributes() map[string]string {
 		panic(err)
 	}
 	return m
+}
+
+type AppInfo struct {
+	BundleID string `json:"bundle_id"`
+	Version  string `json:"version"`
+}
+
+func NewAppInfo() *AppInfo {
+	return new(AppInfo)
 }
