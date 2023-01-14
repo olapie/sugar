@@ -16,11 +16,11 @@ import (
 	"strconv"
 	"time"
 
+	"code.olapie.com/sugar/v2/base62"
 	"code.olapie.com/sugar/v2/conv"
 	"code.olapie.com/sugar/v2/xcontext"
 	"code.olapie.com/sugar/v2/xerror"
 	"code.olapie.com/sugar/v2/xmath"
-	"github.com/google/uuid"
 )
 
 const (
@@ -54,7 +54,7 @@ func Sign[K PrivateKey](ctx context.Context, req *http.Request, priv *K) error {
 	SetHeaderNX(req.Header, KeyClientID, xcontext.GetClientID(ctx))
 	traceID := xcontext.GetTraceID(ctx)
 	if traceID == "" {
-		traceID = uuid.NewString()
+		traceID = base62.NewUUIDString()
 	}
 	SetHeaderNX(req.Header, KeyTraceID, traceID)
 	SetHeaderNX(req.Header, KeyTimestamp, fmt.Sprint(time.Now().Unix()))
