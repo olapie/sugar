@@ -29,10 +29,20 @@ func (d *DeviceInfo) Attributes() map[string]string {
 }
 
 type AppInfo struct {
-	BundleID string `json:"bundle_id"`
-	Version  string `json:"version"`
+	ID      string `json:"id,omitempty"`
+	Name    string `json:"name,omitempty"`
+	Version string `json:"version,omitempty"`
 }
 
 func NewAppInfo() *AppInfo {
 	return new(AppInfo)
+}
+
+func (i *AppInfo) Attributes() map[string]string {
+	m := make(map[string]string)
+	err := json.Unmarshal(xjson.ToBytes(i), &m)
+	if err != nil {
+		panic(err)
+	}
+	return m
 }
