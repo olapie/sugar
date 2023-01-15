@@ -2,10 +2,10 @@ package main
 
 import (
 	"bytes"
-	"os"
-
 	"code.olapie.com/log"
 	"code.olapie.com/sugar/v2/xname"
+	"go/format"
+	"os"
 )
 
 func Generate(filename string) {
@@ -34,7 +34,7 @@ func generateSQLForEntity(r *RepoModel) {
 	}
 
 	m := &Model{
-		Name:           xname.ToClassName(r.Name) + "RepoModel",
+		Name:           xname.ToClassName(r.Name) + "Repo",
 		Table:          r.Table,
 		Columns:        r.GetColumns(),
 		KeyParams:      r.KeyParams(),
@@ -62,7 +62,12 @@ func generateSQLForEntity(r *RepoModel) {
 		log.S().Fatal(err)
 	}
 
-	err = os.WriteFile("_generate/"+r.Name+".gen.go", b.Bytes(), 0644)
+	data, err := format.Source(b.Bytes())
+	if err != nil {
+		log.S().Fatal(err)
+	}
+
+	err = os.WriteFile("_generate/"+r.Name+".gen.go", data, 0644)
 	if err != nil {
 		log.S().Fatal(err)
 	}
@@ -74,7 +79,12 @@ func generateSQLForEntity(r *RepoModel) {
 		log.S().Fatal(err)
 	}
 
-	err = os.WriteFile("_generate/"+r.Name+"_test.gen.go", b.Bytes(), 0644)
+	data, err = format.Source(b.Bytes())
+	if err != nil {
+		log.S().Fatal(err)
+	}
+
+	err = os.WriteFile("_generate/"+r.Name+"_test.gen.go", data, 0644)
 	if err != nil {
 		log.S().Fatal(err)
 	}

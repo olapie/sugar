@@ -1,4 +1,11 @@
 {{ define `repo` }}package repo
+
+import (
+	"context"
+	"database/sql"
+	"time"
+)
+
 type {{.Entity.Name}} struct {
 {{range .Entity.Fields}}   {{toStructName .Name}} {{.Type}} `json:"{{toSnake .Name}}"` 
 {{end}}}

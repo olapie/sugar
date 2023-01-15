@@ -5,9 +5,9 @@
   columns:
     id: int64
     name: string 
-    gender: types.Gender
+    gender: xtype.Gender
     dob: string
-    place: types.Place
+    place: xtype.Place
     accounts: "[]string"
   jsonColumns:
     - place

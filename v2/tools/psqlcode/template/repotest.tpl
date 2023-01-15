@@ -1,32 +1,37 @@
-{{ define `repotest` }}package repo_test
+{{ define `repotest` }}package repo
 
-func setup{{.Name}}(t *testing.T) *repo.{{.Name}} {
-    db := setupDB(t)
+import (
+	"context"
+    "testing"
+)
+
+func setupTest{{.Name}}(t *testing.T) *{{.Name}} {
+    db := setupTestDB(t)
     _, err := db.Exec(`TRUNCATE TABLE {{.Table}}`)
     if err != nil {
         t.Error(err)
     }
-    return repo.New{{.Name}}(db)
+    return New{{.Name}}(db)
 }
 
-func new{{.Entity.Name}}() *repo.{{.Entity.Name}} {
-    return new(repo.{{.Entity.Name}})
+func newTest{{.Entity.Name}}() *{{.Entity.Name}} {
+    return new({{.Entity.Name}})
 }
 
-func TestInsert(t *testing.T) {
+func TestInsert{{.Entity.Name}}(t *testing.T) {
     ctx := context.TODO()
-    v := new{{.Entity.Name}}()
-    r := setup{{.Name}}(t)
+    v := newTest{{.Entity.Name}}()
+    r := setupTest{{.Name}}(t)
     err := r.Insert(ctx, v)
     if err != nil {
         t.Error(err)
     }
 }
 
-func TestUpdate(t *testing.T) {
+func TestUpdate{{.Entity.Name}}(t *testing.T) {
     ctx := context.TODO()
-    v := new{{.Entity.Name}}()
-    r := setup{{.Name}}(t)
+    v := newTest{{.Entity.Name}}()
+    r := setupTest{{.Name}}(t)
     err := r.Insert(ctx, v)
     if err != nil {
         t.Error(err)
@@ -39,10 +44,10 @@ func TestUpdate(t *testing.T) {
     }
 }
 
-func TestSave(t *testing.T) {
+func TestSave{{.Entity.Name}}(t *testing.T) {
     ctx := context.TODO()
-    v := new{{.Entity.Name}}()
-    r := setup{{.Name}}(t)
+    v := newTest{{.Entity.Name}}()
+    r := setupTest{{.Name}}(t)
     err := r.Save(ctx, v)
     if err != nil {
         t.Error(err)
@@ -55,17 +60,17 @@ func TestSave(t *testing.T) {
     }
 }
 
-func TestGet(t *testing.T) {
-    v := new{{.Entity.Name}}()
-    r := setup{{.Name}}(t)
+func TestGet{{.Entity.Name}}(t *testing.T) {
+    v := newTest{{.Entity.Name}}()
+    r := setupTest{{.Name}}(t)
     // TODO:
 }
 
-func TestBatchGet(t *testing.T) {
+func TestBatchGet{{.Entity.Name}}(t *testing.T) {
     // TODO:
 }
 
-func TestList(t *testing.T) {
+func TestList{{.Entity.Name}}(t *testing.T) {
     // TODO:
 }
 

@@ -5,6 +5,7 @@ go 1.19
 require (
 	code.olapie.com/log v1.0.5
 	code.olapie.com/sugar/v2 v2.1.1
+	github.com/google/go-cmp v0.5.8
 	gopkg.in/yaml.v2 v2.4.0
 )
 
