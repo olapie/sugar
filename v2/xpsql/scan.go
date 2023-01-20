@@ -1,6 +1,7 @@
 package xpsql
 
 import (
+	"code.olapie.com/sugar/v2/xcontact"
 	"database/sql"
 	"database/sql/driver"
 	"fmt"
@@ -9,14 +10,14 @@ import (
 )
 
 type supportedScanTypes interface {
-	*xtype.Point | *xtype.Place | *xtype.PhoneNumber | *xtype.FullName | *xtype.Money | map[string]string
+	*xtype.Point | *xtype.Place | *xcontact.PhoneNumber | *xtype.FullName | *xtype.Money | map[string]string
 }
 
 func Scan[T supportedScanTypes](v *T) sql.Scanner {
 	switch val := any(v).(type) {
 	case **xtype.Point:
 		return &pointScanner{v: val}
-	case **xtype.PhoneNumber:
+	case **xcontact.PhoneNumber:
 		return &phoneNumberScanner{v: val}
 	case **xtype.Place:
 		return &placeScanner{v: val}
@@ -35,7 +36,7 @@ func Value[T supportedScanTypes](v T) driver.Valuer {
 	switch val := any(v).(type) {
 	case *xtype.Point:
 		return &pointValuer{v: val}
-	case *xtype.PhoneNumber:
+	case *xcontact.PhoneNumber:
 		return &phoneNumberValuer{v: val}
 	case *xtype.Place:
 		return &placeValuer{v: val}

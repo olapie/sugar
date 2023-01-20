@@ -1,14 +1,12 @@
 package xpsql
 
 import (
+	"code.olapie.com/sugar/v2/conv"
+	"code.olapie.com/sugar/v2/xcontact"
+	"code.olapie.com/sugar/v2/xpsql/internal/composite"
 	"database/sql"
 	"database/sql/driver"
 	"fmt"
-	"strings"
-
-	"code.olapie.com/sugar/v2/conv"
-	"code.olapie.com/sugar/v2/xpsql/internal/composite"
-	"code.olapie.com/sugar/v2/xtype"
 )
 
 var (
@@ -17,7 +15,7 @@ var (
 )
 
 type phoneNumberScanner struct {
-	v **xtype.PhoneNumber
+	v **xcontact.PhoneNumber
 }
 
 func (ps *phoneNumberScanner) Scan(src any) error {
@@ -42,7 +40,7 @@ func (ps *phoneNumberScanner) Scan(src any) error {
 		return fmt.Errorf("parse composite fields %s: got %v", s, fields)
 	}
 
-	n := new(xtype.PhoneNumber)
+	n := new(xcontact.PhoneNumber)
 	n.Code, err = conv.ToInt32(fields[0])
 	if err != nil {
 		return fmt.Errorf("parse code %s: %w", fields[0], err)
@@ -51,20 +49,21 @@ func (ps *phoneNumberScanner) Scan(src any) error {
 	if err != nil {
 		return fmt.Errorf("parse code %s: %w", fields[1], err)
 	}
-	n.Extension = fields[2]
+	//n.Extension = fields[2]
 	*ps.v = n
 	return nil
 }
 
 type phoneNumberValuer struct {
-	v *xtype.PhoneNumber
+	v *xcontact.PhoneNumber
 }
 
 func (pv *phoneNumberValuer) Value() (driver.Value, error) {
 	if pv == nil {
 		return nil, nil
 	}
-	ext := strings.Replace(pv.v.Extension, ",", "\\,", -1)
+	//ext := strings.Replace(pv.v.Extension, ",", "\\,", -1)
+	ext := ""
 	s := fmt.Sprintf("(%d,%d,%s)", pv.v.Code, pv.v.Number, ext)
 	return s, nil
 }
