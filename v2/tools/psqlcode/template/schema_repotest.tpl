@@ -13,7 +13,7 @@ func setupTest{{.Name}}(t *testing.T) *{{.Name}} {
     if err != nil {
         t.Error(err)
     }
-    return New{{.Name}}(db)
+    return New{{.Name}}(db, "test")
 }
 
 func newTest{{.Entity.Name}}() *{{.Entity.Name}} {
