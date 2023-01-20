@@ -6,6 +6,7 @@ import (
 	"code.olapie.com/sugar/v2/xname"
 	"go/format"
 	"os"
+	"strings"
 )
 
 func Generate(filename string) {
@@ -52,6 +53,15 @@ func generateSQLForEntity(r *RepoModel) {
 		BatchKeyArgs:       r.BatchKeyArgs(),
 		NumKeys:            len(r.PrimaryKey),
 	}
+
+	tplName := "repo"
+	testTplName := "repotest"
+	if splits := strings.Split(r.Table, "."); len(splits) == 2 {
+		m.Table = splits[1]
+		tplName = "schema_" + tplName
+		testTplName = "schema_" + testTplName
+	}
+
 	m.Entity.Name = xname.ToClassName(r.Name)
 	for _, c := range r.Columns {
 		field := &Field{
@@ -61,7 +71,7 @@ func generateSQLForEntity(r *RepoModel) {
 		m.Entity.Fields = append(m.Entity.Fields, field)
 	}
 	var b bytes.Buffer
-	err := globalTemplate.ExecuteTemplate(&b, "repo", m)
+	err := globalTemplate.ExecuteTemplate(&b, tplName, m)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -78,7 +88,7 @@ func generateSQLForEntity(r *RepoModel) {
 	log.Infof("Generate repo %s", r.Name)
 
 	b.Reset()
-	err = globalTemplate.ExecuteTemplate(&b, "repotest", m)
+	err = globalTemplate.ExecuteTemplate(&b, testTplName, m)
 	if err != nil {
 		log.Fatalln(err)
 	}
