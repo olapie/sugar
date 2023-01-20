@@ -81,7 +81,7 @@ func generateSQLForEntity(r *RepoModel) {
 		log.Fatalln(err)
 	}
 
-	err = os.WriteFile("_generate/"+r.Name+".gen.go", data, 0644)
+	err = os.WriteFile("_generate/"+r.Name+".go", data, 0644)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -98,7 +98,7 @@ func generateSQLForEntity(r *RepoModel) {
 		log.Fatalln(err)
 	}
 
-	err = os.WriteFile("_generate/"+r.Name+"_test.gen.go", data, 0644)
+	err = os.WriteFile("_generate/"+r.Name+"_test.go", data, 0644)
 	if err != nil {
 		log.Fatalln(err)
 	}
