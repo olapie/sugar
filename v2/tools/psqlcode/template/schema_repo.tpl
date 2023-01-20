@@ -3,6 +3,7 @@
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"time"
 
 	"github.com/lib/pq"
