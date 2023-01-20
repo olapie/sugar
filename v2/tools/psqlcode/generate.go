@@ -59,34 +59,34 @@ func generateSQLForEntity(r *RepoModel) {
 	var b bytes.Buffer
 	err := globalTemplate.ExecuteTemplate(&b, "repo", m)
 	if err != nil {
-		log.S().Fatal(err)
+		log.Fatalln(err)
 	}
 
 	data, err := format.Source(b.Bytes())
 	if err != nil {
-		log.S().Fatal(err)
+		log.Fatalln(err)
 	}
 
 	err = os.WriteFile("_generate/"+r.Name+".gen.go", data, 0644)
 	if err != nil {
-		log.S().Fatal(err)
+		log.Fatalln(err)
 	}
-	log.S().Infof("Generate repo %s", r.Name)
+	log.Infof("Generate repo %s", r.Name)
 
 	b.Reset()
 	err = globalTemplate.ExecuteTemplate(&b, "repotest", m)
 	if err != nil {
-		log.S().Fatal(err)
+		log.Fatalln(err)
 	}
 
 	data, err = format.Source(b.Bytes())
 	if err != nil {
-		log.S().Fatal(err)
+		log.Fatalln(err)
 	}
 
 	err = os.WriteFile("_generate/"+r.Name+"_test.gen.go", data, 0644)
 	if err != nil {
-		log.S().Fatal(err)
+		log.Fatalln(err)
 	}
-	log.S().Infof("Generate repo test %s", r.Name)
+	log.Infof("Generate repo test %s", r.Name)
 }

@@ -45,17 +45,18 @@ func (r *RepoModel) IsJSON(col string) bool {
 }
 
 func (r *RepoModel) IsArray(col string) bool {
-	return strings.Index(col, "[]") == 0
+	return strings.Index(col, "[]") == 0 && col != "[]byte"
 }
 
 func (r *RepoModel) Args() string {
 	args := make([]string, len(r.Columns))
 	for i, c := range r.Columns {
 		name := c.Key.(string)
+		value := c.Value.(string)
 		args[i] = "v." + xname.ToClassName(name)
-		if r.IsJSON(name) {
-			args[i] = "gosql.JSON(" + args[i] + ")"
-		} else if r.IsArray(name) {
+		if r.IsJSON(value) {
+			args[i] = "xsql.JSON(" + args[i] + ")"
+		} else if r.IsArray(value) {
 			args[i] = "pq.Array(" + args[i] + ")"
 		}
 	}
@@ -135,10 +136,11 @@ func (r *RepoModel) ScanHolders() string {
 	scanArgs := make([]string, len(r.Columns))
 	for i, c := range r.Columns {
 		name := c.Key.(string)
+		value := c.Value.(string)
 		scanArgs[i] = "&v." + xname.ToClassName(name)
-		if r.IsJSON(name) {
-			scanArgs[i] = "gosql.JSON(" + scanArgs[i] + ")"
-		} else if r.IsArray(name) {
+		if r.IsJSON(value) {
+			scanArgs[i] = "xsql.JSON(" + scanArgs[i] + ")"
+		} else if r.IsArray(value) {
 			scanArgs[i] = "pq.Array(" + scanArgs[i] + ")"
 		}
 	}

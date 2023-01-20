@@ -10,13 +10,13 @@ import (
 func ParseYAML(filename string) []*RepoModel {
 	data, err := os.ReadFile(filename)
 	if err != nil {
-		log.S().Fatal(err)
+		log.Fatalln(err)
 	}
 
 	var repos []*RepoModel
 	err = yaml.Unmarshal(data, &repos)
 	if err != nil {
-		log.S().Fatal(err)
+		log.Fatalln(err)
 	}
 	return repos
 }

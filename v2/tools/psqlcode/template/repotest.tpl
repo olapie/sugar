@@ -3,6 +3,8 @@
 import (
 	"context"
     "testing"
+
+	"github.com/lib/pq"
 )
 
 func setupTest{{.Name}}(t *testing.T) *{{.Name}} {

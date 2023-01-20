@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"time"
+
+	"github.com/lib/pq"
 )
 
 type {{.Entity.Name}} struct {
