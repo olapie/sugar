@@ -17,36 +17,40 @@ func Generate(filename string) {
 
 func generateSQLForEntity(r *RepoModel) {
 	type Model struct {
-		Name           string
-		Table          string
-		Entity         Entity
-		Columns        string
-		KeyParams      string
-		KeyConditions  string
-		KeyArgs        string
-		UpdateColumns  string
-		ScanHolders    string
-		Args           string
-		Placeholders   string
-		Keys           string
-		BatchKeyParams string
-		NumKeys        int
+		Name               string
+		Table              string
+		Entity             Entity
+		Columns            string
+		KeyParams          string
+		KeyConditions      string
+		KeyArgs            string
+		UpdateColumns      string
+		ScanHolders        string
+		Args               string
+		Placeholders       string
+		Keys               string
+		BatchKeyParams     string
+		BatchKeyConditions string
+		BatchKeyArgs       string
+		NumKeys            int
 	}
 
 	m := &Model{
-		Name:           xname.ToClassName(r.Name) + "Repo",
-		Table:          r.Table,
-		Columns:        r.GetColumns(),
-		KeyParams:      r.KeyParams(),
-		KeyConditions:  r.KeyConditions(),
-		KeyArgs:        r.KeyArgs(),
-		UpdateColumns:  r.UpdateColumns(),
-		ScanHolders:    r.ScanHolders(),
-		Args:           r.Args(),
-		Placeholders:   r.Placeholders(),
-		Keys:           r.GetKeys(),
-		BatchKeyParams: r.BatchKeyParams(),
-		NumKeys:        len(r.PrimaryKey),
+		Name:               xname.ToClassName(r.Name) + "Repo",
+		Table:              r.Table,
+		Columns:            r.GetColumns(),
+		KeyParams:          r.KeyParams(),
+		KeyConditions:      r.KeyConditions(),
+		KeyArgs:            r.KeyArgs(),
+		UpdateColumns:      r.UpdateColumns(),
+		ScanHolders:        r.ScanHolders(),
+		Args:               r.Args(),
+		Placeholders:       r.Placeholders(),
+		Keys:               r.GetKeys(),
+		BatchKeyParams:     r.BatchKeyParams(),
+		BatchKeyConditions: r.BatchKeyConditions(),
+		BatchKeyArgs:       r.BatchKeyArgs(),
+		NumKeys:            len(r.PrimaryKey),
 	}
 	m.Entity.Name = xname.ToClassName(r.Name)
 	for _, c := range r.Columns {

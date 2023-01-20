@@ -117,7 +117,21 @@ func (r *RepoModel) BatchKeyParams() string {
 		return ""
 	}
 	k := r.PrimaryKey[0]
-	return fmt.Sprintf("%ss []%v", xname.ToCamel(k), r.GetColType(k))
+	return fmt.Sprintf("%s []%v", xname.ToCamel(xname.Plural(k)), r.GetColType(k))
+}
+
+func (r *RepoModel) BatchKeyConditions() string {
+	if len(r.PrimaryKey) != 1 {
+		return ""
+	}
+	return fmt.Sprintf("%s=ANY($%d)", r.PrimaryKey[0], len(r.Columns)+1)
+}
+
+func (r *RepoModel) BatchKeyArgs() string {
+	if len(r.PrimaryKey) != 1 {
+		return ""
+	}
+	return strings.Split(r.BatchKeyParams(), " ")[0]
 }
 
 func (r *RepoModel) GetKeys() string {

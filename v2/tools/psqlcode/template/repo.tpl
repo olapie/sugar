@@ -50,7 +50,7 @@ func (r *{{.Name}}) Get(ctx context.Context, {{.KeyParams}}) (v *{{.Entity.Name}
 
 {{if eq .NumKeys 1}}
 func (r *{{.Name}}) BatchGet(ctx context.Context, {{.BatchKeyParams}}) (list []*{{.Entity.Name}}, err error) {
-	rows, err :=  r.db.QueryContext(ctx, `SELECT {{.Columns}} FROM {{.Table}} WHERE {{.KeyConditions}}`, {{.KeyArgs}})
+	rows, err :=  r.db.QueryContext(ctx, `SELECT {{.Columns}} FROM {{.Table}} WHERE {{.BatchKeyConditions}}`, pq.Array({{.BatchKeyArgs}}))
 	if err != nil {
         return nil, err
     }
