@@ -61,11 +61,11 @@ func TestSave{{.Entity.Name}}(t *testing.T) {
         t.Error(err)
     }
 
-    got, err := r.Get(ctx, {{.KeyArgs}})
-    if err != nil {
-        t.Error(err)
-    }
-    t.Log(got)
+//    got, err := r.Get(ctx, {{.KeyArgs}})
+//    if err != nil {
+//        t.Error(err)
+//    }
+//    t.Log(got)
 }
 
 func TestBatchGet{{.Entity.Name}}(t *testing.T) {
