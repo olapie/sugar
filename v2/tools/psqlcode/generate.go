@@ -11,9 +11,42 @@ import (
 
 func Generate(filename string) {
 	os.Mkdir("_generate", 0755)
+	var model struct {
+		Entities []Entity
+	}
 	for _, e := range ParseYAML(filename) {
 		generateSQLForEntity(e)
+		model.Entities = append(model.Entities, getEntity(e))
 	}
+
+	var b bytes.Buffer
+	err := globalTemplate.ExecuteTemplate(&b, "model", model)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	data, err := format.Source(b.Bytes())
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	err = os.WriteFile("_generate/model_gen.go", data, 0644)
+	if err != nil {
+		log.Fatalln(err)
+	}
+}
+
+func getEntity(r *RepoModel) Entity {
+	var e Entity
+	e.Name = xname.ToClassName(r.Name)
+	for _, c := range r.Columns {
+		field := &Field{
+			Name: c.Key.(string),
+			Type: c.Value.(string),
+		}
+		e.Fields = append(e.Fields, field)
+	}
+	return e
 }
 
 func generateSQLForEntity(r *RepoModel) {
@@ -37,7 +70,7 @@ func generateSQLForEntity(r *RepoModel) {
 	}
 
 	m := &Model{
-		Name:               xname.ToClassName(r.Name) + "Repo",
+		Name:               xname.ToClassName(r.Name) + "GenRepo",
 		Table:              r.Table,
 		Columns:            r.GetColumns(),
 		KeyParams:          r.KeyParams(),
@@ -56,14 +89,7 @@ func generateSQLForEntity(r *RepoModel) {
 
 	tplName := "repo"
 	testTplName := "repotest"
-	m.Entity.Name = xname.ToClassName(r.Name)
-	for _, c := range r.Columns {
-		field := &Field{
-			Name: c.Key.(string),
-			Type: c.Value.(string),
-		}
-		m.Entity.Fields = append(m.Entity.Fields, field)
-	}
+	m.Entity = getEntity(r)
 	var b bytes.Buffer
 	err := globalTemplate.ExecuteTemplate(&b, tplName, m)
 	if err != nil {

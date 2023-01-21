@@ -8,10 +8,6 @@ import (
 	"github.com/lib/pq"
 )
 
-type {{.Entity.Name}} struct {
-{{range .Entity.Fields}}   {{toStructName .Name}} {{.Type}} `json:"{{toSnake .Name}}"` 
-{{end}}}
-
 type {{.Name}} struct {
     db *sql.DB 
 }
