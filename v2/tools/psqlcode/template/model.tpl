@@ -1,4 +1,4 @@
-{{ define `model` }}package repo
+{{ define `model` }}package generate
 import (
 	"time"
 )

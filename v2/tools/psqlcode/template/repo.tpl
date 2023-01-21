@@ -1,4 +1,4 @@
-{{ define `repo` }}package repo
+{{ define `repo` }}package generate
 
 import (
 	"context"

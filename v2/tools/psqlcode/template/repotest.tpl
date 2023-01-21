@@ -1,4 +1,4 @@
-{{ define `repotest` }}package repo
+{{ define `repotest` }}package generate
 
 import (
 	"context"

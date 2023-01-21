@@ -10,7 +10,7 @@ import (
 )
 
 func Generate(filename string) {
-	os.Mkdir("_generate", 0755)
+	os.Mkdir("generate", 0755)
 	var model struct {
 		Entities []Entity
 	}
@@ -30,7 +30,7 @@ func Generate(filename string) {
 		log.Fatalln(err)
 	}
 
-	err = os.WriteFile("_generate/model_gen.go", data, 0644)
+	err = os.WriteFile("generate/model.go", data, 0644)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -101,7 +101,7 @@ func generateSQLForEntity(r *RepoModel) {
 		log.Fatalln(err)
 	}
 
-	err = os.WriteFile("_generate/"+r.Name+"_gen.go", data, 0644)
+	err = os.WriteFile("generate/"+r.Name+".go", data, 0644)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -118,7 +118,7 @@ func generateSQLForEntity(r *RepoModel) {
 		log.Fatalln(err)
 	}
 
-	err = os.WriteFile("_generate/"+r.Name+"_gen_test.go", data, 0644)
+	err = os.WriteFile("generate/"+r.Name+"_test.go", data, 0644)
 	if err != nil {
 		log.Fatalln(err)
 	}
