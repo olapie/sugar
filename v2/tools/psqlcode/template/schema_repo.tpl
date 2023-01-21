@@ -52,8 +52,12 @@ func (r *{{.Name}}) Delete(ctx context.Context, {{.KeyParams}}) error {
 func (r *{{.Name}}) Get(ctx context.Context, {{.KeyParams}}) (v *{{.Entity.Name}}, err error) {
     query := fmt.Sprintf(`SELECT {{.Columns}} FROM %s.{{.Table}} WHERE {{.KeyConditions}}`, r.schema)
 	row := r.db.QueryRowContext(ctx, query, {{.KeyArgs}})
-	err = row.Scan({{.ScanHolders}})
-	return
+	v = new({{.Entity.Name}})
+    err = row.Scan({{.ScanHolders}})
+    if err != nil {
+        return nil, err
+    }
+    return v, ni
 }
 
 {{if eq .NumKeys 1}}

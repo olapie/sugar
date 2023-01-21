@@ -43,9 +43,13 @@ func (r *{{.Name}}) Delete(ctx context.Context, {{.KeyParams}}) error {
 }
 
 func (r *{{.Name}}) Get(ctx context.Context, {{.KeyParams}}) (v *{{.Entity.Name}}, err error) {
+    v = new({{.Entity.Name}})
 	row := r.db.QueryRowContext(ctx, `SELECT {{.Columns}} FROM {{.Table}} WHERE {{.KeyConditions}}`, {{.KeyArgs}})
 	err = row.Scan({{.ScanHolders}})
-	return
+	if err != nil {
+	    return nil, err
+	}
+	return v, nil
 }
 
 {{if eq .NumKeys 1}}
