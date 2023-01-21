@@ -3,12 +3,41 @@ package xpsql
 import (
 	"database/sql"
 	"fmt"
+	"net/url"
 	"os/user"
 
 	"code.olapie.com/sugar/v2/must"
 )
 
-func GetConnectionString(name, host string, port int, user, password string, sslEnabled bool) string {
+type OpenOptions struct {
+	UnixSocket bool
+	Host       string
+	Port       int
+	User       string
+	Password   string
+	Database   string
+	Schema     string
+	SSL        bool
+}
+
+func NewOpenOptions() *OpenOptions {
+	return &OpenOptions{
+		Host: "localhost",
+		Port: 5432,
+	}
+}
+
+func (c *OpenOptions) String() string {
+	if c.UnixSocket {
+		u, err := user.Current()
+		if err != nil {
+			fmt.Println(err)
+			return ""
+		}
+		return fmt.Sprintf("postgres:///%s?host=/var/run/postgresql/", u.Username)
+	}
+	host := c.Host
+	port := c.Port
 	if host == "" {
 		host = "localhost"
 	}
@@ -17,24 +46,37 @@ func GetConnectionString(name, host string, port int, user, password string, ssl
 		port = 5432
 	}
 
-	url := fmt.Sprintf("%s:%d/%s", host, port, name)
-	if user == "" {
-		url = "postgres://" + url
+	connStr := fmt.Sprintf("%s:%d", host, port)
+	if c.Database != "" {
+		connStr += "/" + c.Database
+	}
+	if c.User == "" {
+		connStr = "postgres://" + connStr
 	} else {
-		if password == "" {
-			url = "postgres://" + user + "@" + url
+		if c.Password == "" {
+			connStr = "postgres://" + c.User + "@" + connStr
 		} else {
-			url = "postgres://" + user + ":" + password + "@" + url
+			connStr = "postgres://" + c.User + ":" + c.Password + "@" + connStr
 		}
 	}
-	if !sslEnabled {
-		url = url + "?sslmode=disable"
+	query := url.Values{}
+	if !c.SSL {
+		query.Add("sslmode", "disable")
 	}
-	return url
+	if c.Schema != "" {
+		query.Add("search_path", c.Schema)
+	}
+	if len(query) == 0 {
+		return connStr
+	}
+	return connStr + "?" + query.Encode()
 }
 
-func Open(connectionString string) (*sql.DB, error) {
-	db, err := sql.Open("postgres", connectionString)
+func Open(options *OpenOptions) (*sql.DB, error) {
+	if options == nil {
+		options = NewOpenOptions()
+	}
+	db, err := sql.Open("postgres", options.String())
 	if err != nil {
 		return nil, fmt.Errorf("open: %w", err)
 	}
@@ -46,28 +88,16 @@ func Open(connectionString string) (*sql.DB, error) {
 	return db, nil
 }
 
-func MustOpen(connectionString string) *sql.DB {
-	return must.Get(Open(connectionString))
-}
-
-func GetLocalConnectionString(unixSocket bool) string {
-	u, err := user.Current()
-	if err != nil {
-		fmt.Println(err)
-		return ""
-	}
-	if unixSocket {
-		return fmt.Sprintf("postgres:///%s?host=/var/run/postgresql/", u.Username)
-	}
-	return GetConnectionString(u.Username, "localhost", 5432, u.Username, "", false)
+func MustOpen(options *OpenOptions) *sql.DB {
+	return must.Get(Open(options))
 }
 
 func OpenLocal() (*sql.DB, error) {
-	if db, err := Open(GetLocalConnectionString(false)); err == nil {
+	if db, err := Open(&OpenOptions{UnixSocket: true}); err == nil {
 		fmt.Println("Connected via unix socket")
 		return db, nil
 	}
-	db, err := Open(GetLocalConnectionString(true))
+	db, err := Open(NewOpenOptions())
 	if err == nil {
 		fmt.Println("Connected via tcp socket")
 	}
