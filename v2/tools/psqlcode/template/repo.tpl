@@ -118,7 +118,7 @@ func (r *{{.Name}}) BatchDelete(ctx context.Context, {{.BatchKeyParams}}) error 
 	return err
 }
 
-func (r *{{.Name}}) BatchDelete(ctx context.Context, tx *sql.Tx, {{.BatchKeyParams}}) error {
+func (r *{{.Name}}) BatchDeleteTx(ctx context.Context, tx *sql.Tx, {{.BatchKeyParams}}) error {
 	_, err :=  tx.ExecContext(ctx, `DELETE FROM {{.Table}} WHERE {{.BatchKeyConditions}}`, pq.Array({{.BatchKeyArgs}}))
 	return err
 }
