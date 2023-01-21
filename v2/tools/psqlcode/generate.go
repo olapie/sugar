@@ -9,6 +9,23 @@ import (
 	"code.olapie.com/sugar/v2/xname"
 )
 
+const generateTestCode = `
+package generate
+
+import (
+    "code.olapie.com/sugar/v2/xpsql"
+)
+
+func setupTestDB(t *testing.T) *sql.DB {
+	options := xpsql.NewOpenOptions()
+	db, err := xpsql.Open(options)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return db
+}
+`
+
 func Generate(filename string) {
 	os.Mkdir("generate", 0755)
 	var model struct {
@@ -31,6 +48,11 @@ func Generate(filename string) {
 	}
 
 	err = os.WriteFile("generate/model.go", data, 0644)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	err = os.WriteFile("generate/generate_test.go", []byte(generateTestCode), 0644)
 	if err != nil {
 		log.Fatalln(err)
 	}
