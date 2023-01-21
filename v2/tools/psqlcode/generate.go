@@ -56,7 +56,7 @@ func generateSQLForEntity(r *RepoModel) {
 
 	tplName := "repo"
 	testTplName := "repotest"
-	if splits := strings.Split(r.Table, "."); len(splits) == 2 {
+	if splits := strings.Split(r.Table, "."); len(splits) == 2 && splits[0] == "{schema}" {
 		m.Table = splits[1]
 		tplName = "schema_" + tplName
 		testTplName = "schema_" + testTplName
