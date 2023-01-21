@@ -70,7 +70,7 @@ func generateSQLForEntity(r *RepoModel) {
 	}
 
 	m := &Model{
-		Name:               xname.ToClassName(r.Name) + "GenRepo",
+		Name:               xname.ToClassName(r.Name) + "Repo",
 		Table:              r.Table,
 		Columns:            r.GetColumns(),
 		KeyParams:          r.KeyParams(),
