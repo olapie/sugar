@@ -1,12 +1,13 @@
 package xpsql
 
 import (
-	"code.olapie.com/sugar/v2/conv"
-	"code.olapie.com/sugar/v2/xcontact"
-	"code.olapie.com/sugar/v2/xpsql/internal/composite"
 	"database/sql"
 	"database/sql/driver"
 	"fmt"
+
+	"code.olapie.com/sugar/v2/conv"
+	"code.olapie.com/sugar/v2/xcontact"
+	"code.olapie.com/sugar/v2/xpsql/internal/composite"
 )
 
 var (

@@ -1,10 +1,11 @@
 package xpsql
 
 import (
-	"code.olapie.com/sugar/v2/xcontact"
 	"database/sql"
 	"database/sql/driver"
 	"fmt"
+
+	"code.olapie.com/sugar/v2/xcontact"
 
 	"code.olapie.com/sugar/v2/xtype"
 )
