@@ -112,6 +112,17 @@ func (r *{{.Name}}) BatchGetTx(ctx context.Context, tx *sql.Tx, {{.BatchKeyParam
     }
 	return list, nil
 }
+
+func (r *{{.Name}}) BatchDelete(ctx context.Context, {{.BatchKeyParams}}) error {
+	_, err :=  r.db.ExecContext(ctx, `DELETE FROM {{.Table}} WHERE {{.BatchKeyConditions}}`, pq.Array({{.BatchKeyArgs}}))
+	return err
+}
+
+func (r *{{.Name}}) BatchDelete(ctx context.Context, tx *sql.Tx, {{.BatchKeyParams}}) error {
+	_, err :=  tx.ExecContext(ctx, `DELETE FROM {{.Table}} WHERE {{.BatchKeyConditions}}`, pq.Array({{.BatchKeyArgs}}))
+	return err
+}
+
 {{end}}
 
 func (r *{{.Name}}) List(ctx context.Context) (list []*{{.Entity.Name}}, err error) {
