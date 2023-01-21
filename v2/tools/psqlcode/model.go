@@ -54,7 +54,7 @@ func (r *RepoModel) Args() string {
 		name := c.Key.(string)
 		value := c.Value.(string)
 		args[i] = "v." + xname.ToClassName(name)
-		if r.IsJSON(value) {
+		if r.IsJSON(name) {
 			args[i] = "xsql.JSON(" + args[i] + ")"
 		} else if r.IsArray(value) {
 			args[i] = "pq.Array(" + args[i] + ")"
