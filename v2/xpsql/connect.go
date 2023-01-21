@@ -34,7 +34,11 @@ func (c *OpenOptions) String() string {
 			fmt.Println(err)
 			return ""
 		}
-		return fmt.Sprintf("postgres:///%s?host=/var/run/postgresql/", u.Username)
+		if c.Schema == "" {
+			return fmt.Sprintf("postgres:///%s?host=/var/run/postgresql/", u.Username)
+		} else {
+			return fmt.Sprintf("postgres:///%s?host=/var/run/postgresql/&search_path=%s", u.Username, c.Schema)
+		}
 	}
 	host := c.Host
 	port := c.Port
