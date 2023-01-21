@@ -2,11 +2,11 @@ package main
 
 import (
 	"bytes"
-	"code.olapie.com/log"
-	"code.olapie.com/sugar/v2/xname"
 	"go/format"
 	"os"
-	"strings"
+
+	"code.olapie.com/log"
+	"code.olapie.com/sugar/v2/xname"
 )
 
 func Generate(filename string) {
@@ -56,12 +56,6 @@ func generateSQLForEntity(r *RepoModel) {
 
 	tplName := "repo"
 	testTplName := "repotest"
-	if splits := strings.Split(r.Table, "."); len(splits) == 2 && splits[0] == "{schema}" {
-		m.Table = splits[1]
-		tplName = "schema_" + tplName
-		testTplName = "schema_" + testTplName
-	}
-
 	m.Entity.Name = xname.ToClassName(r.Name)
 	for _, c := range r.Columns {
 		field := &Field{
