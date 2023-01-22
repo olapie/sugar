@@ -83,14 +83,15 @@ func Open(options *OpenOptions) (*sql.DB, error) {
 	if options == nil {
 		options = NewOpenOptions()
 	}
-	db, err := sql.Open("postgres", options.String())
+	connString := options.String()
+	db, err := sql.Open("postgres", connString)
 	if err != nil {
-		return nil, fmt.Errorf("open: %w", err)
+		return nil, fmt.Errorf("open: %s, %w", connString, err)
 	}
 
 	err = db.Ping()
 	if err != nil {
-		return nil, fmt.Errorf("ping: %w", err)
+		return nil, fmt.Errorf("ping: %s, %w", connString, err)
 	}
 	return db, nil
 }
