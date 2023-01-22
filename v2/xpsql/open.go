@@ -1,10 +1,13 @@
 package xpsql
 
 import (
+	"code.olapie.com/sugar/v2/xcontext"
+	"context"
 	"database/sql"
 	"fmt"
 	"net/url"
 	"os/user"
+	"sync"
 
 	"code.olapie.com/sugar/v2/must"
 )
@@ -110,4 +113,48 @@ func OpenLocal() (*sql.DB, error) {
 
 func MustOpenLocal() *sql.DB {
 	return must.Get(OpenLocal())
+}
+
+type RepoFactory[T any] interface {
+	Get(ctx context.Context) T
+}
+
+type NewRepoFunc[T any] func(ctx context.Context, db *sql.DB) T
+
+type factoryImpl[T any] struct {
+	mu      sync.RWMutex
+	cache   map[string]T
+	options *OpenOptions
+	fn      NewRepoFunc[T]
+}
+
+func NewFactory[T any](options *OpenOptions, fn NewRepoFunc[T]) RepoFactory[T] {
+	f := &factoryImpl[T]{
+		options: options,
+		cache:   make(map[string]T),
+		fn:      fn,
+	}
+	return f
+}
+
+func (f *factoryImpl[T]) Get(ctx context.Context) T {
+	appID := xcontext.GetAppID(ctx)
+	f.mu.RLock()
+	r, ok := f.cache[appID]
+	f.mu.RUnlock()
+	if ok {
+		return r
+	}
+
+	f.mu.Lock()
+	r, ok = f.cache[appID]
+	if !ok {
+		opt := *f.options
+		opt.Schema = appID
+		db := MustOpen(&opt)
+		r = f.fn(ctx, db)
+		f.cache[appID] = r
+	}
+	f.mu.Unlock()
+	return r
 }
