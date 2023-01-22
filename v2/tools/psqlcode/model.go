@@ -152,7 +152,7 @@ func (r *RepoModel) ScanHolders() string {
 		name := c.Key.(string)
 		value := c.Value.(string)
 		scanArgs[i] = "&v." + xname.ToClassName(name)
-		if r.IsJSON(value) {
+		if r.IsJSON(name) {
 			scanArgs[i] = "xsql.JSON(" + scanArgs[i] + ")"
 		} else if r.IsArray(value) {
 			scanArgs[i] = "pq.Array(" + scanArgs[i] + ")"
