@@ -115,7 +115,7 @@ func MustOpenLocal() *sql.DB {
 	return must.Get(OpenLocal())
 }
 
-type RepoFactory[T any] interface {
+type Factory[T any] interface {
 	Get(ctx context.Context) T
 }
 
@@ -128,7 +128,7 @@ type factoryImpl[T any] struct {
 	fn      NewRepoFunc[T]
 }
 
-func NewFactory[T any](options *OpenOptions, fn NewRepoFunc[T]) RepoFactory[T] {
+func NewFactory[T any](options *OpenOptions, fn NewRepoFunc[T]) Factory[T] {
 	f := &factoryImpl[T]{
 		options: options,
 		cache:   make(map[string]T),
