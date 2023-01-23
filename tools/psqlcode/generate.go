@@ -13,7 +13,7 @@ const generateTestCode = `
 package generate
 
 import (
-    "code.olapie.com/sugar/v2/xpsql"
+    "code.olapie.com/sugar/xpsql/v2"
 )
 
 func setupTestDB(t *testing.T) *sql.DB {

@@ -5,9 +5,8 @@ import (
 	"database/sql/driver"
 	"fmt"
 
-	"code.olapie.com/sugar/v2/xcontact"
-
 	"code.olapie.com/sugar/v2/xtype"
+	"code.olapie.com/sugar/xcontact/v2"
 )
 
 type supportedScanTypes interface {

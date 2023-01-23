@@ -6,8 +6,8 @@ import (
 	"fmt"
 
 	"code.olapie.com/sugar/v2/conv"
-	"code.olapie.com/sugar/v2/xcontact"
-	"code.olapie.com/sugar/v2/xpsql/internal/composite"
+	"code.olapie.com/sugar/xcontact/v2"
+	"code.olapie.com/sugar/xpsql/v2/internal/composite"
 )
 
 var (

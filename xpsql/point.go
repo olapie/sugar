@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 
-	"code.olapie.com/sugar/v2/xpsql/internal/composite"
 	"code.olapie.com/sugar/v2/xtype"
+	"code.olapie.com/sugar/xpsql/v2/internal/composite"
 )
 
 type pointScanner struct {
