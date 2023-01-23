@@ -6,30 +6,30 @@ import (
 	"testing"
 	"time"
 
-	"code.olapie.com/sugar/olasec"
-	"code.olapie.com/sugar/types"
+	"code.olapie.com/sugar/v2/olasec"
+	"code.olapie.com/sugar/v2/xtype"
 
-	"code.olapie.com/sugar/hashing"
-	"code.olapie.com/sugar/testx"
+	"code.olapie.com/sugar/v2/xhash"
+	"code.olapie.com/sugar/v2/xtest"
 )
 
 func TestDecryptedReader(t *testing.T) {
-	raw := []byte(hashing.SHA1(time.Now().String()))
+	raw := []byte(xhash.SHA1(time.Now().String()))
 	enc, err := olasec.Encrypt(raw, "123")
-	testx.NoError(t, err)
+	xtest.NoError(t, err)
 	r := olasec.NewDecryptedReader(bytes.NewReader(enc), "123")
 	dec := &bytes.Buffer{}
 	n, err := io.Copy(dec, r)
-	testx.NoError(t, err)
+	xtest.NoError(t, err)
 	t.Log(n)
-	testx.Equal(t, raw, dec.Bytes())
+	xtest.Equal(t, raw, dec.Bytes())
 }
 
 func BenchmarkDecryptedReader(b *testing.B) {
-	raw := testx.RandomBytes(int(4 * types.MB))
+	raw := xtest.RandomBytes(int(4 * xtype.MB))
 	enc, err := olasec.Encrypt(raw, "123")
-	testx.NoError(b, err)
+	xtest.NoError(b, err)
 	for i := 0; i < b.N; i++ {
-		olasec.DecryptBytes(enc, "123")
+		olasec.Decrypt(enc, "123")
 	}
 }
