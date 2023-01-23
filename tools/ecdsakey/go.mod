@@ -1,4 +1,4 @@
-module code.olapie.com/sugar/v2/tool/ecdsakey
+module code.olapie.com/sugar/tool/ecdsakey/v2
 
 go 1.19
 

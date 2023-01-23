@@ -1,4 +1,4 @@
-module code.olapie.com/sugar/v2/tools/psqlcode
+module code.olapie.com/sugar/tools/psqlcode/v2
 
 go 1.19
 
