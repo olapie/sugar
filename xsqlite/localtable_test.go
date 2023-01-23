@@ -1,4 +1,4 @@
-package xsqlite_test
+package xsqlite
 
 import (
 	"context"
@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"code.olapie.com/sugar/v2/base62"
-	"code.olapie.com/sugar/v2/xsqlite"
 	"code.olapie.com/sugar/v2/xtest"
 	"code.olapie.com/sugar/v2/xtype"
 	"github.com/google/uuid"
@@ -21,9 +20,12 @@ type localTableItem struct {
 	List   []int
 }
 
-func setupLocalTable(t testing.TB) *xsqlite.LocalTable[*localTableItem] {
+func setupLocalTable(t testing.TB) *LocalTable[*localTableItem] {
+	if err := os.MkdirAll("testdata", 0755); err != nil {
+		t.Fatal(err)
+	}
 	filename := "testdata/localtable" + xtype.NextID().Pretty() + ".db"
-	db, err := xsqlite.Open(filename)
+	db, err := Open(filename)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -32,7 +34,7 @@ func setupLocalTable(t testing.TB) *xsqlite.LocalTable[*localTableItem] {
 			db.Close()
 			os.Remove(filename)
 		})
-	return xsqlite.NewLocalTable[*localTableItem](db, func(opts *xsqlite.LocalTableOptions[*localTableItem]) {
+	return NewLocalTable[*localTableItem](db, func(opts *LocalTableOptions[*localTableItem]) {
 		opts.Password = xtest.RandomString(10)
 	})
 }
