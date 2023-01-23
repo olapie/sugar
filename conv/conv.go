@@ -729,7 +729,9 @@ func SliceToList[E any](a []E) *list.List {
 	return l
 }
 
-func ToFuncE[S any, T any](fn func(S) T) func(S, error) (T, error) {
+type FuncE[S any, T any] func(S, error) (T, error)
+
+func ToFuncE[S any, T any](fn func(S) T) FuncE[S, T] {
 	return func(s S, err error) (T, error) {
 		var t T
 		if err != nil {
