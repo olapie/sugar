@@ -6,7 +6,7 @@ import (
 	"io"
 	"os"
 
-	"code.olapie.com/sugar/errorx"
+	"code.olapie.com/sugar/v2/xerror"
 )
 
 // MagicNumberV1 is a defined 4-byte number to identify file type
@@ -20,7 +20,7 @@ const (
 	KeyHashSize     = 16
 	HeaderSize      = MagicNumberSize + KeyHashSize
 
-	ErrKey errorx.String = "invalid key"
+	ErrKey xerror.String = "invalid key"
 )
 
 type Key [KeySize]byte
