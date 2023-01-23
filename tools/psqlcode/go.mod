@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	code.olapie.com/log v1.1.2
-	code.olapie.com/sugar/v2 v2.1.2
+	code.olapie.com/sugar/v2 v2.1.6
 	gopkg.in/yaml.v2 v2.4.0
 )
 
