@@ -182,8 +182,8 @@ func searchPrettyTable(v byte) int {
 
 // ------------------------------
 // IDGenerator
-type IDGenerator interface {
-	NextID() ID
+type IDGenerator[T ~int64] interface {
+	NextID() T
 }
 
 type NextNumber interface {
@@ -244,8 +244,8 @@ func (g *SnakeIDGenerator) NextID() ID {
 // id is made of time, shard and seq
 // Putting the time at the beginning can ensure the id unique and increasing in case increase shard or seq bits size in the future
 var (
-	epoch                   = time.Date(2019, time.January, 2, 15, 4, 5, 0, time.UTC)
-	idGenerator IDGenerator = NewSnakeIDGenerator(0, 6, nextMilliseconds, nil)
+	epoch                       = time.Date(2019, time.January, 2, 15, 4, 5, 0, time.UTC)
+	idGenerator IDGenerator[ID] = NewSnakeIDGenerator(0, 6, nextMilliseconds, nil)
 )
 
 type NextNumberFunc func() int64
@@ -262,7 +262,7 @@ func NextID() ID {
 	return idGenerator.NextID()
 }
 
-func SetIDGenerator(g IDGenerator) {
+func SetIDGenerator(g IDGenerator[ID]) {
 	idGenerator = g
 }
 
