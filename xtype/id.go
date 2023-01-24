@@ -190,7 +190,7 @@ type NextNumber interface {
 	NextNumber() int64
 }
 
-type SnakeIDGenerator struct {
+type SnakeIDGenerator[T ~int64] struct {
 	seqSize   uint
 	shardSize uint
 
@@ -200,7 +200,7 @@ type SnakeIDGenerator struct {
 	counter int64
 }
 
-func NewSnakeIDGenerator(shardBitsSize, seqBitsSize uint, clock, sharding NextNumber) *SnakeIDGenerator {
+func NewSnakeIDGenerator[T ~int64](shardBitsSize, seqBitsSize uint, clock, sharding NextNumber) *SnakeIDGenerator[T] {
 	if seqBitsSize < 1 || seqBitsSize > 16 {
 		panic("seqBitsSize should be [1,16]")
 	}
@@ -221,7 +221,7 @@ func NewSnakeIDGenerator(shardBitsSize, seqBitsSize uint, clock, sharding NextNu
 		panic("shardBitsSize + seqBitsSize should be less than 20")
 	}
 
-	return &SnakeIDGenerator{
+	return &SnakeIDGenerator[T]{
 		seqSize:   seqBitsSize,
 		shardSize: shardBitsSize,
 		clock:     clock,
@@ -229,14 +229,14 @@ func NewSnakeIDGenerator(shardBitsSize, seqBitsSize uint, clock, sharding NextNu
 	}
 }
 
-func (g *SnakeIDGenerator) NextID() ID {
+func (g *SnakeIDGenerator[T]) NextID() T {
 	id := g.clock.NextNumber() << (g.seqSize + g.shardSize)
 	if g.shardSize > 0 {
 		id |= (g.sharding.NextNumber() % (1 << g.shardSize)) << g.seqSize
 	}
 	n := atomic.AddInt64(&g.counter, 1)
 	id |= n % (1 << g.seqSize)
-	return ID(id)
+	return T(id)
 }
 
 // Most language's JSON decoders decode number into double if type isn't explicitly specified.
@@ -245,7 +245,7 @@ func (g *SnakeIDGenerator) NextID() ID {
 // Putting the time at the beginning can ensure the id unique and increasing in case increase shard or seq bits size in the future
 var (
 	epoch                       = time.Date(2019, time.January, 2, 15, 4, 5, 0, time.UTC)
-	idGenerator IDGenerator[ID] = NewSnakeIDGenerator(0, 6, nextMilliseconds, nil)
+	idGenerator IDGenerator[ID] = NewSnakeIDGenerator[ID](0, 6, nextMilliseconds, nil)
 )
 
 type NextNumberFunc func() int64
