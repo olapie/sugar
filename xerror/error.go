@@ -101,6 +101,9 @@ var rawErrType = reflect.TypeOf(errors.New(""))
 
 func GetCode(err error) int {
 	err = Cause(err)
+	if err == nil {
+		return 0
+	}
 	if reflect.TypeOf(err) == rawErrType {
 		return 0
 	}
