@@ -57,9 +57,12 @@ func (e *Error) String() string {
 
 func (e *Error) Error() string {
 	if e.Message == "" {
-		return fmt.Sprintf("code:%d", e.Code)
+		e.Message = http.StatusText(e.Code)
+		if e.Message == "" {
+			e.Message = fmt.Sprint(e.Code)
+		}
 	}
-	return fmt.Sprintf("code:%d, message:%s", e.Code, e.Message)
+	return e.Message
 }
 
 func (e *Error) Is(target error) bool {
