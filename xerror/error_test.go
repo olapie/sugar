@@ -66,3 +66,12 @@ func TestErrorString(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestEmbedError(t *testing.T) {
+	err := xerror.NotFound("token")
+	err = xerror.Unauthorized(err.Error())
+	t.Log(err)
+	if err.Error() != "code:401, message:token" {
+		t.Fail()
+	}
+}
