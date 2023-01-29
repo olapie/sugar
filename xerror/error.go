@@ -74,15 +74,16 @@ func (e *Error) Is(target error) bool {
 }
 
 func (e *Error) Respond(ctx context.Context, w http.ResponseWriter) {
-	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(e.Code)
-	msg := e.Message
-	if msg == "" {
-		msg = http.StatusText(e.Code)
-	}
-	_, err := w.Write([]byte(msg))
+	body, err := json.Marshal(e)
 	if err != nil {
-		log.Printf("Cannot write: %v", err)
+		log.Printf("marshal json: %v", err)
+		return
+	}
+	_, err = w.Write(body)
+	if err != nil {
+		log.Printf("write body: %v", err)
 	}
 }
 
