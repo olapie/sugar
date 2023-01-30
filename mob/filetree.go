@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"code.olapie.com/sugar/v2/mob/nomobile"
+	"code.olapie.com/sugar/mob/nomobile"
 	"code.olapie.com/sugar/v2/xtest"
 	"github.com/google/uuid"
 )

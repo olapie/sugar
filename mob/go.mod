@@ -1,4 +1,4 @@
-module code.olapie.com/sugar/v2/mob
+module code.olapie.com/sugar/mob
 
 go 1.19
 
