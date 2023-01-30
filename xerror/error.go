@@ -3,6 +3,7 @@ package xerror
 import (
 	"context"
 	"database/sql"
+	"encoding"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -12,43 +13,24 @@ import (
 	"reflect"
 	"regexp"
 	"strconv"
-	"strings"
 )
 
 var errorRegexp1 = regexp.MustCompile(`^code:(\d+)$`)
 var errorRegexp2 = regexp.MustCompile(`^code:(\d+), message:(.*)$`)
+var _ encoding.TextMarshaler = (*Error)(nil)
+var _ encoding.TextUnmarshaler = (*Error)(nil)
 
 type Error struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
+	code    int    `json:"code"`
+	message string `json:"message"`
 }
 
-func FromString(s string) *Error {
-	s = strings.TrimSpace(s)
-	texts := errorRegexp1.FindStringSubmatch(s)
-	if len(texts) == 2 {
-		code, err := strconv.ParseInt(texts[1], 0, 64)
-		if err == nil {
-			return &Error{
-				Code: int(code),
-			}
-		}
-	}
+func (e *Error) Code() int {
+	return e.code
+}
 
-	texts = errorRegexp2.FindStringSubmatch(s)
-	if len(texts) != 3 {
-		return nil
-	}
-
-	code, err := strconv.ParseInt(texts[1], 0, 64)
-	if err != nil {
-		return nil
-	}
-
-	return &Error{
-		Code:    int(code),
-		Message: texts[2],
-	}
+func (e *Error) Message() string {
+	return e.message
 }
 
 func (e *Error) String() string {
@@ -56,13 +38,13 @@ func (e *Error) String() string {
 }
 
 func (e *Error) Error() string {
-	if e.Message == "" {
-		e.Message = http.StatusText(e.Code)
-		if e.Message == "" {
-			e.Message = fmt.Sprint(e.Code)
+	if e.message == "" {
+		e.message = http.StatusText(e.code)
+		if e.message == "" {
+			e.message = fmt.Sprint(e.code)
 		}
 	}
-	return e.Message
+	return e.message
 }
 
 func (e *Error) Is(target error) bool {
@@ -71,14 +53,14 @@ func (e *Error) Is(target error) bool {
 	}
 
 	if t, ok := target.(*Error); ok {
-		return t.Code == e.Code && t.Message == e.Message
+		return t.code == e.code && t.message == e.message
 	}
 	return false
 }
 
 func (e *Error) Respond(ctx context.Context, w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(e.Code)
+	w.WriteHeader(e.code)
 	body, err := json.Marshal(e)
 	if err != nil {
 		log.Printf("marshal json: %v", err)
@@ -90,22 +72,38 @@ func (e *Error) Respond(ctx context.Context, w http.ResponseWriter) {
 	}
 }
 
-func Format(code int, format string, a ...any) *Error {
-	if len(a) == 0 {
-		err := FromString(format)
-		if err != nil {
-			err.Code = code
-			return err
-		}
-	}
+type errorObject struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+}
 
+func (e *Error) MarshalText() (text []byte, err error) {
+	obj := &errorObject{
+		Code:    e.code,
+		Message: e.message,
+	}
+	return json.Marshal(obj)
+}
+
+func (e *Error) UnmarshalText(text []byte) error {
+	var obj errorObject
+	err := json.Unmarshal(text, &obj)
+	if err != nil {
+		return err
+	}
+	e.code = obj.Code
+	e.message = obj.Message
+	return nil
+}
+
+func New(code int, format string, a ...any) *Error {
 	msg := fmt.Sprintf(format, a...)
 	if msg == "" {
 		msg = http.StatusText(code)
 	}
 	return &Error{
-		Code:    code,
-		Message: msg,
+		code:    code,
+		message: msg,
 	}
 }
 
@@ -144,7 +142,7 @@ func GetCode(err error) int {
 		return 0
 	}
 
-	keys := []string{"status", "Status", "status_code", "StatusCode", "statusCode", "code", "Code"}
+	keys := []string{"status", "Status", "status_code", "StatusCode", "statusCode", "code", "code"}
 	i := indirect(err)
 	k := reflect.ValueOf(i).Kind()
 	if k != reflect.Struct && k != reflect.Map {

@@ -29,10 +29,7 @@ func DoWithResponse(ctx context.Context, method, url string, body io.Reader) (*h
 		return nil, fmt.Errorf("io.ReadAll: %w", err)
 	}
 	resp.Body.Close()
-	return nil, &xerror.Error{
-		Code:    resp.StatusCode,
-		Message: string(message),
-	}
+	return nil, xerror.New(resp.StatusCode, string(message))
 }
 
 func Do(ctx context.Context, method, url string, body io.Reader) error {
@@ -55,10 +52,7 @@ func Do(ctx context.Context, method, url string, body io.Reader) error {
 		return fmt.Errorf("io.ReadAll: %w", err)
 	}
 	resp.Body.Close()
-	return &xerror.Error{
-		Code:    resp.StatusCode,
-		Message: string(message),
-	}
+	return xerror.New(resp.StatusCode, string(message))
 }
 
 func Post(ctx context.Context, url string, body io.Reader) error {

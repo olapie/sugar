@@ -162,7 +162,7 @@ func (c *Caller[IN, OUT]) call(ctx context.Context, input IN) (*http.Response, e
 			if tr, ok := err.(interface{ Timeout() bool }); ok && tr.Timeout() {
 				err = xerror.RequestTimeout(err.Error())
 			} else {
-				err = xerror.Format(600, err.Error())
+				err = xerror.New(600, err.Error())
 			}
 		}
 		return nil, fmt.Errorf("send request: %w", err)

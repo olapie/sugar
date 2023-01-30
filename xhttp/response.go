@@ -48,7 +48,7 @@ func GetResponseResult[T any](resp *http.Response) (T, error) {
 		return res, fmt.Errorf("read resp body: %v", err)
 	}
 	if resp.StatusCode >= http.StatusBadRequest {
-		return res, xerror.Format(resp.StatusCode, string(body))
+		return res, xerror.New(resp.StatusCode, string(body))
 	}
 
 	if any(res) == nil {
