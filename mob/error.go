@@ -1,7 +1,6 @@
 package mob
 
 import (
-	"fmt"
 	"reflect"
 
 	"code.olapie.com/sugar/v2/xerror"
@@ -9,19 +8,24 @@ import (
 
 type Error xerror.Error
 
+func (e *Error) Code() int {
+	return (*xerror.Error)(e).Code()
+}
+
+func (e *Error) Message() string {
+	return (*xerror.Error)(e).Message()
+}
+
 func (e *Error) Error() string {
-	return e.Message
+	return (*xerror.Error)(e).Error()
 }
 
 func (e *Error) String() string {
-	return fmt.Sprintf("code=%d, message=%s", e.Code, e.Message)
+	return (*xerror.Error)(e).String()
 }
 
 func NewError(code int, message string) *Error {
-	return &Error{
-		Code:    code,
-		Message: message,
-	}
+	return (*Error)(xerror.New(code, message))
 }
 
 func ToError(err error) *Error {
@@ -35,11 +39,11 @@ func ToError(err error) *Error {
 
 	cause := xerror.Cause(err)
 	if e, ok := cause.(*Error); ok && e != nil {
-		return NewError((*xerror.Error)(e).Code, err.Error())
+		return NewError((*xerror.Error)(e).Code(), err.Error())
 	}
 
 	if e, ok := cause.(*xerror.Error); ok && e != nil {
-		return NewError(e.Code, e.Message)
+		return NewError(e.Code(), e.Message())
 	}
 
 	return NewError(0, err.Error())

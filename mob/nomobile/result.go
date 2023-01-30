@@ -19,14 +19,14 @@ func (r *Result[T]) ErrorCode() int {
 	if r.err == nil {
 		return 0
 	}
-	return r.err.Code
+	return r.err.Code()
 }
 
 func (r *Result[T]) ErrorMessage() string {
 	if r.err == nil {
 		return ""
 	}
-	return r.err.Message
+	return r.err.Message()
 }
 
 func (r *Result[T]) SetValue(v T) {
@@ -35,16 +35,18 @@ func (r *Result[T]) SetValue(v T) {
 
 func (r *Result[T]) SetErrorCode(code int) {
 	if r.err == nil {
-		r.err = new(xerror.Error)
+		r.err = xerror.New(code, "")
+	} else {
+		r.err = xerror.New(code, r.err.Message())
 	}
-	r.err.Code = code
 }
 
 func (r *Result[T]) SetMessage(message string) {
 	if r.err == nil {
-		r.err = new(xerror.Error)
+		r.err = xerror.New(0, message)
+	} else {
+		r.err = xerror.New(r.err.Code(), message)
 	}
-	r.err.Message = message
 }
 
 func (r *Result[T]) SetError(err error) {
@@ -68,9 +70,6 @@ func ErrorResult[T any](err error) *Result[T] {
 		return res
 	}
 
-	res.err = &xerror.Error{
-		Code:    xerror.GetCode(err),
-		Message: err.Error(),
-	}
+	res.err = xerror.New(xerror.GetCode(err), err.Error())
 	return res
 }
