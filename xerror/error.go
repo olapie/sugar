@@ -3,7 +3,6 @@ package xerror
 import (
 	"context"
 	"database/sql"
-	"encoding"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -17,8 +16,8 @@ import (
 
 var errorRegexp1 = regexp.MustCompile(`^code:(\d+)$`)
 var errorRegexp2 = regexp.MustCompile(`^code:(\d+), message:(.*)$`)
-var _ encoding.TextMarshaler = (*Error)(nil)
-var _ encoding.TextUnmarshaler = (*Error)(nil)
+var _ json.Marshaler = (*Error)(nil)
+var _ json.Unmarshaler = (*Error)(nil)
 
 type Error struct {
 	code    int    `json:"code"`
@@ -77,7 +76,7 @@ type errorObject struct {
 	Message string `json:"message"`
 }
 
-func (e *Error) MarshalText() (text []byte, err error) {
+func (e *Error) MarshalJSON() (text []byte, err error) {
 	obj := &errorObject{
 		Code:    e.code,
 		Message: e.message,
@@ -85,7 +84,7 @@ func (e *Error) MarshalText() (text []byte, err error) {
 	return json.Marshal(obj)
 }
 
-func (e *Error) UnmarshalText(text []byte) error {
+func (e *Error) UnmarshalJSON(text []byte) error {
 	var obj errorObject
 	err := json.Unmarshal(text, &obj)
 	if err != nil {

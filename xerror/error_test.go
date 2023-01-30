@@ -35,4 +35,11 @@ func TestJSON(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Log(e.Code(), e.message)
+
+	obj := &errorObject{
+		Code:    e.code,
+		Message: e.message,
+	}
+	text, _ = json.Marshal(obj)
+	t.Log(string(text))
 }
