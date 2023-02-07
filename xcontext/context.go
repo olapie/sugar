@@ -3,7 +3,6 @@ package xcontext
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"reflect"
 
 	"code.olapie.com/sugar/v2/xruntime"
@@ -15,38 +14,12 @@ type keyType int
 const (
 	keyStart keyType = iota
 	keyLogin
-	keyTraceID
 	keySudo
-	keyHttpHeader
-	keyAppID
-	keyClientID
-	keyServiceID
 	keyLogger
-	keyTestFlag
+	keyRequestMetadata
 
 	keyEnd
 )
-
-func GetHTTPHeader(ctx context.Context) http.Header {
-	h, _ := ctx.Value(keyHttpHeader).(http.Header)
-	return h
-}
-
-func WithHTTPHeader(ctx context.Context, h http.Header) context.Context {
-	return context.WithValue(ctx, keyHttpHeader, h)
-}
-
-func GetTraceID(ctx context.Context) string {
-	id, _ := ctx.Value(keyTraceID).(string)
-	return id
-}
-
-func WithTraceID(ctx context.Context, traceID string) context.Context {
-	if traceID == "" {
-		return ctx
-	}
-	return context.WithValue(ctx, keyTraceID, traceID)
-}
 
 func Detach(ctx context.Context) context.Context {
 	newCtx := context.Background()
@@ -112,50 +85,6 @@ func WithSudo(ctx context.Context) context.Context {
 func IsSudo(ctx context.Context) bool {
 	b, _ := ctx.Value(keySudo).(bool)
 	return b
-}
-
-func GetAppID(ctx context.Context) string {
-	id, _ := ctx.Value(keyAppID).(string)
-	return id
-}
-
-func WithAppID(ctx context.Context, id string) context.Context {
-	if id == "" {
-		return ctx
-	}
-	return context.WithValue(ctx, keyAppID, id)
-}
-
-func GetServiceID(ctx context.Context) string {
-	id, _ := ctx.Value(keyServiceID).(string)
-	return id
-}
-
-func WithServiceID(ctx context.Context, id string) context.Context {
-	if id == "" {
-		return ctx
-	}
-	return context.WithValue(ctx, keyServiceID, id)
-}
-
-func GetClientID(ctx context.Context) string {
-	id, _ := ctx.Value(keyClientID).(string)
-	return id
-}
-
-func WithClientID(ctx context.Context, id string) context.Context {
-	if id == "" {
-		return ctx
-	}
-	return context.WithValue(ctx, keyClientID, id)
-}
-
-func IsTest(ctx context.Context) bool {
-	return ctx.Value(keyTestFlag) != nil
-}
-
-func WithTestFlag(ctx context.Context) context.Context {
-	return context.WithValue(ctx, keyTestFlag, true)
 }
 
 func GetLogger[T any](ctx context.Context) T {
