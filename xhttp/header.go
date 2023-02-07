@@ -3,6 +3,7 @@ package xhttp
 import (
 	"encoding/base64"
 	"fmt"
+	"mime"
 	"net/http"
 	"strings"
 
@@ -124,13 +125,7 @@ func GetAcceptEncodings[H Headerxtypeet](h H) []string {
 }
 
 func GetContentType[H Headerxtypeet](h H) string {
-	t := GetHeader(h, KeyContentType)
-	for i, ch := range t {
-		if ch == ' ' || ch == ';' {
-			t = t[:i]
-			break
-		}
-	}
+	t, _, _ := mime.ParseMediaType(GetHeader(h, KeyContentType))
 	return t
 }
 
