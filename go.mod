@@ -1,6 +1,6 @@
 module code.olapie.com/sugar/v2
 
-go 1.19
+go 1.20
 
 require (
 	github.com/golang/geo v0.0.0-20210211234256-740aa86cb551

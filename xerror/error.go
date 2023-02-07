@@ -215,7 +215,7 @@ func And(errs ...error) error {
 			return nil
 		}
 	}
-	return errorSlice(errs)
+	return errors.Join(errs...)
 }
 
 func Combine(errs ...error) error {
@@ -229,7 +229,7 @@ func Combine(errs ...error) error {
 		return nil
 	}
 
-	return errorSlice(errs)
+	return errors.Join(errs...)
 }
 
 func OrFn(err error, errFns ...func() error) error {
