@@ -42,7 +42,7 @@ func IsTest(ctx context.Context) bool {
 	return ctx.Value(keyRequestMetadata).(*RequestMetadata).TestFlag
 }
 
-func getRequest(ctx context.Context) *RequestMetadata {
+func GetRequest(ctx context.Context) RequestMetadata {
 	v, _ := ctx.Value(keyRequestMetadata).(*RequestMetadata)
-	return v
+	return *v
 }
