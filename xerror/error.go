@@ -50,7 +50,7 @@ func (e *Error) Error() string {
 		if e.message == "" {
 			e.message = fmt.Sprint(e.code)
 		} else if e.subCode > 0 {
-			e.message = fmt.Sprintf("%s: %d", e.message, e.subCode)
+			e.message = fmt.Sprintf("%s (%d)", e.message, e.subCode)
 		}
 	}
 	return e.message
