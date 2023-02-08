@@ -2,11 +2,12 @@ package xerror
 
 import (
 	"encoding/json"
+	"net/http"
 	"testing"
 )
 
 func TestErrorString(t *testing.T) {
-	err := Conflict("duplicate nickname")
+	err := New(http.StatusConflict, "duplicate nickname")
 	t.Log(err.Error())
 	if err.Error() != "duplicate nickname" {
 		t.Fail()
@@ -14,8 +15,8 @@ func TestErrorString(t *testing.T) {
 }
 
 func TestEmbedError(t *testing.T) {
-	err := NotFound("token")
-	err = Unauthorized(err.Error())
+	err := New(http.StatusNotFound, "token")
+	err = New(http.StatusUnauthorized, err.Error())
 	t.Log(err)
 	if err.Error() != "token" {
 		t.Fail()
@@ -23,7 +24,7 @@ func TestEmbedError(t *testing.T) {
 }
 
 func TestJSON(t *testing.T) {
-	text, err := json.Marshal(BadRequest("test"))
+	text, err := json.Marshal(New(http.StatusBadRequest, "test"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -36,7 +37,7 @@ func TestJSON(t *testing.T) {
 	}
 	t.Log(e.Code(), e.message)
 
-	obj := &errorObject{
+	obj := &errorJSONObject{
 		Code:    e.code,
 		Message: e.message,
 	}
