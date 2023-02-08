@@ -49,6 +49,8 @@ func (e *Error) Error() string {
 		e.message = http.StatusText(e.code)
 		if e.message == "" {
 			e.message = fmt.Sprint(e.code)
+		} else if e.subCode > 0 {
+			e.message = fmt.Sprintf("%s: %d", e.message, e.subCode)
 		}
 	}
 	return e.message
