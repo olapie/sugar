@@ -3,7 +3,7 @@ module code.olapie.com/sugar/mob
 go 1.19
 
 require (
-	code.olapie.com/sugar/v2 v2.2.2
+	code.olapie.com/sugar/v2 v2.2.10
 	github.com/google/uuid v1.3.0
 )
 

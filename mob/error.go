@@ -37,12 +37,11 @@ func ToError(err error) *Error {
 		return nil
 	}
 
-	cause := xerror.Cause(err)
-	if e, ok := cause.(*Error); ok && e != nil {
+	if e, ok := xerror.CauseOf[*Error](err); ok && e != nil {
 		return NewError((*xerror.Error)(e).Code(), err.Error())
 	}
 
-	if e, ok := cause.(*xerror.Error); ok && e != nil {
+	if e, ok := xerror.CauseOf[*xerror.Error](err); ok && e != nil {
 		return NewError(e.Code(), e.Message())
 	}
 
