@@ -8,6 +8,7 @@ import (
 	"image/gif"
 	"image/jpeg"
 	"image/png"
+	"net/http"
 
 	"code.olapie.com/sugar/v2/xerror"
 )
@@ -23,7 +24,7 @@ func Resize(origin []byte, width, height, quality int, resizer Resizer) (resized
 	img, typ, err := image.Decode(bytes.NewReader(origin))
 	if err != nil {
 		if errors.Is(err, image.ErrFormat) {
-			return nil, xerror.BadRequest("decode: %v", err)
+			return nil, xerror.New(http.StatusBadRequest, "decode: %v", err)
 		}
 		return nil, fmt.Errorf("decode: %w", err)
 	}

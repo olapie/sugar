@@ -8,6 +8,7 @@ import (
 	_ "image/gif"
 	"image/jpeg"
 	_ "image/png"
+	"net/http"
 
 	"code.olapie.com/sugar/v2/xerror"
 	"github.com/disintegration/imaging"
@@ -36,7 +37,7 @@ func GenerateThumbnail(origin []byte, w, h int) ([]byte, error) {
 	img, _, err := image.Decode(bytes.NewReader(origin))
 	if err != nil {
 		if errors.Is(err, image.ErrFormat) {
-			return nil, xerror.BadRequest("decode: %v", err)
+			return nil, xerror.New(http.StatusBadRequest, "decode: %v", err)
 		}
 		return nil, fmt.Errorf("decode: %w", err)
 	}
