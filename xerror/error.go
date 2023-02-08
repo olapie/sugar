@@ -89,6 +89,9 @@ func (e *Error) UnmarshalJSON(text []byte) error {
 }
 
 func New(code int, format string, a ...any) *Error {
+	if code <= 0 {
+		panic("invalid code")
+	}
 	msg := fmt.Sprintf(format, a...)
 	if msg == "" {
 		msg = http.StatusText(code)
@@ -100,6 +103,14 @@ func New(code int, format string, a ...any) *Error {
 }
 
 func NewSub(code, subCode int, message string) *Error {
+	if code <= 0 {
+		panic("invalid code")
+	}
+
+	if subCode <= 0 {
+		panic("invalid subCode")
+	}
+
 	if message == "" {
 		message = http.StatusText(code)
 	}
