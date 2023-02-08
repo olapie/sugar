@@ -106,17 +106,3 @@ func WithLogger[T any](ctx context.Context, logger T) context.Context {
 	}
 	return context.WithValue(ctx, keyLogger, logger)
 }
-
-func CanEditUser[T comparable](ctx context.Context, user T) bool {
-	if IsSudo(ctx) {
-		return true
-	}
-
-	var zero T
-	if user == zero {
-		return true
-	}
-
-	login := GetLogin[T](ctx)
-	return login == user
-}

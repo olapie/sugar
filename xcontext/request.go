@@ -6,11 +6,11 @@ import (
 )
 
 type RequestMetadata struct {
-	TraceID    string
-	HttpHeader http.Header
-	ClientID   string
-	ServiceID  string
 	AppID      string
+	ClientID   string
+	HttpHeader http.Header
+	ServiceID  string
+	TraceID    string
 	TestFlag   bool
 }
 
