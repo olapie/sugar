@@ -157,12 +157,10 @@ func (c *Caller[IN, OUT]) call(ctx context.Context, input IN) (*http.Response, e
 	resp, err := client.Do(req)
 	if err != nil {
 		if err == context.DeadlineExceeded {
-			err = xerror.RequestTimeout(err.Error())
+			err = xerror.New(http.StatusRequestTimeout, err.Error())
 		} else {
 			if tr, ok := err.(interface{ Timeout() bool }); ok && tr.Timeout() {
-				err = xerror.RequestTimeout(err.Error())
-			} else {
-				err = xerror.New(600, err.Error())
+				err = xerror.New(http.StatusRequestTimeout, err.Error())
 			}
 		}
 		return nil, fmt.Errorf("send request: %w", err)

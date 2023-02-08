@@ -166,15 +166,15 @@ func getMessageHashForSigning(req *http.Request) []byte {
 func CheckTimestamp[H Headerxtypeet](h H) error {
 	ts := GetHeader(h, KeyTimestamp)
 	if ts == "" {
-		return xerror.BadRequest("missing %s", KeyTimestamp)
+		return xerror.New(http.StatusBadRequest, "missing %s", KeyTimestamp)
 	}
 	t, err := conv.ToInt64(ts)
 	if err != nil {
-		return xerror.BadRequest("invalid timestamp")
+		return xerror.New(http.StatusBadRequest, "invalid timestamp")
 	}
 	now := time.Now().Unix()
 	if xmath.Abs(now-t) > 60 {
-		return xerror.NotAcceptable("outdated request")
+		return xerror.New(http.StatusNotAcceptable, "outdated request")
 	}
 	return nil
 }
@@ -182,11 +182,11 @@ func CheckTimestamp[H Headerxtypeet](h H) error {
 func DecodeSign[H Headerxtypeet](h H) ([]byte, error) {
 	signature := GetHeader(h, KeySignature)
 	if signature == "" {
-		return nil, xerror.BadRequest("missing %s", KeySignature)
+		return nil, xerror.New(http.StatusBadRequest, "missing %s", KeySignature)
 	}
 	sign, err := base64.StdEncoding.DecodeString(signature)
 	if err != nil {
-		return nil, xerror.NotAcceptable("malformed signature")
+		return nil, xerror.New(http.StatusNotAcceptable, "malformed signature")
 	}
 	return sign, nil
 }
