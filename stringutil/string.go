@@ -1,0 +1,150 @@
+package stringutil
+
+import (
+	"errors"
+	"fmt"
+	"reflect"
+	"regexp"
+	"strings"
+
+	"code.olapie.com/sugar/v2/rt"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+)
+
+func Join[E ~string](elems []E, sep string) string {
+	switch len(elems) {
+	case 0:
+		return ""
+	case 1:
+		return string(elems[0])
+	}
+	n := len(sep) * (len(elems) - 1)
+	for i := 0; i < len(elems); i++ {
+		n += len(elems[i])
+	}
+
+	var b strings.Builder
+	b.Grow(n)
+	b.WriteString(string(elems[0]))
+	for _, s := range elems[1:] {
+		b.WriteString(sep)
+		b.WriteString(string(s))
+	}
+	return b.String()
+}
+
+func TrimSpace[T ~string](s T) T {
+	return T(strings.TrimSpace(string(s)))
+}
+
+var whitespaceRegexp = regexp.MustCompile(`[ \t\n\r]+`)
+var bulletRegexp = regexp.MustCompile(`[\d.*]*`)
+
+// Squish returns the string
+// first removing all whitespace on both ends of the string,
+// and then changing remaining consecutive whitespace groups into one space each.
+func Squish[T ~string](s T) T {
+	str := strings.TrimSpace(string(s))
+	str = whitespaceRegexp.ReplaceAllString(str, " ")
+	return T(str)
+}
+
+func SquishFields(i any) {
+	squishFields(reflect.ValueOf(i))
+}
+
+func squishFields(v reflect.Value) {
+	v = rt.IndirectReadableValue(v)
+	switch v.Kind() {
+	case reflect.Struct:
+		squishStructFields(v)
+	case reflect.String:
+		fmt.Println(v.CanSet(), v.String())
+		if v.CanSet() {
+			v.SetString(Squish(v.String()))
+		}
+	default:
+		break
+	}
+}
+
+func squishStructFields(v reflect.Value) {
+	for i := 0; i < v.NumField(); i++ {
+		fv := v.Field(i)
+		if !fv.IsValid() || !fv.CanSet() {
+			continue
+		}
+		switch fv.Kind() {
+		case reflect.String:
+			fv.SetString(Squish(fv.String()))
+		case reflect.Struct:
+			squishStructFields(fv)
+		case reflect.Ptr, reflect.Interface:
+			if fv.IsNil() {
+				break
+			}
+			squishFields(fv.Elem())
+		default:
+			break
+		}
+	}
+}
+
+func RemoveAllSpaces[T ~string](s T) T {
+	return T(strings.ReplaceAll(string(Squish(s)), " ", ""))
+}
+
+func RemoveBullet[T ~string](s T) T {
+	s = Squish(s)
+	a := strings.Split(string(s), " ")
+
+	if len(a) == 0 {
+		return ""
+	}
+	a[0] = bulletRegexp.ReplaceAllString(a[0], "")
+	if a[0] == "" {
+		a = a[1:]
+	}
+	return T(strings.Join(a, " "))
+}
+
+func FromVarargs(keyValues ...any) (keys []string, values []any, err error) {
+	n := len(keyValues)
+	if n%2 != 0 {
+		err = errors.New("keyValues should be pairs of (string, any)")
+		return
+	}
+
+	keys, values = make([]string, 0, n/2), make([]any, 0, n/2)
+	for i := 0; i < n/2; i++ {
+		if k, ok := keyValues[2*i].(string); !ok {
+			err = fmt.Errorf("keyValues[%d] isn't convertible to string", i)
+			return
+		} else if keyValues[2*i+1] == nil {
+			err = fmt.Errorf("keyValues[%d] is nil", 2*i+1)
+			return
+		} else {
+			keys = append(keys, k)
+			values = append(values, keyValues[2*i+1])
+		}
+	}
+	return
+}
+
+func Title(s string) string {
+	return cases.Title(language.English).String(s)
+}
+
+func Cast[FROM ~string, TO ~string](from FROM) TO {
+	return TO(from)
+}
+
+func CastSlice[FROM ~string, TO ~string](from []FROM) []TO {
+	to := make([]TO, len(from))
+	for i := range from {
+		to[i] = TO(from[i])
+	}
+	return to
+}

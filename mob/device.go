@@ -1,8 +1,9 @@
 package mob
 
 import (
-	"code.olapie.com/sugar/v2/xjson"
 	"encoding/json"
+
+	"code.olapie.com/sugar/v2/xjson"
 )
 
 type DeviceInfo struct {

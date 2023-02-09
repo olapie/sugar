@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"code.olapie.com/log"
-	"code.olapie.com/sugar/v2/xname"
+	"code.olapie.com/sugar/v2/naming"
 )
 
 const generateTestCode = `
@@ -60,7 +60,7 @@ func Generate(filename string) {
 
 func getEntity(r *RepoModel) Entity {
 	var e Entity
-	e.Name = xname.ToClassName(r.Name)
+	e.Name = naming.ToClassName(r.Name)
 	for _, c := range r.Columns {
 		field := &Field{
 			Name: c.Key.(string),
@@ -92,7 +92,7 @@ func generateSQLForEntity(r *RepoModel) {
 	}
 
 	m := &Model{
-		Name:               xname.ToClassName(r.Name) + "Repo",
+		Name:               naming.ToClassName(r.Name) + "Repo",
 		Table:              r.Table,
 		Columns:            r.GetColumns(),
 		KeyParams:          r.KeyParams(),

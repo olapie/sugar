@@ -4,8 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"code.olapie.com/sugar/v2/xslice"
-	"code.olapie.com/sugar/v2/xtest"
+	"code.olapie.com/sugar/v2/testutil"
 )
 
 func TestDeriveKey(t *testing.T) {
@@ -16,27 +15,27 @@ func TestDeriveKey(t *testing.T) {
 }
 
 func TestStream(t *testing.T) {
-	raw := xtest.RandomBytes(8)
-	password := xtest.RandomString(8)
+	raw := testutil.RandomBytes(8)
+	password := testutil.RandomString(8)
 	stream1 := getCipherStream(password)
 	stream2 := getCipherStream(password)
 
-	data := xslice.Clone(raw)
-	xtest.Equal(t, raw, data)
+	data := sliceutil.Clone(raw)
+	testutil.Equal(t, raw, data)
 
 	// encrypt
 	stream1.XORKeyStream(data, data)
-	xtest.NotEqual(t, raw, data)
+	testutil.NotEqual(t, raw, data)
 
 	// decrypt
 	stream2.XORKeyStream(data, data)
-	xtest.Equal(t, raw, data)
+	testutil.Equal(t, raw, data)
 }
 
 func TestStream2(t *testing.T) {
 	n := 10 * 500
-	raw := xtest.RandomBytes(n)
-	password := xtest.RandomString(8)
+	raw := testutil.RandomBytes(n)
+	password := testutil.RandomString(8)
 	var encrypted []byte
 	{
 		stream1 := getCipherStream(password)
@@ -58,7 +57,7 @@ func TestStream2(t *testing.T) {
 			buf2.Write(data[:])
 		}
 
-		xtest.Equal(t, buf1.Bytes(), buf2.Bytes())
+		testutil.Equal(t, buf1.Bytes(), buf2.Bytes())
 		encrypted = buf1.Bytes()
 	}
 
@@ -82,8 +81,8 @@ func TestStream2(t *testing.T) {
 			buf2.Write(data[:])
 		}
 
-		xtest.Equal(t, buf1.Bytes(), buf2.Bytes())
-		xtest.Equal(t, raw, buf1.Bytes())
+		testutil.Equal(t, buf1.Bytes(), buf2.Bytes())
+		testutil.Equal(t, raw, buf1.Bytes())
 	}
 
 }

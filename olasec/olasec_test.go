@@ -8,14 +8,13 @@ import (
 	"testing"
 	"time"
 
+	"code.olapie.com/sugar/hashing"
 	"code.olapie.com/sugar/v2/olasec"
-
-	"code.olapie.com/sugar/v2/xhash"
-	"code.olapie.com/sugar/v2/xtest"
+	"code.olapie.com/sugar/v2/testutil"
 )
 
 func TestEncrypt(t *testing.T) {
-	password := xhash.SHA1(time.Now().String())
+	password := hashing.SHA1(time.Now().String())
 	testEncrypt(t, 1<<4+9, password)
 	testEncrypt(t, 1<<24, password)
 }
@@ -29,12 +28,12 @@ func testEncrypt(t *testing.T, size int, password string) {
 
 	enc, err := olasec.Encrypt(raw[:], password)
 	t.Log(enc[:30])
-	xtest.NoError(t, err)
-	xtest.True(t, olasec.IsEncrypted(enc))
+	testutil.NoError(t, err)
+	testutil.True(t, olasec.IsEncrypted(enc))
 	dec, err := olasec.Decrypt(enc, password)
-	xtest.NoError(t, err)
-	xtest.False(t, olasec.IsEncrypted(dec), dec[:olasec.HeaderSize])
-	xtest.Equal(t, raw, dec)
+	testutil.NoError(t, err)
+	testutil.False(t, olasec.IsEncrypted(dec), dec[:olasec.HeaderSize])
+	testutil.Equal(t, raw, dec)
 }
 
 func TestEncryptFile(t *testing.T) {
@@ -50,13 +49,13 @@ func TestEncryptFile(t *testing.T) {
 		os.RemoveAll(largeFilename)
 	})
 
-	password := xhash.SHA1(time.Now().String())
+	password := hashing.SHA1(time.Now().String())
 	var raw [32]byte
 	n, err := io.ReadFull(rand.Reader, raw[:])
-	xtest.NoError(t, err)
+	testutil.NoError(t, err)
 	t.Log(n, raw)
 	f, err := os.OpenFile(rawFilename, os.O_CREATE|os.O_WRONLY, 0644)
-	xtest.NoError(t, err)
+	testutil.NoError(t, err)
 
 	_, err = f.Write(raw[:])
 	f.Close()
@@ -68,14 +67,14 @@ func TestEncryptFile(t *testing.T) {
 
 	var large [32 * 1024 * 1024]byte
 	n, err = io.ReadFull(rand.Reader, large[:])
-	xtest.NoError(t, err)
+	testutil.NoError(t, err)
 
 	f, err = os.OpenFile(largeFilename, os.O_CREATE|os.O_WRONLY, 0644)
-	xtest.NoError(t, err)
+	testutil.NoError(t, err)
 
 	_, err = f.Write(large[:])
 	f.Close()
-	xtest.NoError(t, err)
+	testutil.NoError(t, err)
 
 	testEncryptFile(t, largeFilename, password)
 }
@@ -88,23 +87,23 @@ func testEncryptFile(t *testing.T, rawFilename string, password string) {
 		os.RemoveAll(encFilename)
 	})
 	err := olasec.EncryptFile(olasec.SF(rawFilename), olasec.DF(encFilename), password)
-	xtest.NoError(t, err)
+	testutil.NoError(t, err)
 
-	xtest.True(t, olasec.IsEncryptedFile(encFilename))
-	xtest.False(t, olasec.IsEncryptedFile(rawFilename))
+	testutil.True(t, olasec.IsEncryptedFile(encFilename))
+	testutil.False(t, olasec.IsEncryptedFile(rawFilename))
 	err = olasec.DecryptFile(olasec.SF(encFilename), olasec.DF(decFilename), password)
-	xtest.NoError(t, err)
+	testutil.NoError(t, err)
 	raw, err := os.ReadFile(rawFilename)
-	xtest.NoError(t, err)
+	testutil.NoError(t, err)
 
 	enc, err := os.ReadFile(encFilename)
-	xtest.NoError(t, err)
-	xtest.NotEqual(t, raw, enc)
+	testutil.NoError(t, err)
+	testutil.NotEqual(t, raw, enc)
 
 	dec, err := os.ReadFile(decFilename)
-	xtest.NoError(t, err)
-	xtest.Equal(t, raw, dec)
+	testutil.NoError(t, err)
+	testutil.Equal(t, raw, dec)
 
 	valid := olasec.ValidateFilePassword(encFilename, password)
-	xtest.True(t, valid)
+	testutil.True(t, valid)
 }

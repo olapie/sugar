@@ -4,7 +4,7 @@ import (
 	"embed"
 	"text/template"
 
-	"code.olapie.com/sugar/v2/xname"
+	"code.olapie.com/sugar/v2/naming"
 )
 
 //go:embed template
@@ -13,17 +13,17 @@ var globalTemplate = template.New("")
 
 func init() {
 	globalTemplate = globalTemplate.Funcs(template.FuncMap{
-		"toStructName": xname.ToClassName,
-		"toCamel":      xname.ToCamel,
-		"toSnake":      xname.ToSnake,
+		"toStructName": naming.ToClassName,
+		"toCamel":      naming.ToCamel,
+		"toSnake":      naming.ToSnake,
 		"toEntityName": func(s string) string {
-			return xname.ToClassName(s) + "Entity"
+			return naming.ToClassName(s) + "Entity"
 		},
 		"toBuilderName": func(s string) string {
-			return xname.ToCamel(s) + "EntityBuilder"
+			return naming.ToCamel(s) + "EntityBuilder"
 		},
 		"toModifierName": func(s string) string {
-			return xname.ToCamel(s) + "EntityModifier"
+			return naming.ToCamel(s) + "EntityModifier"
 		},
 		"first": func(s string) string {
 			return s[:1]

@@ -4,16 +4,15 @@ import (
 	"strings"
 	"unicode"
 
-	"code.olapie.com/sugar/v2/xcheck"
 	"code.olapie.com/sugar/v2/xtime"
 )
 
 func IsEmailAddress(s string) bool {
-	return xcheck.IsEmailAddress(s)
+	return rt.IsEmailAddress(s)
 }
 
 func IsURL(s string) bool {
-	return xcheck.IsURL(s)
+	return rt.IsURL(s)
 }
 
 func IsDate(s string) bool {

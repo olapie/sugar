@@ -6,46 +6,46 @@ import (
 	"testing"
 	"time"
 
+	"code.olapie.com/sugar/hashing"
 	"code.olapie.com/sugar/v2/olasec"
-	"code.olapie.com/sugar/v2/xhash"
-	"code.olapie.com/sugar/v2/xtest"
+	"code.olapie.com/sugar/v2/testutil"
 )
 
 func TestEncodePrivateKey(t *testing.T) {
 	pk, err := olasec.GeneratePrivateKey()
-	xtest.NoError(t, err)
+	testutil.NoError(t, err)
 	data, err := olasec.EncodePrivateKey(pk, "hello")
-	xtest.NoError(t, err)
+	testutil.NoError(t, err)
 	_, err = olasec.DecodePrivateKey(data, "hi")
-	xtest.Error(t, err)
+	testutil.Error(t, err)
 	pk2, err := olasec.DecodePrivateKey(data, "hello")
-	xtest.NoError(t, err)
-	digest := []byte(xhash.SHA1(time.Now().String()))
+	testutil.NoError(t, err)
+	digest := []byte(hashing.SHA1(time.Now().String()))
 	sign1, err := ecdsa.SignASN1(rand.Reader, pk, digest[:])
-	xtest.NoError(t, err)
+	testutil.NoError(t, err)
 	sign2, err := ecdsa.SignASN1(rand.Reader, pk2, digest[:])
-	xtest.NoError(t, err)
+	testutil.NoError(t, err)
 
-	xtest.True(t, ecdsa.VerifyASN1(&pk.PublicKey, digest[:], sign1))
-	xtest.True(t, ecdsa.VerifyASN1(&pk.PublicKey, digest[:], sign2))
-	xtest.True(t, ecdsa.VerifyASN1(&pk2.PublicKey, digest[:], sign1))
-	xtest.True(t, ecdsa.VerifyASN1(&pk2.PublicKey, digest[:], sign2))
+	testutil.True(t, ecdsa.VerifyASN1(&pk.PublicKey, digest[:], sign1))
+	testutil.True(t, ecdsa.VerifyASN1(&pk.PublicKey, digest[:], sign2))
+	testutil.True(t, ecdsa.VerifyASN1(&pk2.PublicKey, digest[:], sign1))
+	testutil.True(t, ecdsa.VerifyASN1(&pk2.PublicKey, digest[:], sign2))
 
-	xtest.Equal(t, pk.X, pk2.X)
-	xtest.Equal(t, pk.Y, pk2.Y)
-	xtest.Equal(t, pk.D, pk2.D)
+	testutil.Equal(t, pk.X, pk2.X)
+	testutil.Equal(t, pk.Y, pk2.Y)
+	testutil.Equal(t, pk.D, pk2.D)
 }
 
 func TestEncodePublicKey(t *testing.T) {
 	pk, err := olasec.GeneratePrivateKey()
-	xtest.NoError(t, err)
+	testutil.NoError(t, err)
 	data, err := olasec.EncodePublicKey(&pk.PublicKey)
-	xtest.NoError(t, err)
+	testutil.NoError(t, err)
 	pub, err := olasec.DecodePublicKey(data)
-	xtest.NoError(t, err)
-	digest := []byte(xhash.SHA1(time.Now().String()))
+	testutil.NoError(t, err)
+	digest := []byte(hashing.SHA1(time.Now().String()))
 	sign, err := ecdsa.SignASN1(rand.Reader, pk, digest[:])
-	xtest.NoError(t, err)
-	xtest.True(t, ecdsa.VerifyASN1(pub, digest[:], sign))
-	xtest.True(t, pk.PublicKey.Equal(pub))
+	testutil.NoError(t, err)
+	testutil.True(t, ecdsa.VerifyASN1(pub, digest[:], sign))
+	testutil.True(t, pk.PublicKey.Equal(pub))
 }

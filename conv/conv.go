@@ -13,14 +13,15 @@ import (
 	"strings"
 	"unsafe"
 
+	"code.olapie.com/sugar/v2/rt"
+
 	"code.olapie.com/sugar/v2/xerror"
-	"code.olapie.com/sugar/v2/xruntime"
 )
 
 // ToBool converts i to bool
 // i can be bool, integer or string
 func ToBool(i any) (bool, error) {
-	i = xruntime.Indirect(i)
+	i = rt.Indirect(i)
 	switch v := i.(type) {
 	case bool:
 		return v, nil
@@ -50,7 +51,7 @@ func ToBool(i any) (bool, error) {
 // ToBoolSlice converts i to []bool
 // i is an array or slice with elements convertiable to bool
 func ToBoolSlice(i any) ([]bool, error) {
-	i = xruntime.Indirect(i)
+	i = rt.Indirect(i)
 	if i == nil {
 		return nil, nil
 	}
@@ -85,7 +86,7 @@ func ToFloat32(i any) (float32, error) {
 }
 
 func ToFloat64(i any) (float64, error) {
-	i = xruntime.Indirect(i)
+	i = rt.Indirect(i)
 	if i == nil {
 		return 0, xerror.NotExist
 	}
@@ -94,15 +95,15 @@ func ToFloat64(i any) (float64, error) {
 		i = string(b)
 	}
 	v := reflect.ValueOf(i)
-	if xruntime.IsInt(v) {
+	if rt.IsInt(v) {
 		return float64(v.Int()), nil
 	}
 
-	if xruntime.IsUint(v) {
+	if rt.IsUint(v) {
 		return float64(v.Uint()), nil
 	}
 
-	if xruntime.IsFloat(v) {
+	if rt.IsFloat(v) {
 		return v.Float(), nil
 	}
 
@@ -120,7 +121,7 @@ func ToFloat64(i any) (float64, error) {
 }
 
 func ToFloat32Slice(i any) ([]float32, error) {
-	i = xruntime.Indirect(i)
+	i = rt.Indirect(i)
 	if i == nil {
 		return nil, nil
 	}
@@ -144,7 +145,7 @@ func ToFloat32Slice(i any) ([]float32, error) {
 }
 
 func ToFloat64Slice(i any) ([]float64, error) {
-	i = xruntime.Indirect(i)
+	i = rt.Indirect(i)
 	if i == nil {
 		return nil, nil
 	}
@@ -284,7 +285,7 @@ func ToUint64(i any) (uint64, error) {
 }
 
 func ToIntSlice(i any) ([]int, error) {
-	i = xruntime.Indirect(i)
+	i = rt.Indirect(i)
 	if i == nil {
 		return nil, nil
 	}
@@ -312,7 +313,7 @@ func ToIntSlice(i any) ([]int, error) {
 }
 
 func ToInt64Slice(i any) ([]int64, error) {
-	i = xruntime.Indirect(i)
+	i = rt.Indirect(i)
 	if i == nil {
 		return nil, nil
 	}
@@ -341,7 +342,7 @@ func ToInt64Slice(i any) ([]int64, error) {
 }
 
 func ToUintSlice(i any) ([]uint, error) {
-	i = xruntime.Indirect(i)
+	i = rt.Indirect(i)
 	if i == nil {
 		return nil, nil
 	}
@@ -370,7 +371,7 @@ func ToUintSlice(i any) ([]uint, error) {
 }
 
 func ToUint64Slice(i any) ([]uint64, error) {
-	i = xruntime.Indirect(i)
+	i = rt.Indirect(i)
 	if i == nil {
 		return nil, nil
 	}
@@ -399,7 +400,7 @@ func ToUint64Slice(i any) ([]uint64, error) {
 }
 
 func parseInt64(i any) (int64, error) {
-	i = xruntime.Indirect(i)
+	i = rt.Indirect(i)
 	if i == nil {
 		return 0, xerror.NotExist
 	}
@@ -407,11 +408,11 @@ func parseInt64(i any) (int64, error) {
 		i = string(b)
 	}
 	v := reflect.ValueOf(i)
-	if xruntime.IsInt(v) {
+	if rt.IsInt(v) {
 		return v.Int(), nil
 	}
 
-	if xruntime.IsUint(v) {
+	if rt.IsUint(v) {
 		n := v.Uint()
 		if n > math.MaxInt64 {
 			return 0, strconv.ErrRange
@@ -419,7 +420,7 @@ func parseInt64(i any) (int64, error) {
 		return int64(n), nil
 	}
 
-	if xruntime.IsFloat(v) {
+	if rt.IsFloat(v) {
 		return int64(v.Float()), nil
 	}
 
@@ -447,7 +448,7 @@ func parseInt64(i any) (int64, error) {
 }
 
 func parseUint64(i any) (uint64, error) {
-	i = xruntime.Indirect(i)
+	i = rt.Indirect(i)
 	if i == nil {
 		return 0, xerror.NotExist
 	}
@@ -455,7 +456,7 @@ func parseUint64(i any) (uint64, error) {
 		i = string(b)
 	}
 	v := reflect.ValueOf(i)
-	if xruntime.IsInt(v) {
+	if rt.IsInt(v) {
 		n := v.Int()
 		if n < 0 {
 			return 0, strconv.ErrRange
@@ -463,11 +464,11 @@ func parseUint64(i any) (uint64, error) {
 		return uint64(n), nil
 	}
 
-	if xruntime.IsUint(v) {
+	if rt.IsUint(v) {
 		return v.Uint(), nil
 	}
 
-	if xruntime.IsFloat(v) {
+	if rt.IsFloat(v) {
 		f := v.Float()
 		if f < 0 {
 			return 0, strconv.ErrRange
@@ -531,7 +532,7 @@ func ToUniqueInt64Slice(a []int64) []int64 {
 }
 
 func ToBytes(i any) ([]byte, error) {
-	i = xruntime.Indirect(i)
+	i = rt.Indirect(i)
 	switch v := i.(type) {
 	case []byte:
 		return v, nil
@@ -587,7 +588,7 @@ func ToByteArray64[T []byte | string](v T) [64]byte {
 // ToString converts i to string
 // i can be string, integer xtype, bool, []byte or any xtype which implement fmt.Stringer
 func ToString(i any) (string, error) {
-	i = xruntime.IndirectToStringerOrError(i)
+	i = rt.IndirectToStringerOrError(i)
 	if i == nil {
 		return "", xerror.NotExist
 	}
@@ -618,7 +619,7 @@ func ToString(i any) (string, error) {
 }
 
 func ToStringSlice(i any) ([]string, error) {
-	i = xruntime.Indirect(i)
+	i = rt.Indirect(i)
 	if i == nil {
 		return nil, nil
 	}
@@ -709,7 +710,7 @@ func ToList(i any) *list.List {
 	}
 
 	l := list.New()
-	v := reflect.ValueOf(xruntime.Indirect(i))
+	v := reflect.ValueOf(rt.Indirect(i))
 	if v.IsValid() && (v.Kind() == reflect.Slice || v.Kind() == reflect.Array) && !v.IsNil() {
 		for j := 0; j < v.Len(); j++ {
 			l.PushBack(v.Index(j).Interface())

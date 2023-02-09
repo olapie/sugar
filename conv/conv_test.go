@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"code.olapie.com/sugar/v2/conv"
-	"code.olapie.com/sugar/v2/xtest"
+	"code.olapie.com/sugar/v2/testutil"
 )
 
 func TestToBool(t *testing.T) {
@@ -114,7 +114,7 @@ func TestToBool(t *testing.T) {
 			if err != nil {
 				t.Error(err, c.Value)
 			}
-			xtest.Equal(t, c.Result, res)
+			testutil.Equal(t, c.Result, res)
 		}
 	})
 
@@ -128,7 +128,7 @@ func TestToBool(t *testing.T) {
 			if err == nil {
 				t.Error("should fail", c)
 			}
-			xtest.Equal(t, false, res)
+			testutil.Equal(t, false, res)
 		}
 	})
 }
@@ -207,7 +207,7 @@ func TestToFloat64(t *testing.T) {
 			if err != nil {
 				t.Error(err, c.Value)
 			}
-			xtest.Equal(t, c.Result, res)
+			testutil.Equal(t, c.Result, res)
 		}
 	})
 
@@ -301,7 +301,7 @@ func TestToInt64(t *testing.T) {
 			if err != nil {
 				t.Error(err, c.Value)
 			}
-			xtest.Equal(t, c.Result, res)
+			testutil.Equal(t, c.Result, res)
 		}
 	})
 
@@ -386,7 +386,7 @@ func TestToInt(t *testing.T) {
 			if err != nil {
 				t.Error(err, c.Value)
 			}
-			xtest.Equal(t, c.Result, res)
+			testutil.Equal(t, c.Result, res)
 		}
 	})
 
@@ -473,7 +473,7 @@ func TestToUint64(t *testing.T) {
 			if err != nil {
 				t.Error(err, c.Value)
 			}
-			xtest.Equal(t, c.Result, res)
+			testutil.Equal(t, c.Result, res)
 		}
 	})
 
@@ -501,7 +501,7 @@ func TestToIntSlice(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		xtest.Equal(t, []int{1, 12, -13, 100}, res)
+		testutil.Equal(t, []int{1, 12, -13, 100}, res)
 	})
 	t.Run("nil", func(t *testing.T) {
 		res, err := conv.ToIntSlice(nil)
@@ -564,7 +564,7 @@ func TestToString(t *testing.T) {
 			if err != nil {
 				t.Error(err, c.Value)
 			}
-			xtest.Equal(t, c.Result, res)
+			testutil.Equal(t, c.Result, res)
 		}
 	})
 
@@ -578,7 +578,7 @@ func TestToString(t *testing.T) {
 			if err == nil {
 				t.Error("should fail", c)
 			}
-			xtest.Equal(t, "", res)
+			testutil.Equal(t, "", res)
 		}
 	})
 }
@@ -590,7 +590,7 @@ func TestToSlice(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		xtest.Equal(t, []string{s}, l)
+		testutil.Equal(t, []string{s}, l)
 	})
 	t.Run("SingleInt", func(t *testing.T) {
 		s := 123
@@ -598,7 +598,7 @@ func TestToSlice(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		xtest.Equal(t, []string{fmt.Sprint(s)}, l)
+		testutil.Equal(t, []string{fmt.Sprint(s)}, l)
 	})
 	t.Run("IntSlice", func(t *testing.T) {
 		s := []int{123, -1, 9}
@@ -606,7 +606,7 @@ func TestToSlice(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		xtest.Equal(t, []string{"123", "-1", "9"}, l)
+		testutil.Equal(t, []string{"123", "-1", "9"}, l)
 	})
 	t.Run("MixSlice", func(t *testing.T) {
 		s := []any{123, "hello", "0x123"}
@@ -614,7 +614,7 @@ func TestToSlice(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		xtest.Equal(t, []string{"123", "hello", "0x123"}, l)
+		testutil.Equal(t, []string{"123", "hello", "0x123"}, l)
 	})
 	t.Run("MixArray", func(t *testing.T) {
 		s := [3]any{123, "hello", "0x123"}
@@ -622,6 +622,6 @@ func TestToSlice(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		xtest.Equal(t, []string{"123", "hello", "0x123"}, l)
+		testutil.Equal(t, []string{"123", "hello", "0x123"}, l)
 	})
 }

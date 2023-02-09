@@ -1,9 +1,10 @@
 package mob
 
 import (
-	"code.olapie.com/sugar/v2/xnetwork"
 	"net"
 	"time"
+
+	"code.olapie.com/sugar/v2/xnetwork"
 )
 
 const (

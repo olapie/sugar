@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"code.olapie.com/sugar/v2/xname"
+	"code.olapie.com/sugar/v2/naming"
 	"gopkg.in/yaml.v2"
 )
 
@@ -53,7 +53,7 @@ func (r *RepoModel) Args() string {
 	for i, c := range r.Columns {
 		name := c.Key.(string)
 		value := c.Value.(string)
-		args[i] = "v." + xname.ToClassName(name)
+		args[i] = "v." + naming.ToClassName(name)
 		if r.IsJSON(name) {
 			args[i] = "xsql.JSON(" + args[i] + ")"
 		} else if r.IsArray(value) {
@@ -107,7 +107,7 @@ func (r *RepoModel) GetColType(col string) string {
 func (r *RepoModel) KeyParams() string {
 	params := make([]string, len(r.PrimaryKey))
 	for i, k := range r.PrimaryKey {
-		params[i] = fmt.Sprintf("%s %v", xname.ToCamel(k), r.GetColType(k))
+		params[i] = fmt.Sprintf("%s %v", naming.ToCamel(k), r.GetColType(k))
 	}
 	return strings.Join(params, ", ")
 }
@@ -117,7 +117,7 @@ func (r *RepoModel) BatchKeyParams() string {
 		return ""
 	}
 	k := r.PrimaryKey[0]
-	return fmt.Sprintf("%s []%v", xname.ToCamel(xname.Plural(k)), r.GetColType(k))
+	return fmt.Sprintf("%s []%v", naming.ToCamel(naming.Plural(k)), r.GetColType(k))
 }
 
 func (r *RepoModel) BatchKeyConditions() string {
@@ -141,7 +141,7 @@ func (r *RepoModel) GetKeys() string {
 func (r *RepoModel) KeyArgs() string {
 	args := make([]string, len(r.PrimaryKey))
 	for i, k := range r.PrimaryKey {
-		args[i] = xname.ToCamel(k)
+		args[i] = naming.ToCamel(k)
 	}
 	return strings.Join(args, ", ")
 }
@@ -151,7 +151,7 @@ func (r *RepoModel) ScanHolders() string {
 	for i, c := range r.Columns {
 		name := c.Key.(string)
 		value := c.Value.(string)
-		scanArgs[i] = "&v." + xname.ToClassName(name)
+		scanArgs[i] = "&v." + naming.ToClassName(name)
 		if r.IsJSON(name) {
 			scanArgs[i] = "xsql.JSON(" + scanArgs[i] + ")"
 		} else if r.IsArray(value) {

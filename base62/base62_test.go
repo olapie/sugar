@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"code.olapie.com/sugar/v2/base62"
-	"code.olapie.com/sugar/v2/xtest"
+	"code.olapie.com/sugar/v2/testutil"
 	"github.com/google/uuid"
 )
 
@@ -19,7 +19,7 @@ func TestEncodeToString(t *testing.T) {
 		t.Log(strings.ReplaceAll(id.String(), "-", ""))
 		t.Log(id.String())
 		parsed, err := base62.DecodeString(idStr)
-		xtest.NoError(t, err)
-		xtest.Equal(t, id[:], parsed)
+		testutil.NoError(t, err)
+		testutil.Equal(t, id[:], parsed)
 	})
 }
