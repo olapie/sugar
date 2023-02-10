@@ -44,7 +44,7 @@ func GetLogin[T comparable](ctx context.Context) T {
 
 	actualVal := reflect.ValueOf(v)
 	var expect T
-	if rt.IsInt(actualVal) || rt.IsUint(actualVal) || rt.IsFloat(actualVal) {
+	if rt.IsIntValue(actualVal) || rt.IsUintValue(actualVal) || rt.IsFloatValue(actualVal) {
 		if reflect.ValueOf(expect).Kind() == reflect.String {
 			reflect.ValueOf(&expect).Elem().SetString(fmt.Sprint(v))
 			return expect

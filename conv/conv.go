@@ -95,15 +95,15 @@ func ToFloat64(i any) (float64, error) {
 		i = string(b)
 	}
 	v := reflect.ValueOf(i)
-	if rt.IsInt(v) {
+	if rt.IsIntValue(v) {
 		return float64(v.Int()), nil
 	}
 
-	if rt.IsUint(v) {
+	if rt.IsUintValue(v) {
 		return float64(v.Uint()), nil
 	}
 
-	if rt.IsFloat(v) {
+	if rt.IsFloatValue(v) {
 		return v.Float(), nil
 	}
 
@@ -408,11 +408,11 @@ func parseInt64(i any) (int64, error) {
 		i = string(b)
 	}
 	v := reflect.ValueOf(i)
-	if rt.IsInt(v) {
+	if rt.IsIntValue(v) {
 		return v.Int(), nil
 	}
 
-	if rt.IsUint(v) {
+	if rt.IsUintValue(v) {
 		n := v.Uint()
 		if n > math.MaxInt64 {
 			return 0, strconv.ErrRange
@@ -420,7 +420,7 @@ func parseInt64(i any) (int64, error) {
 		return int64(n), nil
 	}
 
-	if rt.IsFloat(v) {
+	if rt.IsFloatValue(v) {
 		return int64(v.Float()), nil
 	}
 
@@ -456,7 +456,7 @@ func parseUint64(i any) (uint64, error) {
 		i = string(b)
 	}
 	v := reflect.ValueOf(i)
-	if rt.IsInt(v) {
+	if rt.IsIntValue(v) {
 		n := v.Int()
 		if n < 0 {
 			return 0, strconv.ErrRange
@@ -464,11 +464,11 @@ func parseUint64(i any) (uint64, error) {
 		return uint64(n), nil
 	}
 
-	if rt.IsUint(v) {
+	if rt.IsUintValue(v) {
 		return v.Uint(), nil
 	}
 
-	if rt.IsFloat(v) {
+	if rt.IsFloatValue(v) {
 		f := v.Float()
 		if f < 0 {
 			return 0, strconv.ErrRange
