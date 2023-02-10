@@ -2,6 +2,7 @@ package sqlite
 
 import (
 	"bytes"
+	"code.olapie.com/sugar/v2"
 	"context"
 	"database/sql"
 	"encoding/json"

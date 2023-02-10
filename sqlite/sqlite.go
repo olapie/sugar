@@ -1,6 +1,7 @@
 package sqlite
 
 import (
+	"code.olapie.com/sugar/v2"
 	"database/sql"
 	"errors"
 	"fmt"
