@@ -1,5 +1,5 @@
-code.olapie.com/sugar/v2 v2.1.6 h1:yQS7H5YXh6mXzpA9LY19jKN58cT5KI85duY5AsFcGRY=
-code.olapie.com/sugar/v2 v2.1.6/go.mod h1:1oErXpdsvE5TKWdM16KeV4cCw0ygrwzh2vRz+IhdBhQ=
+code.olapie.com/sugar/v2 v2.2.3 h1:0g3x8J6dq3FT94wzb8qAkCQnhw4WcVIFZ5i75voAZyE=
+code.olapie.com/sugar/v2 v2.2.3/go.mod h1:1oErXpdsvE5TKWdM16KeV4cCw0ygrwzh2vRz+IhdBhQ=
 github.com/disintegration/imaging v1.6.2 h1:w1LecBlG2Lnp8B3jk5zSuNqd7b4DXhcjwek1ei82L+c=
 github.com/disintegration/imaging v1.6.2/go.mod h1:44/5580QXChDfwIclfc/PCwrr44amcmDAg8hxG0Ewe4=
 golang.org/x/image v0.0.0-20191009234506-e7c1f5e7dbb8 h1:hVwzHzIUGRjiF7EcUjqNxk3NCfkPxbDKRdnNE1Rpg0U=

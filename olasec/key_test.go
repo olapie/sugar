@@ -2,6 +2,7 @@ package olasec
 
 import (
 	"bytes"
+	"code.olapie.com/sugar/v2/slices"
 	"testing"
 
 	"code.olapie.com/sugar/v2/testutil"
@@ -20,7 +21,7 @@ func TestStream(t *testing.T) {
 	stream1 := getCipherStream(password)
 	stream2 := getCipherStream(password)
 
-	data := sliceutil.Clone(raw)
+	data := slices.Clone(raw)
 	testutil.Equal(t, raw, data)
 
 	// encrypt

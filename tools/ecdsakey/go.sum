@@ -1,5 +1,5 @@
-code.olapie.com/sugar/v2 v2.1.6 h1:yQS7H5YXh6mXzpA9LY19jKN58cT5KI85duY5AsFcGRY=
-code.olapie.com/sugar/v2 v2.1.6/go.mod h1:1oErXpdsvE5TKWdM16KeV4cCw0ygrwzh2vRz+IhdBhQ=
+code.olapie.com/sugar/v2 v2.2.3 h1:0g3x8J6dq3FT94wzb8qAkCQnhw4WcVIFZ5i75voAZyE=
+code.olapie.com/sugar/v2 v2.2.3/go.mod h1:1oErXpdsvE5TKWdM16KeV4cCw0ygrwzh2vRz+IhdBhQ=
 github.com/golang/geo v0.0.0-20210211234256-740aa86cb551 h1:gtexQ/VGyN+VVFRXSFiguSNcXmS6rkKT+X7FdIrTtfo=
 golang.org/x/crypto v0.4.0 h1:UVQgzMY87xqpKNgb+kDsll2Igd33HszWHFLmpaRMq/8=
 golang.org/x/crypto v0.4.0/go.mod h1:3quD/ATkf6oY+rnes5c3ExXTbLc8mueNue5/DoinL80=

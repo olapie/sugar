@@ -586,7 +586,7 @@ func ToByteArray64[T []byte | string](v T) [64]byte {
 }
 
 // ToString converts i to string
-// i can be string, integer xtype, bool, []byte or any xtype which implement fmt.Stringer
+// i can be string, integer types, bool, []byte or any types which implement fmt.Stringer
 func ToString(i any) (string, error) {
 	i = rt.IndirectToStringerOrError(i)
 	if i == nil {

@@ -103,23 +103,23 @@ type PublicKey interface {
 func Verify[K PublicKey](ctx context.Context, req *http.Request, pub *K) bool {
 	ts := req.Header.Get(KeyTimestamp)
 	if ts == "" {
-		fmt.Printf("[sugar/v2/xhttp] missing %s in header\n", KeyTimestamp)
+		fmt.Printf("[sugar/v2/httpkit] missing %s in header\n", KeyTimestamp)
 	}
 	t, err := strconv.ParseInt(ts, 0, 64)
 	if err != nil {
-		fmt.Printf("[sugar/v2/xhttp] strconv.ParseInt: %s, %v\n", ts, err)
+		fmt.Printf("[sugar/v2/httpkit] strconv.ParseInt: %s, %v\n", ts, err)
 		return false
 	}
 
 	if time.Now().Unix()-t > 5 {
-		fmt.Printf("[sugar/v2/xhttp] outdated timestamp %s in header\n", ts)
+		fmt.Printf("[sugar/v2/httpkit] outdated timestamp %s in header\n", ts)
 		return false
 	}
 
 	signature := req.Header.Get(KeySignature)
 	sign, err := base64.StdEncoding.DecodeString(signature)
 	if err != nil {
-		fmt.Printf("[sugar/v2/xhttp] base64.DecodeString: %s, %v\n", signature, err)
+		fmt.Printf("[sugar/v2/httpkit] base64.DecodeString: %s, %v\n", signature, err)
 		return false
 	}
 	hash := getMessageHashForSigning(req)
@@ -127,18 +127,18 @@ func Verify[K PublicKey](ctx context.Context, req *http.Request, pub *K) bool {
 	case *ecdsa.PublicKey:
 		verified := ecdsa.VerifyASN1(k, hash, sign)
 		if !verified {
-			fmt.Printf("[sugar/v2/xhttp] failed verifying: %s\n", signature)
+			fmt.Printf("[sugar/v2/httpkit] failed verifying: %s\n", signature)
 		}
 		return verified
 	case *rsa.PublicKey:
 		err = rsa.VerifyPKCS1v15(k, crypto.SHA256, hash, sign)
 		if err != nil {
-			fmt.Printf("[sugar/v2/xhttp] failed verifying: %s, %v\n", signature, err)
+			fmt.Printf("[sugar/v2/httpkit] failed verifying: %s, %v\n", signature, err)
 			return false
 		}
 		return true
 	default:
-		fmt.Printf("[sugar/v2/xhttp] unsupported pub key: %T", pub)
+		fmt.Printf("[sugar/v2/httpkit] unsupported pub key: %T", pub)
 		return false
 	}
 }

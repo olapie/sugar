@@ -13,9 +13,9 @@ import (
   columns:
     id: int64
     name: string
-    gender: xtype.Gender
+    gender: types.Gender
     dob: string
-    place: xtype.Place
+    place: types.Place
     accounts: "[]string"
   jsonColumns:
     - place

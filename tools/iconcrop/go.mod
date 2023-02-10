@@ -3,7 +3,7 @@ module code.olapie.com/sugar/tools/iconcrop/v2
 go 1.19
 
 require (
-	code.olapie.com/sugar/v2 v2.1.6
+	code.olapie.com/sugar/v2 v2.2.3
 	github.com/disintegration/imaging v1.6.2
 )
 

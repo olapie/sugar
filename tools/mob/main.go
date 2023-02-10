@@ -23,7 +23,7 @@ package mob
 
 import (
 	"code.olapie.com/sugar/mob/nomobile"
-	"code.olapie.com/sugar/v2/xtype"
+	"code.olapie.com/sugar/v2/types"
 )
 
 `

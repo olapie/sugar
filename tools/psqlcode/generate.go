@@ -13,12 +13,12 @@ const generateTestCode = `
 package generate
 
 import (
-    "code.olapie.com/sugar/xpsql/v2"
+    "code.olapie.com/sugar/psql"
 )
 
 func setupTestDB(t *testing.T) *sql.DB {
-	options := xpsql.NewOpenOptions()
-	db, err := xpsql.Open(options)
+	options := psql.NewOpenOptions()
+	db, err := psql.Open(options)
 	if err != nil {
 		t.Fatal(err)
 	}
