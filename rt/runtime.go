@@ -351,7 +351,7 @@ func IsString(v any) bool {
 	flag := reflect.ValueOf(v).Kind() == reflect.String
 	if !flag {
 		if rv, ok := v.(reflect.Value); ok {
-			fmt.Printf("invalid type: %s, %v\n", rv.Type().Name(), rv.Kind())
+			fmt.Printf("invalid type: %T, %v\n", v, rv.Kind())
 		}
 	}
 	return flag
@@ -361,7 +361,7 @@ func IsBool(v any) bool {
 	flag := reflect.ValueOf(v).Kind() == reflect.Bool
 	if !flag {
 		if rv, ok := v.(reflect.Value); ok {
-			fmt.Printf("invalid type: %s, %v\n", rv.Type().Name(), rv.Kind())
+			fmt.Printf("invalid type: %T, %v\n", v, rv.Kind())
 		}
 	}
 	return flag
@@ -373,7 +373,7 @@ func IsFloat(v any) bool {
 		return true
 	default:
 		if rv, ok := v.(reflect.Value); ok {
-			fmt.Printf("invalid type: %s, %v\n", rv.Type().Name(), rv.Kind())
+			fmt.Printf("invalid type: %T, %v\n", v, rv.Kind())
 		}
 		return false
 	}
@@ -385,7 +385,7 @@ func IsUint(v any) bool {
 		return true
 	default:
 		if rv, ok := v.(reflect.Value); ok {
-			fmt.Printf("invalid type: %s, %v\n", rv.Type().Name(), rv.Kind())
+			fmt.Printf("invalid type: %T, %v\n", v, rv.Kind())
 		}
 		return false
 	}
@@ -397,7 +397,7 @@ func IsInt(v any) bool {
 		return true
 	default:
 		if rv, ok := v.(reflect.Value); ok {
-			fmt.Printf("invalid type: %s, %v\n", rv.Type().Name(), rv.Kind())
+			fmt.Printf("invalid type: %T, %v\n", v, rv.Kind())
 		}
 		return false
 	}
