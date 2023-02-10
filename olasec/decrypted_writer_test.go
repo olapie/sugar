@@ -6,13 +6,13 @@ import (
 	"testing"
 	"time"
 
-	"code.olapie.com/sugar/hashing"
+	"code.olapie.com/sugar/v2/hashutil"
 	"code.olapie.com/sugar/v2/olasec"
 	"code.olapie.com/sugar/v2/testutil"
 )
 
 func TestDecryptedWriter(t *testing.T) {
-	raw := []byte(hashing.SHA1(time.Now().String()))
+	raw := []byte(hashutil.SHA1(time.Now().String()))
 	enc, err := olasec.Encrypt(raw, "123")
 	testutil.NoError(t, err)
 	dec := &bytes.Buffer{}

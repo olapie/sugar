@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"code.olapie.com/sugar/hashing"
+	"code.olapie.com/sugar/v2/hashutil"
 	"code.olapie.com/sugar/v2/olasec"
 	"code.olapie.com/sugar/v2/testutil"
 )
@@ -20,7 +20,7 @@ func TestEncodePrivateKey(t *testing.T) {
 	testutil.Error(t, err)
 	pk2, err := olasec.DecodePrivateKey(data, "hello")
 	testutil.NoError(t, err)
-	digest := []byte(hashing.SHA1(time.Now().String()))
+	digest := []byte(hashutil.SHA1(time.Now().String()))
 	sign1, err := ecdsa.SignASN1(rand.Reader, pk, digest[:])
 	testutil.NoError(t, err)
 	sign2, err := ecdsa.SignASN1(rand.Reader, pk2, digest[:])
@@ -43,7 +43,7 @@ func TestEncodePublicKey(t *testing.T) {
 	testutil.NoError(t, err)
 	pub, err := olasec.DecodePublicKey(data)
 	testutil.NoError(t, err)
-	digest := []byte(hashing.SHA1(time.Now().String()))
+	digest := []byte(hashutil.SHA1(time.Now().String()))
 	sign, err := ecdsa.SignASN1(rand.Reader, pk, digest[:])
 	testutil.NoError(t, err)
 	testutil.True(t, ecdsa.VerifyASN1(pub, digest[:], sign))

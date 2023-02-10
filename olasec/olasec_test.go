@@ -8,13 +8,13 @@ import (
 	"testing"
 	"time"
 
-	"code.olapie.com/sugar/hashing"
+	"code.olapie.com/sugar/v2/hashutil"
 	"code.olapie.com/sugar/v2/olasec"
 	"code.olapie.com/sugar/v2/testutil"
 )
 
 func TestEncrypt(t *testing.T) {
-	password := hashing.SHA1(time.Now().String())
+	password := hashutil.SHA1(time.Now().String())
 	testEncrypt(t, 1<<4+9, password)
 	testEncrypt(t, 1<<24, password)
 }
@@ -49,7 +49,7 @@ func TestEncryptFile(t *testing.T) {
 		os.RemoveAll(largeFilename)
 	})
 
-	password := hashing.SHA1(time.Now().String())
+	password := hashutil.SHA1(time.Now().String())
 	var raw [32]byte
 	n, err := io.ReadFull(rand.Reader, raw[:])
 	testutil.NoError(t, err)
