@@ -16,7 +16,7 @@ const (
 	keyLogin
 	keySudo
 	keyLogger
-	keyRequestMetadata
+	keyRequestInfo
 
 	keyEnd
 )
