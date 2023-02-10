@@ -3,7 +3,7 @@ module code.olapie.com/sugar/contacts
 go 1.19
 
 require (
-	code.olapie.com/sugar/v2 v2.3.0
+	code.olapie.com/sugar/v2 v2.3.3
 	github.com/nyaruka/phonenumbers v1.1.4
 )
 

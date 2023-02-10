@@ -1,5 +1,5 @@
-code.olapie.com/sugar/v2 v2.3.0 h1:ObcLDVhxNUflG8TXyhxVvwf1PN8GRGERi9gbh2LbD1k=
-code.olapie.com/sugar/v2 v2.3.0/go.mod h1:H4m9CSL4V+i0pZKwurkMHiaSPL4Nfu6sXbOr6ri3fQw=
+code.olapie.com/sugar/v2 v2.3.3 h1:PITkFwE8f8XUE89kzGzoIAkTcJEkPSkFThDZ4YLTDWg=
+code.olapie.com/sugar/v2 v2.3.3/go.mod h1:H4m9CSL4V+i0pZKwurkMHiaSPL4Nfu6sXbOr6ri3fQw=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
 github.com/golang/protobuf v1.5.0 h1:LUVKkCeviFUMKqHa4tXIIij/lbhnMbP7Fn5wKdKkRh4=
 github.com/golang/protobuf v1.5.0/go.mod h1:FsONVRAS9T7sI+LIUmWTfcYkHO4aIWwzhcaSAoJOfIk=
