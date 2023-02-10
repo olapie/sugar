@@ -1,4 +1,4 @@
-package maps_test
+package maps
 
 import (
 	"testing"
@@ -19,7 +19,7 @@ func TestToEnvMap(t *testing.T) {
 		},
 	}
 
-	m1 := maputil.ToEnvironMap(m)
+	m1 := ToEnvironMap(m)
 	m2 := map[string]any{"k1": "v1", "k2.k21": "v21", "k2.k22": 22, "k2.k23.k231": "v231", "k2.k23.k232": 232}
 	testutil.Equal(t, m2, m1)
 }
@@ -34,7 +34,7 @@ func TestOSEnvsToEnvMap(t *testing.T) {
 		"DB_URL=localhost:4436",
 	}
 
-	m := maputil.FromEnvirons(envs)
+	m := FromEnvirons(envs)
 	expected := map[string]string{
 		"debug":       "true",
 		"test":        "1",
@@ -60,7 +60,7 @@ func TestOSArgsToEnvMap(t *testing.T) {
 		"-flag",
 	}
 
-	m := maputil.ArgsToEnvironMap(args)
+	m := ArgsToEnvironMap(args)
 	expected := map[string]string{
 		"enabled":     "",
 		"test=1":      "",

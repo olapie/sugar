@@ -1,4 +1,4 @@
-package conv_test
+package conv
 
 import (
 	"encoding/json"
@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"code.olapie.com/sugar/v2/conv"
 	"code.olapie.com/sugar/v2/testutil"
 )
 
@@ -110,7 +109,7 @@ func TestToBool(t *testing.T) {
 
 	t.Run("Good", func(t *testing.T) {
 		for _, c := range goodCases {
-			res, err := conv.ToBool(c.Value)
+			res, err := ToBool(c.Value)
 			if err != nil {
 				t.Error(err, c.Value)
 			}
@@ -124,7 +123,7 @@ func TestToBool(t *testing.T) {
 	}
 	t.Run("Bad", func(t *testing.T) {
 		for _, c := range badCases {
-			res, err := conv.ToBool(c)
+			res, err := ToBool(c)
 			if err == nil {
 				t.Error("should fail", c)
 			}
@@ -203,7 +202,7 @@ func TestToFloat64(t *testing.T) {
 
 	t.Run("Good", func(t *testing.T) {
 		for _, c := range goodCases {
-			res, err := conv.ToFloat64(c.Value)
+			res, err := ToFloat64(c.Value)
 			if err != nil {
 				t.Error(err, c.Value)
 			}
@@ -217,7 +216,7 @@ func TestToFloat64(t *testing.T) {
 	}
 	t.Run("Bad", func(t *testing.T) {
 		for _, c := range badCases {
-			res, err := conv.ToFloat64(c)
+			res, err := ToFloat64(c)
 			if err == nil {
 				t.Error("should fail", c)
 			}
@@ -297,7 +296,7 @@ func TestToInt64(t *testing.T) {
 
 	t.Run("Good", func(t *testing.T) {
 		for _, c := range goodCases {
-			res, err := conv.ToInt64(c.Value)
+			res, err := ToInt64(c.Value)
 			if err != nil {
 				t.Error(err, c.Value)
 			}
@@ -311,7 +310,7 @@ func TestToInt64(t *testing.T) {
 	}
 	t.Run("Bad", func(t *testing.T) {
 		for _, c := range badCases {
-			res, err := conv.ToInt64(c)
+			res, err := ToInt64(c)
 			if err == nil {
 				t.Error("should fail", c)
 			}
@@ -382,7 +381,7 @@ func TestToInt(t *testing.T) {
 
 	t.Run("Good", func(t *testing.T) {
 		for _, c := range goodCases {
-			res, err := conv.ToInt(c.Value)
+			res, err := ToInt(c.Value)
 			if err != nil {
 				t.Error(err, c.Value)
 			}
@@ -396,7 +395,7 @@ func TestToInt(t *testing.T) {
 	}
 	t.Run("Bad", func(t *testing.T) {
 		for _, c := range badCases {
-			res, err := conv.ToInt(c)
+			res, err := ToInt(c)
 			if err == nil {
 				t.Error("should fail", c)
 			}
@@ -469,7 +468,7 @@ func TestToUint64(t *testing.T) {
 
 	t.Run("Good", func(t *testing.T) {
 		for _, c := range goodCases {
-			res, err := conv.ToUint64(c.Value)
+			res, err := ToUint64(c.Value)
 			if err != nil {
 				t.Error(err, c.Value)
 			}
@@ -483,7 +482,7 @@ func TestToUint64(t *testing.T) {
 	}
 	t.Run("Bad", func(t *testing.T) {
 		for _, c := range badCases {
-			res, err := conv.ToUint64(c)
+			res, err := ToUint64(c)
 			if err == nil {
 				t.Error("should fail", c)
 			}
@@ -497,14 +496,14 @@ func TestToUint64(t *testing.T) {
 func TestToIntSlice(t *testing.T) {
 	t.Run("good", func(t *testing.T) {
 		l := []any{"1", 12, -13.9, json.Number("100")}
-		res, err := conv.ToIntSlice(l)
+		res, err := ToIntSlice(l)
 		if err != nil {
 			t.Error(err)
 		}
 		testutil.Equal(t, []int{1, 12, -13, 100}, res)
 	})
 	t.Run("nil", func(t *testing.T) {
-		res, err := conv.ToIntSlice(nil)
+		res, err := ToIntSlice(nil)
 		if err != nil {
 			t.Error(err)
 		}
@@ -560,7 +559,7 @@ func TestToString(t *testing.T) {
 
 	t.Run("Good", func(t *testing.T) {
 		for _, c := range goodCases {
-			res, err := conv.ToString(c.Value)
+			res, err := ToString(c.Value)
 			if err != nil {
 				t.Error(err, c.Value)
 			}
@@ -574,7 +573,7 @@ func TestToString(t *testing.T) {
 	}
 	t.Run("Bad", func(t *testing.T) {
 		for _, c := range badCases {
-			res, err := conv.ToString(c)
+			res, err := ToString(c)
 			if err == nil {
 				t.Error("should fail", c)
 			}
@@ -586,7 +585,7 @@ func TestToString(t *testing.T) {
 func TestToSlice(t *testing.T) {
 	t.Run("SingleString", func(t *testing.T) {
 		s := "123"
-		l, err := conv.ToStringSlice(s)
+		l, err := ToStringSlice(s)
 		if err != nil {
 			t.Error(err)
 		}
@@ -594,7 +593,7 @@ func TestToSlice(t *testing.T) {
 	})
 	t.Run("SingleInt", func(t *testing.T) {
 		s := 123
-		l, err := conv.ToStringSlice(s)
+		l, err := ToStringSlice(s)
 		if err != nil {
 			t.Error(err)
 		}
@@ -602,7 +601,7 @@ func TestToSlice(t *testing.T) {
 	})
 	t.Run("IntSlice", func(t *testing.T) {
 		s := []int{123, -1, 9}
-		l, err := conv.ToStringSlice(s)
+		l, err := ToStringSlice(s)
 		if err != nil {
 			t.Error(err)
 		}
@@ -610,7 +609,7 @@ func TestToSlice(t *testing.T) {
 	})
 	t.Run("MixSlice", func(t *testing.T) {
 		s := []any{123, "hello", "0x123"}
-		l, err := conv.ToStringSlice(s)
+		l, err := ToStringSlice(s)
 		if err != nil {
 			t.Error(err)
 		}
@@ -618,7 +617,7 @@ func TestToSlice(t *testing.T) {
 	})
 	t.Run("MixArray", func(t *testing.T) {
 		s := [3]any{123, "hello", "0x123"}
-		l, err := conv.ToStringSlice(s)
+		l, err := ToStringSlice(s)
 		if err != nil {
 			t.Error(err)
 		}

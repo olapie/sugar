@@ -1,4 +1,4 @@
-package conv_test
+package conv
 
 import (
 	"encoding/json"
@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"code.olapie.com/sugar/v2/jsonutil"
-	"code.olapie.com/sugar/v2/must"
 )
 
 type Image struct {
@@ -42,7 +41,7 @@ func TestAssign(t *testing.T) {
 
 	var topic Topic
 	var i any = topic
-	err := rt.Assign(&i, params)
+	err := Assign(&i, params)
 	if err != nil {
 		t.FailNow()
 	}
@@ -69,7 +68,7 @@ func TestAssignSlice(t *testing.T) {
 
 	values := []any{params}
 	var topics []*Topic
-	err := rt.Assign(&topics, values)
+	err := Assign(&topics, values)
 	if err != nil || len(topics) == 0 {
 		t.FailNow()
 	}
@@ -108,7 +107,7 @@ func TestAssignStruct(t *testing.T) {
 		},
 	}
 
-	err := rt.Assign(user, userInfo)
+	err := Assign(user, userInfo)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
@@ -124,7 +123,7 @@ func TestAssignJSONToStruct(t *testing.T) {
 	tm := time.Now().Add(time.Hour)
 	i := new(Item)
 	jsonMap := map[string]any{"id": 10, "created_at": tm}
-	err := rt.Assign(i, jsonMap)
+	err := Assign(i, jsonMap)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
@@ -138,7 +137,7 @@ func TestAssignJSONToStruct(t *testing.T) {
 	jsonStr := jsonutil.ToString(tm)
 	jsonStr = jsonStr[1 : len(jsonStr)-1]
 	jsonMap = map[string]any{"id": 10, "created_at": jsonStr}
-	err = rt.Assign(i, jsonMap)
+	err = Assign(i, jsonMap)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
@@ -158,7 +157,7 @@ func (j *jsonMap) UnmarshalJSON(bytes []byte) error {
 		return err
 	}
 	for k, v := range m {
-		(*j)[must.ToInt(k)] = v
+		(*j)[MustToInt(k)] = v
 	}
 	return nil
 }
@@ -168,7 +167,7 @@ var _ json.Unmarshaler = (*jsonMap)(nil)
 func TestAssignMap(t *testing.T) {
 	var dst jsonMap
 	var src = map[string]int{"1": 2}
-	err := rt.Assign(&dst, src)
+	err := Assign(&dst, src)
 	if err != nil {
 		t.Error(err)
 	}
