@@ -51,7 +51,28 @@ func MustNil(v any, msgAndArgs ...any) {
 }
 
 // MustNotNil panics if v is nil
-func MustNotNil[T any](v *T, msgAndArgs ...any) {
+func MustNotNil(v any, msgAndArgs ...any) {
+	if v == nil {
+		rt.PanicWithMessages(msgAndArgs...)
+	}
+}
+
+// MustNilPointer panics if v is not nil
+func MustNilPointer[T any](v *T, msgAndArgs ...any) {
+	if v == nil {
+		return
+	}
+
+	s := fmt.Sprintf("%#v", v)
+	if len(msgAndArgs) == 0 {
+		rt.PanicWithMessages()
+	}
+	msgAndArgs[0] = s + " " + fmt.Sprint(msgAndArgs[0])
+	rt.PanicWithMessages(msgAndArgs...)
+}
+
+// MustNotNilPointer panics if v is nil
+func MustNotNilPointer[T any](v *T, msgAndArgs ...any) {
 	if v == nil {
 		rt.PanicWithMessages(msgAndArgs...)
 	}
