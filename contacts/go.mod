@@ -1,4 +1,4 @@
-module code.olapie.com/sugar/xcontact/v2
+module code.olapie.com/sugar/contacts
 
 go 1.19
 
