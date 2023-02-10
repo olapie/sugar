@@ -1,9 +1,7 @@
-code.olapie.com/sugar/v2 v2.1.6 h1:yQS7H5YXh6mXzpA9LY19jKN58cT5KI85duY5AsFcGRY=
-code.olapie.com/sugar/v2 v2.1.6/go.mod h1:1oErXpdsvE5TKWdM16KeV4cCw0ygrwzh2vRz+IhdBhQ=
-code.olapie.com/sugar/v2/xpsql v0.1.6 h1:2okPtbAMiYauHDVK3EVVdfbqAaS4olhiDKCwRZfydIY=
-code.olapie.com/sugar/v2/xpsql v0.1.6/go.mod h1:iJctb5UPY21aMIcrKaDcROWwWdCXzCdp6DkKuTbbfhU=
-code.olapie.com/sugar/xcontact/v2 v2.0.0 h1:hN/3C3mEqRoyomHBIkrCpz5WtQnEYT+TQuEiapjDqaA=
-code.olapie.com/sugar/xcontact/v2 v2.0.0/go.mod h1:FbTBLOFQU+e9b41ps087Bs59Q5+SHB2Kao87HjBDkLY=
+code.olapie.com/sugar/contacts v0.1.1 h1:V7d5BZsrcjInOyXJpX5MHaTgcB8JxYgv1x6JuIK70Nk=
+code.olapie.com/sugar/contacts v0.1.1/go.mod h1:zpvyR3rklEF2W9gweDqmLuK8BkrdXTR63NBiZcUzf4c=
+code.olapie.com/sugar/v2 v2.3.3 h1:PITkFwE8f8XUE89kzGzoIAkTcJEkPSkFThDZ4YLTDWg=
+code.olapie.com/sugar/v2 v2.3.3/go.mod h1:H4m9CSL4V+i0pZKwurkMHiaSPL4Nfu6sXbOr6ri3fQw=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
 github.com/golang/geo v0.0.0-20210211234256-740aa86cb551 h1:gtexQ/VGyN+VVFRXSFiguSNcXmS6rkKT+X7FdIrTtfo=
 github.com/golang/geo v0.0.0-20210211234256-740aa86cb551/go.mod h1:QZ0nwyI2jOfgRAoBvP+ab5aRr7c9x7lhGEJrKvBwjWI=

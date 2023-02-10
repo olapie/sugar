@@ -1,11 +1,10 @@
-module code.olapie.com/sugar/xpsql/v2
+module code.olapie.com/sugar/psql
 
-go 1.19
+go 1.20
 
 require (
-	code.olapie.com/sugar/v2 v2.1.6
-	code.olapie.com/sugar/v2/xpsql v0.1.6
-	code.olapie.com/sugar/xcontact/v2 v2.0.0
+	code.olapie.com/sugar/contacts v0.1.1
+	code.olapie.com/sugar/v2 v2.3.3
 	github.com/lib/pq v1.10.7
 )
 

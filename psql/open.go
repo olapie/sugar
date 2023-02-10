@@ -8,8 +8,7 @@ import (
 	"os/user"
 	"sync"
 
-	"code.olapie.com/sugar/v2/xcontext"
-
+	"code.olapie.com/sugar/v2/ctxutil"
 	"code.olapie.com/sugar/v2/must"
 )
 
@@ -140,7 +139,7 @@ func NewFactory[T any](options *OpenOptions, fn NewRepoFunc[T]) Factory[T] {
 }
 
 func (f *factoryImpl[T]) Get(ctx context.Context) T {
-	appID := xcontext.GetAppID(ctx)
+	appID := ctxutil.GetAppID(ctx)
 	f.mu.RLock()
 	r, ok := f.cache[appID]
 	f.mu.RUnlock()

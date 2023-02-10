@@ -5,8 +5,8 @@ import (
 	"database/sql/driver"
 	"fmt"
 
-	"code.olapie.com/sugar/v2/xtype"
-	"code.olapie.com/sugar/xpsql/v2/internal/composite"
+	"code.olapie.com/sugar/psql/internal/composite"
+	"code.olapie.com/sugar/v2/types"
 )
 
 var (
@@ -15,7 +15,7 @@ var (
 )
 
 type placeScanner struct {
-	v **xtype.Place
+	v **types.Place
 }
 
 func (ps *placeScanner) Scan(src any) error {
@@ -42,11 +42,11 @@ func (ps *placeScanner) Scan(src any) error {
 	if len(fields) != 3 {
 		return fmt.Errorf("parse composite fields %s", s)
 	}
-	p := new(xtype.Place)
+	p := new(types.Place)
 	p.Code = fields[0]
 	p.Name = fields[1]
 	if len(fields[2]) > 0 {
-		p.Coordinate = new(xtype.Point)
+		p.Coordinate = new(types.Point)
 		point := pointScanner{
 			v: &p.Coordinate,
 		}
@@ -59,7 +59,7 @@ func (ps *placeScanner) Scan(src any) error {
 }
 
 type placeValuer struct {
-	v *xtype.Place
+	v *types.Place
 }
 
 func (pv *placeValuer) Value() (driver.Value, error) {

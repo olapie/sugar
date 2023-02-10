@@ -5,8 +5,8 @@ import (
 	"database/sql/driver"
 	"fmt"
 
-	"code.olapie.com/sugar/v2/xtype"
-	"code.olapie.com/sugar/xpsql/v2/internal/composite"
+	"code.olapie.com/sugar/psql/internal/composite"
+	"code.olapie.com/sugar/v2/types"
 )
 
 var (
@@ -15,7 +15,7 @@ var (
 )
 
 type moneyScanner struct {
-	v **xtype.Money
+	v **types.Money
 }
 
 func (ms *moneyScanner) Scan(src any) error {
@@ -44,7 +44,7 @@ func (ms *moneyScanner) Scan(src any) error {
 	if len(fields) != 2 {
 		return fmt.Errorf("parse composite fields %s: got %v", s, fields)
 	}
-	m := new(xtype.Money)
+	m := new(types.Money)
 	m.Currency = fields[0]
 	m.Amount = fields[1]
 	if err != nil {
@@ -55,7 +55,7 @@ func (ms *moneyScanner) Scan(src any) error {
 }
 
 type moneyValuer struct {
-	v *xtype.Money
+	v *types.Money
 }
 
 func (mv *moneyValuer) Value() (driver.Value, error) {

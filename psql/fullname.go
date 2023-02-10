@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"code.olapie.com/sugar/v2/xtype"
+	"code.olapie.com/sugar/v2/types"
 )
 
 var (
@@ -15,7 +15,7 @@ var (
 )
 
 type fullNameScanner struct {
-	v **xtype.FullName
+	v **types.FullName
 }
 
 // Scan implements sql.Scanner
@@ -43,14 +43,14 @@ func (fs *fullNameScanner) Scan(src any) error {
 		return fmt.Errorf("failed to parse %v into sql.FullName", src)
 	}
 
-	n := new(xtype.FullName)
+	n := new(types.FullName)
 	n.First, n.Middle, n.Last = segments[0], segments[1], segments[2]
 	*fs.v = n
 	return nil
 }
 
 type fullNameValuer struct {
-	v *xtype.FullName
+	v *types.FullName
 }
 
 // Value implements driver.Valuer

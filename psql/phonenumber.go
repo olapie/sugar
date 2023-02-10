@@ -5,9 +5,9 @@ import (
 	"database/sql/driver"
 	"fmt"
 
+	"code.olapie.com/sugar/contacts"
+	"code.olapie.com/sugar/psql/internal/composite"
 	"code.olapie.com/sugar/v2/conv"
-	"code.olapie.com/sugar/xcontact/v2"
-	"code.olapie.com/sugar/xpsql/v2/internal/composite"
 )
 
 var (
@@ -16,7 +16,7 @@ var (
 )
 
 type phoneNumberScanner struct {
-	v **xcontact.PhoneNumber
+	v **contacts.PhoneNumber
 }
 
 func (ps *phoneNumberScanner) Scan(src any) error {
@@ -41,7 +41,7 @@ func (ps *phoneNumberScanner) Scan(src any) error {
 		return fmt.Errorf("parse composite fields %s: got %v", s, fields)
 	}
 
-	n := new(xcontact.PhoneNumber)
+	n := new(contacts.PhoneNumber)
 	n.Code, err = conv.ToInt32(fields[0])
 	if err != nil {
 		return fmt.Errorf("parse code %s: %w", fields[0], err)
@@ -56,7 +56,7 @@ func (ps *phoneNumberScanner) Scan(src any) error {
 }
 
 type phoneNumberValuer struct {
-	v *xcontact.PhoneNumber
+	v *contacts.PhoneNumber
 }
 
 func (pv *phoneNumberValuer) Value() (driver.Value, error) {

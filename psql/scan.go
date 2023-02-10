@@ -5,25 +5,25 @@ import (
 	"database/sql/driver"
 	"fmt"
 
-	"code.olapie.com/sugar/v2/xtype"
-	"code.olapie.com/sugar/xcontact/v2"
+	"code.olapie.com/sugar/contacts"
+	"code.olapie.com/sugar/v2/types"
 )
 
 type supportedScanTypes interface {
-	*xtype.Point | *xtype.Place | *xcontact.PhoneNumber | *xtype.FullName | *xtype.Money | map[string]string
+	*types.Point | *types.Place | *contacts.PhoneNumber | *types.FullName | *types.Money | map[string]string
 }
 
 func Scan[T supportedScanTypes](v *T) sql.Scanner {
 	switch val := any(v).(type) {
-	case **xtype.Point:
+	case **types.Point:
 		return &pointScanner{v: val}
-	case **xcontact.PhoneNumber:
+	case **contacts.PhoneNumber:
 		return &phoneNumberScanner{v: val}
-	case **xtype.Place:
+	case **types.Place:
 		return &placeScanner{v: val}
-	case **xtype.Money:
+	case **types.Money:
 		return &moneyScanner{v: val}
-	case **xtype.FullName:
+	case **types.FullName:
 		return &fullNameScanner{v: val}
 	case *map[string]string:
 		return &hstoreScanner{m: val}
@@ -34,15 +34,15 @@ func Scan[T supportedScanTypes](v *T) sql.Scanner {
 
 func Value[T supportedScanTypes](v T) driver.Valuer {
 	switch val := any(v).(type) {
-	case *xtype.Point:
+	case *types.Point:
 		return &pointValuer{v: val}
-	case *xcontact.PhoneNumber:
+	case *contacts.PhoneNumber:
 		return &phoneNumberValuer{v: val}
-	case *xtype.Place:
+	case *types.Place:
 		return &placeValuer{v: val}
-	case *xtype.Money:
+	case *types.Money:
 		return &moneyValuer{v: val}
-	case *xtype.FullName:
+	case *types.FullName:
 		return &fullNameValuer{v: val}
 	case map[string]string:
 		return mapToHstore(val)

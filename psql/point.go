@@ -6,16 +6,16 @@ import (
 	"fmt"
 	"strings"
 
-	"code.olapie.com/sugar/v2/xtype"
-	"code.olapie.com/sugar/xpsql/v2/internal/composite"
+	"code.olapie.com/sugar/psql/internal/composite"
+	"code.olapie.com/sugar/v2/types"
 )
 
 type pointScanner struct {
-	v **xtype.Point
+	v **types.Point
 }
 
 type pointValuer struct {
-	v *xtype.Point
+	v *types.Point
 }
 
 var (
@@ -55,7 +55,7 @@ func (p *pointScanner) Scan(src any) error {
 		return fmt.Errorf("parse composite fields %s", s)
 	}
 
-	v := new(xtype.Point)
+	v := new(types.Point)
 	_, err = fmt.Sscanf(fields[0], "%f", &v.X)
 	if err != nil {
 		return fmt.Errorf("parse x %s: %w", fields[0], err)
