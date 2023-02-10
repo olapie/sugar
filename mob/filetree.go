@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"code.olapie.com/sugar/mob/nomobile"
-	"code.olapie.com/sugar/v2/xtest"
+	"code.olapie.com/sugar/v2/testutil"
 	"github.com/google/uuid"
 )
 
@@ -377,7 +377,7 @@ func NewMockFileInfo(isDir bool) FileInfo {
 		return &FileTreeNode{
 			entry: &mockFileEntry{
 				id:      uuid.NewString(),
-				name:    "dir" + xtest.RandomString(10),
+				name:    "dir" + testutil.RandomString(10),
 				isDir:   true,
 				modTime: time.Now().Unix(),
 				subIDs:  []string{uuid.NewString(), uuid.NewString()},
@@ -387,7 +387,7 @@ func NewMockFileInfo(isDir bool) FileInfo {
 	return &FileTreeNode{
 		entry: &mockFileEntry{
 			id:      uuid.NewString(),
-			name:    "file" + xtest.RandomString(10),
+			name:    "file" + testutil.RandomString(10),
 			modTime: time.Now().Unix(),
 		},
 	}

@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"code.olapie.com/sugar/v2/conv"
-	"code.olapie.com/sugar/v2/xstring"
-	"code.olapie.com/sugar/v2/xtime"
+	"code.olapie.com/sugar/v2/stringutil"
+	"code.olapie.com/sugar/v2/timing"
 	"github.com/google/uuid"
 )
 
@@ -34,7 +34,7 @@ func GetDeviceID(m SecretManager) string {
 }
 
 func SetTimeZone(name string, offset int) {
-	time.Local = xtime.ToLocation(name, offset)
+	time.Local = timing.ToLocation(name, offset)
 }
 
 func GetTimeZoneOffset() int {
@@ -69,7 +69,7 @@ func SmartLen(s string) int {
 }
 
 func SquishString(s string) string {
-	return xstring.Squish(s)
+	return stringutil.Squish(s)
 }
 
 type Handler interface {

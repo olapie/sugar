@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"code.olapie.com/sugar/v2/xmap"
+	"code.olapie.com/sugar/v2/maps"
 )
 
 type Map[K comparable, V any] struct {
@@ -43,13 +43,13 @@ func (m *Map[K, V]) Count() int {
 
 func (m *Map[K, V]) Keys() *List[K] {
 	return &List[K]{
-		elements: xmap.GetKeys(m.m),
+		elements: maps.GetKeys(m.m),
 	}
 }
 
 func (m *Map[K, V]) Clone() *Map[K, V] {
 	return &Map[K, V]{
-		m: xmap.Clone(m.m),
+		m: maps.Clone(m.m),
 	}
 }
 

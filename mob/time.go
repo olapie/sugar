@@ -3,27 +3,27 @@ package mob
 import (
 	"fmt"
 
-	"code.olapie.com/sugar/v2/xtime"
+	"code.olapie.com/sugar/v2/timing"
 )
 
 func GetDateTimeString(t int64) string {
-	tm := xtime.TimeWithUnix(t)
+	tm := timing.TimeWithUnix(t)
 	return tm.Date().PrettyText() + " " + tm.TimeTextWithZero()
 }
 
 func GetRelativeDateTimeString(t int64) string {
-	tm := xtime.TimeWithUnix(t)
+	tm := timing.TimeWithUnix(t)
 	return tm.RelativeDateTimeText()
 }
 
-type Time = xtime.Time
+type Time = timing.Time
 
 func NowTime() *Time {
-	return (*Time)(xtime.NewTime())
+	return (*Time)(timing.NewTime())
 }
 
 func TimeWithUnix(seconds int64) *Time {
-	return xtime.TimeWithUnix(seconds)
+	return timing.TimeWithUnix(seconds)
 }
 
 func TimerText(elapse int64) string {

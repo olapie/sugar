@@ -4,7 +4,7 @@ import (
 	"net"
 	"time"
 
-	"code.olapie.com/sugar/v2/xnetwork"
+	"code.olapie.com/sugar/v2/netkit"
 )
 
 const (
@@ -20,7 +20,7 @@ const (
 )
 
 func GetOutboundIP() string {
-	return xnetwork.GetOutboundIPString()
+	return netkit.GetOutboundIPString()
 }
 
 const (

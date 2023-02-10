@@ -3,7 +3,7 @@ package mob
 import (
 	"encoding/json"
 
-	"code.olapie.com/sugar/v2/xjson"
+	"code.olapie.com/sugar/v2/jsonutil"
 )
 
 type DeviceInfo struct {
@@ -22,7 +22,7 @@ func NewDeviceInfo() *DeviceInfo {
 
 func (d *DeviceInfo) Attributes() map[string]string {
 	m := make(map[string]string)
-	err := json.Unmarshal(xjson.ToBytes(d), &m)
+	err := json.Unmarshal(jsonutil.ToBytes(d), &m)
 	if err != nil {
 		panic(err)
 	}
@@ -41,7 +41,7 @@ func NewAppInfo() *AppInfo {
 
 func (i *AppInfo) Attributes() map[string]string {
 	m := make(map[string]string)
-	err := json.Unmarshal(xjson.ToBytes(i), &m)
+	err := json.Unmarshal(jsonutil.ToBytes(i), &m)
 	if err != nil {
 		panic(err)
 	}

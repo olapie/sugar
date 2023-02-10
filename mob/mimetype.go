@@ -3,7 +3,7 @@ package mob
 import (
 	"strings"
 
-	"code.olapie.com/sugar/v2/xhttp"
+	"code.olapie.com/sugar/v2/httpkit"
 )
 
 func IsTextFile(f FileInfo) bool {
@@ -23,7 +23,7 @@ func IsAudioFile(f FileInfo) bool {
 }
 
 func IsMIMEText(t string) bool {
-	return xhttp.IsText(t)
+	return httpkit.IsText(t)
 }
 
 func IsMIMEImage(t string) bool {

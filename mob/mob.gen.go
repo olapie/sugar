@@ -2,7 +2,7 @@ package mob
 
 import (
 	"code.olapie.com/sugar/mob/nomobile"
-	"code.olapie.com/sugar/v2/xtype"
+	"code.olapie.com/sugar/v2/types"
 )
 
 type IntList struct {
@@ -90,72 +90,72 @@ func (l *StringList) AddList(l2 *StringList) {
 }
 
 type IntSet struct {
-	xtype.Set[int]
+	types.Set[int]
 }
 
 func NewIntSet() *IntSet {
 	return &IntSet{
-		Set: *xtype.NewSet[int](10),
+		Set: *types.NewSet[int](10),
 	}
 }
 
 type Int16Set struct {
-	xtype.Set[int16]
+	types.Set[int16]
 }
 
 func NewInt16Set() *Int16Set {
 	return &Int16Set{
-		Set: *xtype.NewSet[int16](10),
+		Set: *types.NewSet[int16](10),
 	}
 }
 
 type Int32Set struct {
-	xtype.Set[int32]
+	types.Set[int32]
 }
 
 func NewInt32Set() *Int32Set {
 	return &Int32Set{
-		Set: *xtype.NewSet[int32](10),
+		Set: *types.NewSet[int32](10),
 	}
 }
 
 type Int64Set struct {
-	xtype.Set[int64]
+	types.Set[int64]
 }
 
 func NewInt64Set() *Int64Set {
 	return &Int64Set{
-		Set: *xtype.NewSet[int64](10),
+		Set: *types.NewSet[int64](10),
 	}
 }
 
 type Float64Set struct {
-	xtype.Set[float64]
+	types.Set[float64]
 }
 
 func NewFloat64Set() *Float64Set {
 	return &Float64Set{
-		Set: *xtype.NewSet[float64](10),
+		Set: *types.NewSet[float64](10),
 	}
 }
 
 type BoolSet struct {
-	xtype.Set[bool]
+	types.Set[bool]
 }
 
 func NewBoolSet() *BoolSet {
 	return &BoolSet{
-		Set: *xtype.NewSet[bool](10),
+		Set: *types.NewSet[bool](10),
 	}
 }
 
 type StringSet struct {
-	xtype.Set[string]
+	types.Set[string]
 }
 
 func NewStringSet() *StringSet {
 	return &StringSet{
-		Set: *xtype.NewSet[string](10),
+		Set: *types.NewSet[string](10),
 	}
 }
 

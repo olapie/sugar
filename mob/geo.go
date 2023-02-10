@@ -1,23 +1,23 @@
 package mob
 
 import (
-	"code.olapie.com/sugar/v2/xtype"
+	"code.olapie.com/sugar/v2/types"
 )
 
-type Point xtype.Point
+type Point types.Point
 
 func NewPoint() *Point {
 	return new(Point)
 }
 
-type Place xtype.Place
+type Place types.Place
 
 func NewPlace() *Place {
 	return new(Place)
 }
 
 func (p *Place) SetCoordinate(c *Point) {
-	p.Coordinate = (*xtype.Point)(c)
+	p.Coordinate = (*types.Point)(c)
 }
 
 func (p *Place) GetCoordinate() *Point {

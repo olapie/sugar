@@ -1,16 +1,16 @@
 package mob
 
 import (
-	"code.olapie.com/sugar/v2/xtype"
+	"code.olapie.com/sugar/v2/types"
 )
 
-type Image xtype.Image
+type Image types.Image
 
 func NewImage() *Image {
 	return new(Image)
 }
 
-type Video xtype.Video
+type Video types.Video
 
 func NewVideo() *Video {
 	return new(Video)
@@ -20,68 +20,68 @@ func (v *Video) GetImage() *Image {
 	return (*Image)(v.Image)
 }
 
-type Audio xtype.Audio
+type Audio types.Audio
 
 func NewAudio() *Audio {
 	return new(Audio)
 }
 
-type File xtype.File
+type File types.File
 
 func NewFile() *File {
 	return new(File)
 }
 
-type WebPage xtype.WebPage
+type WebPage types.WebPage
 
 func NewWebPage() *WebPage {
 	return new(WebPage)
 }
 
-type Any xtype.Any
+type Any types.Any
 
 func (a *Any) TypeName() string {
-	return (*xtype.Any)(a).TypeName()
+	return (*types.Any)(a).TypeName()
 }
 
 func (a *Any) SetImage(i *Image) {
-	(*xtype.Any)(a).SetValue((*xtype.Image)(i))
+	(*types.Any)(a).SetValue((*types.Image)(i))
 }
 
 func (a *Any) SetAudio(au *Audio) {
-	(*xtype.Any)(a).SetValue((*xtype.Audio)(au))
+	(*types.Any)(a).SetValue((*types.Audio)(au))
 }
 
 func (a *Any) SetVideo(v *Video) {
-	(*xtype.Any)(a).SetValue((*xtype.Video)(v))
+	(*types.Any)(a).SetValue((*types.Video)(v))
 }
 
 func (a *Any) SetFile(f *File) {
-	(*xtype.Any)(a).SetValue((*xtype.File)(f))
+	(*types.Any)(a).SetValue((*types.File)(f))
 }
 
 func (a *Any) SetWebPage(wp *WebPage) {
-	(*xtype.Any)(a).SetValue((*xtype.WebPage)(wp))
+	(*types.Any)(a).SetValue((*types.WebPage)(wp))
 }
 
 func (a *Any) Image() *Image {
-	return (*Image)((*xtype.Any)(a).Value().(*xtype.Image))
+	return (*Image)((*types.Any)(a).Value().(*types.Image))
 }
 
 func (a *Any) Video() *Video {
-	return (*Video)((*xtype.Any)(a).Value().(*xtype.Video))
+	return (*Video)((*types.Any)(a).Value().(*types.Video))
 }
 
 func (a *Any) Audio() *Audio {
-	return (*Audio)((*xtype.Any)(a).Value().(*xtype.Audio))
+	return (*Audio)((*types.Any)(a).Value().(*types.Audio))
 }
 
 func (a *Any) File() *File {
-	return (*File)((*xtype.Any)(a).Value().(*xtype.File))
+	return (*File)((*types.Any)(a).Value().(*types.File))
 }
 
 func (a *Any) WebPage() *WebPage {
-	return (*WebPage)((*xtype.Any)(a).Value().(*xtype.WebPage))
+	return (*WebPage)((*types.Any)(a).Value().(*types.WebPage))
 }
 
 func NewAnyObj() *Any {

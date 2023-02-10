@@ -4,19 +4,22 @@ import (
 	"strings"
 	"unicode"
 
-	"code.olapie.com/sugar/v2/xtime"
+	"code.olapie.com/sugar/v2/urlutil"
+
+	"code.olapie.com/sugar/contacts"
+	"code.olapie.com/sugar/v2/timing"
 )
 
 func IsEmailAddress(s string) bool {
-	return rt.IsEmailAddress(s)
+	return contacts.IsEmailAddress(s)
 }
 
 func IsURL(s string) bool {
-	return rt.IsURL(s)
+	return urlutil.IsURL(s)
 }
 
 func IsDate(s string) bool {
-	return xtime.IsDate(s)
+	return timing.IsDate(s)
 }
 
 var (
