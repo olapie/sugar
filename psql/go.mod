@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	code.olapie.com/sugar/contacts v0.1.1
-	code.olapie.com/sugar/v2 v2.3.3
+	code.olapie.com/sugar/v2 v2.3.8
 	github.com/lib/pq v1.10.7
 )
 

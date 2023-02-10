@@ -1,6 +1,7 @@
 package psql
 
 import (
+	"code.olapie.com/sugar/v2"
 	"context"
 	"database/sql"
 	"fmt"
