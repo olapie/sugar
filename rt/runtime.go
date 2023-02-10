@@ -348,11 +348,23 @@ type NumberOrString interface {
 }
 
 func IsString(v any) bool {
-	return reflect.ValueOf(v).Kind() == reflect.String
+	flag := reflect.ValueOf(v).Kind() == reflect.String
+	if !flag {
+		if rv, ok := v.(reflect.Value); ok {
+			fmt.Printf("invalid type: %s, %v\n", rv.Type().Name(), rv.Kind())
+		}
+	}
+	return flag
 }
 
 func IsBool(v any) bool {
-	return reflect.ValueOf(v).Kind() == reflect.Bool
+	flag := reflect.ValueOf(v).Kind() == reflect.Bool
+	if !flag {
+		if rv, ok := v.(reflect.Value); ok {
+			fmt.Printf("invalid type: %s, %v\n", rv.Type().Name(), rv.Kind())
+		}
+	}
+	return flag
 }
 
 func IsFloat(v any) bool {
@@ -360,6 +372,9 @@ func IsFloat(v any) bool {
 	case reflect.Float32, reflect.Float64:
 		return true
 	default:
+		if rv, ok := v.(reflect.Value); ok {
+			fmt.Printf("invalid type: %s, %v\n", rv.Type().Name(), rv.Kind())
+		}
 		return false
 	}
 }
@@ -369,15 +384,21 @@ func IsUint(v any) bool {
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		return true
 	default:
+		if rv, ok := v.(reflect.Value); ok {
+			fmt.Printf("invalid type: %s, %v\n", rv.Type().Name(), rv.Kind())
+		}
 		return false
 	}
 }
 
 func IsInt(v any) bool {
-	switch reflect.ValueOf(v).Kind() {
+	switch reflect.TypeOf(v).Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return true
 	default:
+		if rv, ok := v.(reflect.Value); ok {
+			fmt.Printf("invalid type: %s, %v\n", rv.Type().Name(), rv.Kind())
+		}
 		return false
 	}
 }

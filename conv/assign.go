@@ -102,19 +102,19 @@ func assign(dst reflect.Value, src reflect.Value, nm Checker) error {
 		}
 		dv.Set(pv.Elem())
 	default:
-		if rt.IsInt(dv) {
+		if rt.IsIntValue(dv) {
 			i, err := ToInt64(src.Interface())
 			if err != nil {
 				return fmt.Errorf("parse int64: %w", err)
 			}
 			dv.SetInt(i)
-		} else if rt.IsUint(dv) {
+		} else if rt.IsUintValue(dv) {
 			i, err := ToUint64(src.Interface())
 			if err != nil {
 				return fmt.Errorf("parse uint64: %w", err)
 			}
 			dv.SetUint(i)
-		} else if rt.IsFloat(dv) {
+		} else if rt.IsFloatValue(dv) {
 			i, err := ToFloat64(src.Interface())
 			if err != nil {
 				return fmt.Errorf("parse float64: %w", err)
@@ -371,7 +371,7 @@ func SetBytes(target any, b []byte) error {
 	if !v.CanSet() {
 		return fmt.Errorf("cannot set value: %T", target)
 	}
-	if rt.IsInt(v) {
+	if rt.IsIntValue(v) {
 		i, err := ToInt64(b)
 		if err != nil {
 			return fmt.Errorf("parse int: %v", err)
@@ -379,7 +379,7 @@ func SetBytes(target any, b []byte) error {
 		v.SetInt(i)
 	}
 
-	if rt.IsUint(v) {
+	if rt.IsUintValue(v) {
 		i, err := ToUint64(b)
 		if err != nil {
 			return fmt.Errorf("parse uint: %w", err)
@@ -387,7 +387,7 @@ func SetBytes(target any, b []byte) error {
 		v.SetUint(i)
 	}
 
-	if rt.IsFloat(v) {
+	if rt.IsFloatValue(v) {
 		i, err := ToFloat64(b)
 		if err != nil {
 			return fmt.Errorf("parse float: %w", err)
