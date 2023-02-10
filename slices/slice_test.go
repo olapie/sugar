@@ -3,6 +3,7 @@ package slices_test
 import (
 	"testing"
 
+	"code.olapie.com/sugar/v2/slices"
 	"code.olapie.com/sugar/v2/testutil"
 )
 

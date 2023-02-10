@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 
-	"code.olapie.com/sugar/v2/must"
+	"code.olapie.com/sugar/v2/conv"
 )
 
 const (
@@ -338,7 +338,7 @@ func (h *Header) AllowMethods(methods ...string) {
 }
 
 func (h *Header) AllowCredentials(b bool) {
-	h.Header.Set(KeyACLAllowCredentials, must.ToString(b))
+	h.Header.Set(KeyACLAllowCredentials, conv.MustToString(b))
 }
 
 func (h *Header) AllowHeaders(headers ...string) {

@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-
-	"code.olapie.com/sugar/v2/must"
 )
 
 func Open(fileName string) (*sql.DB, error) {
@@ -35,5 +33,5 @@ func Open(fileName string) (*sql.DB, error) {
 }
 
 func MustOpen(filename string) *sql.DB {
-	return must.Get(Open(filename))
+	return sugar.MustGet(Open(filename))
 }

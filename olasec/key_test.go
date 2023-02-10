@@ -2,8 +2,9 @@ package olasec
 
 import (
 	"bytes"
-	"code.olapie.com/sugar/v2/slices"
 	"testing"
+
+	"code.olapie.com/sugar/v2/slices"
 
 	"code.olapie.com/sugar/v2/testutil"
 )

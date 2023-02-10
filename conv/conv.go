@@ -741,3 +741,173 @@ func ToFuncE[S any, T any](fn func(S) T) FuncE[S, T] {
 		return fn(s), nil
 	}
 }
+
+// MustToBoolSlice converts i to []bool, will panic if failed
+func MustToBoolSlice(i any) []bool {
+	v, err := ToBoolSlice(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+// MustToBool converts i to bool, will panic if failed
+func MustToBool(i any) bool {
+	v, err := ToBool(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+func MustToFloat32(i any) float32 {
+	v, err := ToFloat32(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+func MustToFloat64(i any) float64 {
+	v, err := ToFloat64(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+func MustToFloat32Slice(i any) []float32 {
+	v, err := ToFloat32Slice(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+func MustToFloat64Slice(i any) []float64 {
+	v, err := ToFloat64Slice(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+// MustToInt panics if ToInt(i) failed
+func MustToInt(i any) int {
+	v, err := ToInt(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+// MustToInt8 panics if ToInt8(i) failed
+func MustToInt8(i any) int8 {
+	v, err := ToInt8(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+// MustToInt16 panics if ToInt16(i) failed
+func MustToInt16(i any) int16 {
+	v, err := ToInt16(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+func MustToInt64(i any) int64 {
+	v, err := ToInt64(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+func MustToUint(i any) uint {
+	v, err := ToUint(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+func MustToUint8(i any) uint8 {
+	v, err := ToUint8(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+func MustToUint16(i any) uint16 {
+	v, err := ToUint16(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+func MustToUint32(i any) uint32 {
+	v, err := ToUint32(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+func MustToUint64(i any) uint64 {
+	v, err := ToUint64(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+func MustToIntSlice(i any) []int {
+	v, err := ToIntSlice(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+func MustToInt64Slice(i any) []int64 {
+	v, err := ToInt64Slice(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+func MustToUintSlice(i any) []uint {
+	v, err := ToUintSlice(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+func MustToUint64Slice(i any) []uint64 {
+	v, err := ToUint64Slice(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+func MustToString(i any) string {
+	v, err := ToString(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}
+
+func MustToStringSlice(i any) []string {
+	v, err := ToStringSlice(i)
+	if err != nil {
+		log.Panic(err)
+	}
+	return v
+}

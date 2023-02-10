@@ -3,6 +3,7 @@ package maths_test
 import (
 	"testing"
 
+	"code.olapie.com/sugar/v2/maths"
 	"code.olapie.com/sugar/v2/testutil"
 )
 

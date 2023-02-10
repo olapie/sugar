@@ -148,3 +148,15 @@ func CastSlice[FROM ~string, TO ~string](from []FROM) []TO {
 	}
 	return to
 }
+
+func MustEmpty[S ~string](s S, msgAndArgs ...any) {
+	if len(s) != 0 {
+		rt.PanicWithMessages(msgAndArgs...)
+	}
+}
+
+func MustNotEmpty[S ~string](s S, msgAndArgs ...any) {
+	if len(s) == 0 {
+		rt.PanicWithMessages(msgAndArgs...)
+	}
+}

@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"code.olapie.com/sugar/v2/conv"
-	"code.olapie.com/sugar/v2/must"
 	"code.olapie.com/sugar/v2/olasec"
 	"code.olapie.com/sugar/v2/slices"
 	"code.olapie.com/sugar/v2/timing"
@@ -66,29 +65,29 @@ func NewLocalTable[R any](db *sql.DB, optFns ...func(*LocalTableOptions[R])) *Lo
 		t.options.DeletionCacheSize = minimumLocalTableCacheSize
 	}
 
-	t.localCache = must.Get(lru.New[string, R](t.options.LocalCacheSize))
-	t.remoteCache = must.Get(lru.New[string, R](t.options.RemoteCacheSize))
-	t.deletionCache = must.Get(lru.New[string, bool](t.options.DeletionCacheSize))
+	t.localCache = sugar.MustGet(lru.New[string, R](t.options.LocalCacheSize))
+	t.remoteCache = sugar.MustGet(lru.New[string, R](t.options.RemoteCacheSize))
+	t.deletionCache = sugar.MustGet(lru.New[string, bool](t.options.DeletionCacheSize))
 
 	// table remotes: localID, recordData, updateTime, synced
 	// table locals: localID, recordData, createTime, updateTime
 	// table deletions: localID, deleteTime
 
-	must.Get(db.Exec(`CREATE TABLE IF NOT EXISTS remotes(
+	sugar.MustGet(db.Exec(`CREATE TABLE IF NOT EXISTS remotes(
     id VARCHAR PRIMARY KEY,
     category INTEGER DEFAULT 0,
     data BLOB,
     update_time INTEGER,
     synced BOOL DEFAULT FALSE
 )`))
-	must.Get(db.Exec(`CREATE TABLE IF NOT EXISTS locals(
+	sugar.MustGet(db.Exec(`CREATE TABLE IF NOT EXISTS locals(
     id VARCHAR PRIMARY KEY,
     category INTEGER DEFAULT 0,
     data BLOB,
     create_time INTEGER,
     update_time INTEGER
 )`))
-	must.Get(db.Exec(`CREATE TABLE IF NOT EXISTS deletions(
+	sugar.MustGet(db.Exec(`CREATE TABLE IF NOT EXISTS deletions(
     id VARCHAR PRIMARY KEY,
     category INTEGER DEFAULT 0,
     data BLOB,

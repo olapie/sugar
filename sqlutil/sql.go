@@ -2,13 +2,12 @@ package sqlutil
 
 import (
 	"bytes"
+	"code.olapie.com/sugar/v2"
 	"database/sql"
 	"fmt"
 	"io/fs"
 	"path/filepath"
 	"text/template"
-
-	"code.olapie.com/sugar/v2/must"
 )
 
 var Debug = false
@@ -31,7 +30,7 @@ type Executor interface {
 
 func MustPrepare(db *sql.DB, format string, args ...any) *sql.Stmt {
 	query := fmt.Sprintf(format, args...)
-	return must.Get(db.Prepare(query))
+	return sugar.MustGet(db.Prepare(query))
 }
 
 type readDirAndFileFS interface {

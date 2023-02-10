@@ -1,12 +1,12 @@
 package termutil
 
 import (
+	"code.olapie.com/sugar/v2"
 	"fmt"
 	"os"
 	"strings"
 	"syscall"
 
-	"code.olapie.com/sugar/v2/must"
 	"golang.org/x/crypto/ssh/terminal"
 	"golang.org/x/term"
 )
@@ -31,7 +31,7 @@ func ReadPassword(msg ...any) string {
 	for len(pass) == 0 {
 		fmt.Print(msg...)
 		fmt.Print(": ")
-		pass = must.Get(terminal.ReadPassword(syscall.Stdin))
+		pass = sugar.MustGet(terminal.ReadPassword(syscall.Stdin))
 		fmt.Println()
 	}
 	return string(pass)

@@ -3,6 +3,8 @@ package maps
 import (
 	"strings"
 
+	"code.olapie.com/sugar/v2/rt"
+
 	"code.olapie.com/sugar/v2/conv"
 )
 
@@ -151,4 +153,16 @@ func ArgsToEnvironMap(args []string) map[string]string {
 
 func toEnvKey(k string) string {
 	return strings.ReplaceAll(strings.ToLower(k), "_", ".")
+}
+
+func MustEmpty[K comparable, V any](m map[K]V, msgAndArgs ...any) {
+	if len(m) != 0 {
+		rt.PanicWithMessages(msgAndArgs...)
+	}
+}
+
+func MustNotEmpty[K comparable, V any](m map[K]V, msgAndArgs ...any) {
+	if len(m) == 0 {
+		rt.PanicWithMessages(msgAndArgs...)
+	}
 }

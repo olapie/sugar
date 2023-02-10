@@ -1,12 +1,11 @@
 package randoms
 
 import (
+	"code.olapie.com/sugar/v2"
 	"crypto/rand"
 	"fmt"
 	"math/big"
 	"sync"
-
-	"code.olapie.com/sugar/v2/must"
 )
 
 var defaultOTPGenerator *otpGenerator
@@ -76,12 +75,12 @@ func DigitCode(n int) string {
 	if defaultOTPGenerator == nil {
 		defaultOTPGenerator = newOTPGenerator()
 	}
-	return must.Get(defaultOTPGenerator.generateDigitCode(n))
+	return sugar.MustGet(defaultOTPGenerator.generateDigitCode(n))
 }
 
 func AlphaDigitCode(n int) string {
 	if defaultOTPGenerator == nil {
 		defaultOTPGenerator = newOTPGenerator()
 	}
-	return must.Get(defaultOTPGenerator.generateAlphaDigitCode(n))
+	return sugar.MustGet(defaultOTPGenerator.generateAlphaDigitCode(n))
 }

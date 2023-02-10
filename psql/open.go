@@ -9,7 +9,6 @@ import (
 	"sync"
 
 	"code.olapie.com/sugar/v2/ctxutil"
-	"code.olapie.com/sugar/v2/must"
 )
 
 type OpenOptions struct {
@@ -97,7 +96,7 @@ func Open(options *OpenOptions) (*sql.DB, error) {
 }
 
 func MustOpen(options *OpenOptions) *sql.DB {
-	return must.Get(Open(options))
+	return sugar.MustGet(Open(options))
 }
 
 func OpenLocal() (*sql.DB, error) {
@@ -113,7 +112,7 @@ func OpenLocal() (*sql.DB, error) {
 }
 
 func MustOpenLocal() *sql.DB {
-	return must.Get(OpenLocal())
+	return sugar.MustGet(OpenLocal())
 }
 
 type Factory[T any] interface {

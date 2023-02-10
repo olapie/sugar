@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"code.olapie.com/sugar/v2"
 	"embed"
 	_ "embed"
 	"fmt"
@@ -11,8 +12,6 @@ import (
 
 	"code.olapie.com/sugar/v2/templates"
 	"code.olapie.com/sugar/v2/types"
-
-	"code.olapie.com/sugar/v2/must"
 )
 
 //go:embed templates/*
@@ -41,25 +40,25 @@ func main() {
 	for _, elem := range basicTypes {
 		fmt.Println(elem)
 		output.WriteString("\n\n")
-		must.NoError(tpl.ExecuteTemplate(output, "list", types.M{"Elem": elem}))
+		sugar.MustNil(tpl.ExecuteTemplate(output, "list", types.M{"Elem": elem}))
 	}
 	for _, elem := range basicTypes {
 		fmt.Println(elem)
 		output.WriteString("\n\n")
-		must.NoError(tpl.ExecuteTemplate(output, "set", types.M{"Elem": elem}))
+		sugar.MustNil(tpl.ExecuteTemplate(output, "set", types.M{"Elem": elem}))
 	}
 	for _, elem := range basicTypes {
 		fmt.Println(elem)
 		output.WriteString("\n\n")
-		must.NoError(tpl.ExecuteTemplate(output, "pair", types.M{"Elem": elem}))
+		sugar.MustNil(tpl.ExecuteTemplate(output, "pair", types.M{"Elem": elem}))
 	}
 	for _, elem := range basicTypes {
 		fmt.Println(elem)
 		output.WriteString("\n\n")
-		must.NoError(tpl.ExecuteTemplate(output, "result", types.M{"Elem": elem}))
+		sugar.MustNil(tpl.ExecuteTemplate(output, "result", types.M{"Elem": elem}))
 	}
 	output.WriteString("\n\n")
-	must.NoError(tpl.ExecuteTemplate(output, "result", types.M{"Elem": "[]byte"}))
+	sugar.MustNil(tpl.ExecuteTemplate(output, "result", types.M{"Elem": "[]byte"}))
 
 	keys := []string{"int", "int16", "int32", "int64", "string"}
 	values := []string{"int", "int16", "int32", "int64", "float64", "bool", "string"}
@@ -68,7 +67,7 @@ func main() {
 		for _, val := range values {
 			fmt.Println(key, val)
 			output.WriteString("\n")
-			must.NoError(tpl.ExecuteTemplate(output, "map", types.M{"Key": key, "Value": val}))
+			sugar.MustNil(tpl.ExecuteTemplate(output, "map", types.M{"Key": key, "Value": val}))
 		}
 	}
 
@@ -95,7 +94,7 @@ func main() {
 		s = s2
 	}
 
-	must.NoError(os.WriteFile("mob.gen.go", []byte(s), 0644))
+	sugar.MustNil(os.WriteFile("mob.gen.go", []byte(s), 0644))
 
 	fmt.Println("Done")
 }

@@ -143,3 +143,15 @@ func Filter[E any](a []E, filter func(e E) bool) []E {
 func Single[T any](v T) []T {
 	return []T{v}
 }
+
+func MustEmpty[T any](a []T, msgAndArgs ...any) {
+	if len(a) == 0 {
+		rt.PanicWithMessages(msgAndArgs...)
+	}
+}
+
+func MustNotEmpty[T any](a []T, msgAndArgs ...any) {
+	if len(a) == 0 {
+		rt.PanicWithMessages(msgAndArgs...)
+	}
+}

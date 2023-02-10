@@ -9,7 +9,6 @@ import (
 	"syscall"
 	"time"
 
-	"code.olapie.com/sugar/v2/must"
 	"code.olapie.com/sugar/v2/olasec"
 	"golang.org/x/crypto/ssh/terminal"
 )
@@ -20,19 +19,19 @@ func main() {
 		fmt.Println("Password is too short")
 		return
 	}
-	pk := must.Get(olasec.GeneratePrivateKey())
-	pri := must.Get(olasec.EncodePrivateKey(pk, pass))
-	pub := must.Get(olasec.EncodePublicKey(&pk.PublicKey))
+	pk := sugar.MustGet(olasec.GeneratePrivateKey())
+	pri := sugar.MustGet(olasec.EncodePrivateKey(pk, pass))
+	pub := sugar.MustGet(olasec.EncodePublicKey(&pk.PublicKey))
 	name := time.Now().Format("20060102")
-	must.NoError(os.WriteFile(name+"-key.png", pri, 0644))
-	must.NoError(os.WriteFile(name+"-pub.png", pub, 0644))
+	sugar.MustNil(os.WriteFile(name+"-key.png", pri, 0644))
+	sugar.MustNil(os.WriteFile(name+"-pub.png", pub, 0644))
 
-	pubKey := must.Get(olasec.DecodePublicKey(pub))
-	priKey := must.Get(olasec.DecodePrivateKey(pri, pass))
+	pubKey := sugar.MustGet(olasec.DecodePublicKey(pub))
+	priKey := sugar.MustGet(olasec.DecodePrivateKey(pri, pass))
 
 	// Test
 	hash := sha256.Sum256([]byte("message: hello"))
-	sign := must.Get(ecdsa.SignASN1(rand.Reader, priKey, hash[:]))
+	sign := sugar.MustGet(ecdsa.SignASN1(rand.Reader, priKey, hash[:]))
 	ok := ecdsa.VerifyASN1(pubKey, hash[:], sign)
 	if !ok {
 		fmt.Println("Test failed")
@@ -60,7 +59,7 @@ func readNonEmptyPassword(msg ...any) string {
 	var pass []byte
 	for len(pass) == 0 {
 		fmt.Print(msg...)
-		pass = must.Get(terminal.ReadPassword(syscall.Stdin))
+		pass = sugar.MustGet(terminal.ReadPassword(syscall.Stdin))
 		fmt.Println()
 	}
 	return string(pass)
