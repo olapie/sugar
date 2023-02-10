@@ -1,4 +1,4 @@
-module code.olapie.com/sugar/xsqlite/v2
+module code.olapie.com/sugar/sqlite
 
 go 1.19
 
