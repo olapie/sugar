@@ -1,4 +1,4 @@
-package terminalutil
+package termutil
 
 import (
 	"fmt"

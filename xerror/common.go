@@ -82,20 +82,6 @@ func And(errs ...error) error {
 	return errors.Join(errs...)
 }
 
-func Combine(errs ...error) error {
-	for i := len(errs) - 1; i >= 0; i-- {
-		if errs[i] == nil {
-			errs = append(errs[:i], errs[i+1:]...)
-		}
-	}
-
-	if len(errs) == 0 {
-		return nil
-	}
-
-	return errors.Join(errs...)
-}
-
 func OrFn(err error, errFns ...func() error) error {
 	if err != nil {
 		return err

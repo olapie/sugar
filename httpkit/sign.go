@@ -16,11 +16,9 @@ import (
 	"strconv"
 	"time"
 
-	"code.olapie.com/sugar/v2/ctxutil"
-	"code.olapie.com/sugar/v2/mathutil"
-
 	"code.olapie.com/sugar/v2/base62"
 	"code.olapie.com/sugar/v2/conv"
+	"code.olapie.com/sugar/v2/ctxutil"
 	"code.olapie.com/sugar/v2/xerror"
 )
 
@@ -174,7 +172,7 @@ func CheckTimestamp[H Headerxtypeet](h H) error {
 		return xerror.New(http.StatusBadRequest, "invalid timestamp")
 	}
 	now := time.Now().Unix()
-	if mathutil.Abs(now-t) > 60 {
+	if maths.Abs(now-t) > 60 {
 		return xerror.New(http.StatusNotAcceptable, "outdated request")
 	}
 	return nil
