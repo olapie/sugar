@@ -7,10 +7,10 @@ import (
 	"reflect"
 	"sync"
 
+	"code.olapie.com/sugar/v2/conv"
 	"code.olapie.com/sugar/v2/olasec"
-	"code.olapie.com/sugar/v2/xbyte"
-	"code.olapie.com/sugar/v2/xsql"
-	"code.olapie.com/sugar/v2/xtime"
+	"code.olapie.com/sugar/v2/sqlutil"
+	"code.olapie.com/sugar/v2/timing"
 )
 
 type SimpleTableRecord[T SimpleKey] interface {
@@ -18,7 +18,7 @@ type SimpleTableRecord[T SimpleKey] interface {
 }
 
 type SimpleTableOptions[K SimpleKey, R SimpleTableRecord[K]] struct {
-	Clock         xtime.Clock
+	Clock         timing.Clock
 	MarshalFunc   func(r R) ([]byte, error)
 	UnmarshalFunc func(data []byte, r *R) error
 	Password      string
@@ -76,39 +76,39 @@ updated_at BIGINT
 	}
 
 	if t.options.Clock == nil {
-		t.options.Clock = xtime.LocalClock{}
+		t.options.Clock = timing.LocalClock{}
 	}
 
-	t.stmts.insert = xsql.MustPrepare(db, `INSERT INTO %s(id,data,updated_at) VALUES(?,?,?)`, name)
-	t.stmts.update = xsql.MustPrepare(db, `UPDATE %s SET data=?,updated_at=? WHERE id=?`, name)
-	t.stmts.save = xsql.MustPrepare(db, `REPLACE INTO %s(id,data,updated_at) VALUES(?,?,?)`, name)
-	t.stmts.get = xsql.MustPrepare(db, `SELECT data FROM %s WHERE id=?`, name)
-	t.stmts.listAll = xsql.MustPrepare(db, `SELECT id,data FROM %s ORDER BY updated_at`, name)
-	t.stmts.listGreaterThan = xsql.MustPrepare(db, `SELECT id,data FROM %s WHERE id>? ORDER BY id ASC LIMIT ?`, name)
-	t.stmts.listLessThan = xsql.MustPrepare(db, `SELECT id,data FROM %s WHERE id<? ORDER BY id DESC LIMIT ?`, name)
-	t.stmts.delete = xsql.MustPrepare(db, `DELETE FROM %s WHERE id=?`, name)
-	t.stmts.deleteGreaterThan = xsql.MustPrepare(db, `DELETE FROM %s WHERE id>?`, name)
-	t.stmts.deleteLessThan = xsql.MustPrepare(db, `DELETE FROM %s WHERE id<?`, name)
+	t.stmts.insert = sqlutil.MustPrepare(db, `INSERT INTO %s(id,data,updated_at) VALUES(?,?,?)`, name)
+	t.stmts.update = sqlutil.MustPrepare(db, `UPDATE %s SET data=?,updated_at=? WHERE id=?`, name)
+	t.stmts.save = sqlutil.MustPrepare(db, `REPLACE INTO %s(id,data,updated_at) VALUES(?,?,?)`, name)
+	t.stmts.get = sqlutil.MustPrepare(db, `SELECT data FROM %s WHERE id=?`, name)
+	t.stmts.listAll = sqlutil.MustPrepare(db, `SELECT id,data FROM %s ORDER BY updated_at`, name)
+	t.stmts.listGreaterThan = sqlutil.MustPrepare(db, `SELECT id,data FROM %s WHERE id>? ORDER BY id ASC LIMIT ?`, name)
+	t.stmts.listLessThan = sqlutil.MustPrepare(db, `SELECT id,data FROM %s WHERE id<? ORDER BY id DESC LIMIT ?`, name)
+	t.stmts.delete = sqlutil.MustPrepare(db, `DELETE FROM %s WHERE id=?`, name)
+	t.stmts.deleteGreaterThan = sqlutil.MustPrepare(db, `DELETE FROM %s WHERE id>?`, name)
+	t.stmts.deleteLessThan = sqlutil.MustPrepare(db, `DELETE FROM %s WHERE id<?`, name)
 	return t, nil
 }
 
 func (t *SimpleTable[K, R]) Insert(v SimpleTableRecord[K]) error {
 	t.mu.Lock()
-	_, err := t.stmts.insert.Exec(v.PrimaryKey(), xsql.JSON(v), t.options.Clock.Now())
+	_, err := t.stmts.insert.Exec(v.PrimaryKey(), sqlutil.JSON(v), t.options.Clock.Now())
 	t.mu.Unlock()
 	return err
 }
 
 func (t *SimpleTable[K, R]) Update(v SimpleTableRecord[K]) error {
 	t.mu.Lock()
-	_, err := t.stmts.update.Exec(v.PrimaryKey(), xsql.JSON(v), t.options.Clock.Now())
+	_, err := t.stmts.update.Exec(v.PrimaryKey(), sqlutil.JSON(v), t.options.Clock.Now())
 	t.mu.Unlock()
 	return err
 }
 
 func (t *SimpleTable[K, R]) Save(v SimpleTableRecord[K]) error {
 	t.mu.Lock()
-	_, err := t.stmts.save.Exec(v.PrimaryKey(), xsql.JSON(v), t.options.Clock.Now())
+	_, err := t.stmts.save.Exec(v.PrimaryKey(), sqlutil.JSON(v), t.options.Clock.Now())
 	t.mu.Unlock()
 	return err
 }
@@ -209,7 +209,7 @@ func (t *SimpleTable[K, R]) encode(key K, r R) (data []byte, err error) {
 	if t.options.MarshalFunc != nil {
 		data, err = t.options.MarshalFunc(r)
 	} else {
-		data, err = xbyte.Marshal(r)
+		data, err = conv.Marshal(r)
 		if err != nil {
 			data, err = json.Marshal(r)
 		}
@@ -239,7 +239,7 @@ func (t *SimpleTable[K, R]) decode(key K, data []byte) (record R, err error) {
 		return record, err
 	}
 
-	err = xbyte.Unmarshal(data, &record)
+	err = conv.Unmarshal(data, &record)
 	if err != nil {
 		err = json.Unmarshal(data, &record)
 	}

@@ -9,13 +9,13 @@ import (
 	"fmt"
 	"strings"
 
+	"code.olapie.com/sugar/v2/conv"
 	"code.olapie.com/sugar/v2/must"
 	"code.olapie.com/sugar/v2/olasec"
-	"code.olapie.com/sugar/v2/xbyte"
+	"code.olapie.com/sugar/v2/slices"
+	"code.olapie.com/sugar/v2/timing"
+	"code.olapie.com/sugar/v2/types"
 	"code.olapie.com/sugar/v2/xerror"
-	"code.olapie.com/sugar/v2/xslice"
-	"code.olapie.com/sugar/v2/xtime"
-	"code.olapie.com/sugar/v2/xtype"
 	lru "github.com/hashicorp/golang-lru/v2"
 )
 
@@ -25,7 +25,7 @@ const (
 )
 
 type LocalTableOptions[R any] struct {
-	Clock             xtime.Clock
+	Clock             timing.Clock
 	MarshalFunc       func(r R) ([]byte, error)
 	UnmarshalFunc     func(data []byte, r *R) error
 	Password          string
@@ -53,7 +53,7 @@ func NewLocalTable[R any](db *sql.DB, optFns ...func(*LocalTableOptions[R])) *Lo
 		fn(&t.options)
 	}
 	if t.options.Clock == nil {
-		t.options.Clock = xtime.LocalClock{}
+		t.options.Clock = timing.LocalClock{}
 	}
 
 	if t.options.LocalCacheSize < minimumLocalTableCacheSize {
@@ -259,7 +259,7 @@ func (t *LocalTable[R]) List(ctx context.Context, categories ...int) ([]R, error
 		if len(categories) == 1 {
 			where = fmt.Sprintf("category=%d", categories[0])
 		} else {
-			joinedCategories := strings.Join(xslice.MustTransform(categories, func(a int) string {
+			joinedCategories := strings.Join(slices.MustTransform(categories, func(a int) string {
 				return fmt.Sprint(a)
 			}), ",")
 			where = fmt.Sprintf("category in (%s)", joinedCategories)
@@ -275,7 +275,7 @@ func (t *LocalTable[R]) List(ctx context.Context, categories ...int) ([]R, error
 		return nil, fmt.Errorf("failed listing locals: %w", err)
 	}
 
-	ids := xtype.NewSet[string](len(remoteIDs) + len(localIDs))
+	ids := types.NewSet[string](len(remoteIDs) + len(localIDs))
 	for _, id := range remoteIDs {
 		ids.Add(id)
 	}
@@ -296,7 +296,7 @@ func (t *LocalTable[R]) ListExclusive(ctx context.Context, categories ...int) ([
 		if len(categories) == 1 {
 			where = fmt.Sprintf("category!=%d", categories[0])
 		} else {
-			joinedCategories := strings.Join(xslice.MustTransform(categories, func(a int) string {
+			joinedCategories := strings.Join(slices.MustTransform(categories, func(a int) string {
 				return fmt.Sprint(a)
 			}), ",")
 			where = fmt.Sprintf("category not in (%s)", joinedCategories)
@@ -312,7 +312,7 @@ func (t *LocalTable[R]) ListExclusive(ctx context.Context, categories ...int) ([
 		return nil, fmt.Errorf("failed listing locals: %w", err)
 	}
 
-	ids := xtype.NewSet[string](len(remoteIDs) + len(localIDs))
+	ids := types.NewSet[string](len(remoteIDs) + len(localIDs))
 	for _, id := range remoteIDs {
 		ids.Add(id)
 	}
@@ -617,7 +617,7 @@ func (t *LocalTable[R]) encode(localID string, r R) (data []byte, err error) {
 	if t.options.MarshalFunc != nil {
 		data, err = t.options.MarshalFunc(r)
 	} else {
-		data, err = xbyte.Marshal(r)
+		data, err = conv.Marshal(r)
 		if err != nil {
 			data, err = json.Marshal(r)
 		}
@@ -647,7 +647,7 @@ func (t *LocalTable[R]) decode(localID string, data []byte) (record R, err error
 		return record, err
 	}
 
-	err = xbyte.Unmarshal(data, &record)
+	err = conv.Unmarshal(data, &record)
 	if err != nil {
 		err = json.Unmarshal(data, &record)
 	}
@@ -665,7 +665,7 @@ func (t *LocalTable[R]) getCatchIDsCondition(ids ...string) (string, []any) {
 	}
 	buf.Truncate(len(ids) * 2)
 	buf.WriteByte(')')
-	args := xslice.MustTransform(ids, func(a string) any {
+	args := slices.MustTransform(ids, func(a string) any {
 		return any(a)
 	})
 	return buf.String(), args

@@ -7,12 +7,11 @@ import (
 	"sync"
 
 	"code.olapie.com/sugar/v2/conv"
-	"code.olapie.com/sugar/v2/xbyte"
-	"code.olapie.com/sugar/v2/xtime"
+	"code.olapie.com/sugar/v2/timing"
 )
 
 type KVTableOptions struct {
-	Clock xtime.Clock
+	Clock timing.Clock
 }
 
 type KVTable struct {
@@ -32,7 +31,7 @@ func NewKVTable(db *sql.DB, optFns ...func(options *KVTableOptions)) *KVTable {
 	}
 
 	if r.options.Clock == nil {
-		r.options.Clock = xtime.LocalClock{}
+		r.options.Clock = timing.LocalClock{}
 	}
 
 	_, err := db.Exec(`
@@ -186,7 +185,7 @@ func (t *KVTable) Close() error {
 }
 
 func (t *KVTable) encode(obj any) ([]byte, error) {
-	data, err := xbyte.Marshal(obj)
+	data, err := conv.Marshal(obj)
 	if err != nil {
 		return json.Marshal(obj)
 	}
@@ -194,7 +193,7 @@ func (t *KVTable) encode(obj any) ([]byte, error) {
 }
 
 func (t *KVTable) decode(data []byte, ptrToObj any) error {
-	err := xbyte.Unmarshal(data, ptrToObj)
+	err := conv.Unmarshal(data, ptrToObj)
 	if err != nil {
 		err = json.Unmarshal(data, ptrToObj)
 	}
