@@ -25,7 +25,23 @@ func Transform[A any, B any](a []A, f func(A) (B, error)) ([]B, error) {
 	return b, nil
 }
 
-func ToSet[A any, B comparable](a []A, f func(A) (B, error)) (map[B]bool, error) {
+func MustTransform[A any, B any](a []A, f func(A) B) []B {
+	b := make([]B, len(a))
+	for i := range a {
+		b[i] = f(a[i])
+	}
+	return b
+}
+
+func ToSet[E comparable](a []E) map[E]bool {
+	m := make(map[E]bool, len(a))
+	for _, v := range a {
+		m[v] = true
+	}
+	return m
+}
+
+func ToSetF[A any, B comparable](a []A, f func(A) (B, error)) (map[B]bool, error) {
 	m := make(map[B]bool, len(a))
 	for i, v := range a {
 		if f == nil {
@@ -41,15 +57,7 @@ func ToSet[A any, B comparable](a []A, f func(A) (B, error)) (map[B]bool, error)
 	return m, nil
 }
 
-func MustTransform[A any, B any](a []A, f func(A) B) []B {
-	b := make([]B, len(a))
-	for i := range a {
-		b[i] = f(a[i])
-	}
-	return b
-}
-
-func MustToSet[A any, B comparable](a []A, f func(A) B) map[B]bool {
+func MustToSetF[A any, B comparable](a []A, f func(A) B) map[B]bool {
 	m := make(map[B]bool, len(a))
 	for _, v := range a {
 		if f == nil {
