@@ -30,7 +30,6 @@ func ParseRequest(req *http.Request, memInBytes int64) (map[string]any, []byte, 
 		return params, body, nil
 	case JSON:
 		body, err := io.ReadAll(req.Body)
-		req.Body.Close()
 		if err != nil {
 			return params, nil, fmt.Errorf("read json body: %w", err)
 		}
@@ -75,7 +74,6 @@ func ParseRequest(req *http.Request, memInBytes int64) (map[string]any, []byte, 
 		return params, nil, nil
 	default:
 		body, err := io.ReadAll(req.Body)
-		req.Body.Close()
 		if err != nil {
 			return params, nil, fmt.Errorf("read json body: %w", err)
 		}
