@@ -54,7 +54,6 @@ func ParseRequest(req *http.Request, memInBytes int64) (map[string]any, []byte, 
 		//	return params, nil, fmt.Errorf("get body: %w", err)
 		//}
 		//bodyData, err := ioutil.Read(body)
-		//body.Close()
 		//if err != nil {
 		//	return params, nil, fmt.Errorf("read form body: %w", err)
 		//}
