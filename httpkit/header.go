@@ -30,12 +30,10 @@ const (
 	KeyAcceptLanguage      = "Accept-Language"
 	KeyETag                = "ETag"
 
-	KeyClientID  = "X-Client-Id"
-	KeyAppID     = "X-App-Id"
-	KeyServiceID = "X-Service-Id"
-	KeyTraceID   = "X-Trace-Id"
-	KeyUserID    = "X-User-Id"
-	KeyTestFlag  = "X-Test"
+	keyClientID = "x-client-id"
+	keyAppID    = "x-app-id"
+	keyTraceID  = "x-trace-id"
+	keyUserID   = "x-user-id"
 )
 
 const (
@@ -193,35 +191,35 @@ func SetContentEncoding[H HeaderTypes](h H, encoding string) {
 }
 
 func GetUserID[H HeaderTypes](h H) string {
-	return GetHeader(h, KeyUserID)
+	return GetHeader(h, keyUserID)
 }
 
 func SetUserID[H HeaderTypes](h H, id string) {
-	SetHeader(h, KeyUserID, id)
+	SetHeader(h, keyUserID, id)
 }
 
 func GetTraceID[H HeaderTypes](h H) string {
-	return GetHeader(h, KeyTraceID)
+	return GetHeader(h, keyTraceID)
 }
 
 func SetTraceID[H HeaderTypes](h H, id string) {
-	SetHeader(h, KeyTraceID, id)
+	SetHeader(h, keyTraceID, id)
 }
 
 func GetClientID[H HeaderTypes](h H) string {
-	return GetHeader(h, KeyClientID)
+	return GetHeader(h, keyClientID)
 }
 
 func SetClientID[H HeaderTypes](h H, id string) {
-	SetHeader(h, KeyClientID, id)
+	SetHeader(h, keyClientID, id)
 }
 
 func GetAppID[H HeaderTypes](h H) string {
-	return GetHeader(h, KeyAppID)
+	return GetHeader(h, keyAppID)
 }
 
 func SetAppID[H HeaderTypes](h H, id string) {
-	SetHeader(h, KeyAppID, id)
+	SetHeader(h, keyAppID, id)
 }
 
 /**
@@ -311,19 +309,19 @@ func (h *Header) Authorization() string {
 }
 
 func (h *Header) SetClientID(id string) {
-	h.Set(KeyClientID, id)
+	h.Set(keyClientID, id)
 }
 
 func (h *Header) ClientID() string {
-	return h.Get(KeyClientID)
+	return h.Get(keyClientID)
 }
 
 func (h *Header) SetAppID(id string) {
-	h.Set(KeyAppID, id)
+	h.Set(keyAppID, id)
 }
 
 func (h *Header) AppID() string {
-	return h.Get(KeyAppID)
+	return h.Get(keyAppID)
 }
 
 func (h *Header) AllowMethods(methods ...string) {

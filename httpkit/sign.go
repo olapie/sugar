@@ -43,13 +43,13 @@ type PrivateKey interface {
 }
 
 func Sign[K PrivateKey](ctx context.Context, header http.Header, priv *K) error {
-	SetHeaderNX(header, KeyAppID, ctxutil.GetAppID(ctx))
-	SetHeaderNX(header, KeyClientID, ctxutil.GetClientID(ctx))
+	SetHeaderNX(header, keyAppID, ctxutil.GetAppID(ctx))
+	SetHeaderNX(header, keyClientID, ctxutil.GetClientID(ctx))
 	traceID := ctxutil.GetTraceID(ctx)
 	if traceID == "" {
 		traceID = base62.NewUUIDString()
 	}
-	SetHeaderNX(header, KeyTraceID, traceID)
+	SetHeaderNX(header, keyTraceID, traceID)
 	SetHeaderNX(header, KeyTimestamp, fmt.Sprint(time.Now().Unix()))
 
 	hash := getMessageHashForSigning(header)
@@ -110,7 +110,7 @@ func Verify[K PublicKey](ctx context.Context, header http.Header, pub *K) bool {
 	}
 
 	if GetTraceID(header) == "" {
-		fmt.Printf("[sugar/v2/httpkit] missing %s in header\n", KeyTraceID)
+		fmt.Printf("[sugar/v2/httpkit] missing %s in header\n", keyTraceID)
 		return false
 	}
 
@@ -149,7 +149,7 @@ func GetVerifier[K PublicKey](pub *K) Verifier {
 
 func getMessageHashForSigning(h http.Header) []byte {
 	var buf bytes.Buffer
-	buf.WriteString(GetHeader(h, KeyTraceID))
+	buf.WriteString(GetHeader(h, keyTraceID))
 	buf.WriteString(GetHeader(h, KeyTimestamp))
 	hash := md5.Sum(buf.Bytes())
 	return hash[:]

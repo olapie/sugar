@@ -138,7 +138,7 @@ func (c *Caller[IN, OUT]) call(ctx context.Context, input IN) (*http.Response, e
 		return nil, fmt.Errorf("create request %s %s: %w", c.Method, endpoint, err)
 	}
 	req.Header.Set(KeyContentType, contentType)
-	req.Header.Set(KeyTraceID, uuid.NewString())
+	req.Header.Set(keyTraceID, uuid.NewString())
 
 	client := http.DefaultClient
 	if c.Client != nil {

@@ -1,11 +1,12 @@
 package termutil
 
 import (
-	"code.olapie.com/sugar/v2"
 	"fmt"
 	"os"
 	"strings"
 	"syscall"
+
+	"code.olapie.com/sugar/v2"
 
 	"golang.org/x/crypto/ssh/terminal"
 	"golang.org/x/term"

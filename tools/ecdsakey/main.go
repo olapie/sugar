@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"code.olapie.com/sugar/v2"
 	"code.olapie.com/sugar/v2/olasec"
 	"golang.org/x/crypto/ssh/terminal"
 )

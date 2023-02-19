@@ -1,12 +1,13 @@
 package sqlite
 
 import (
-	"code.olapie.com/sugar/v2"
 	"database/sql"
 	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"code.olapie.com/sugar/v2"
 )
 
 func Open(fileName string) (*sql.DB, error) {

@@ -1,13 +1,14 @@
 package psql
 
 import (
-	"code.olapie.com/sugar/v2"
 	"context"
 	"database/sql"
 	"fmt"
 	"net/url"
 	"os/user"
 	"sync"
+
+	"code.olapie.com/sugar/v2"
 
 	"code.olapie.com/sugar/v2/ctxutil"
 )

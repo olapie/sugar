@@ -2,13 +2,14 @@ package sqlite
 
 import (
 	"bytes"
-	"code.olapie.com/sugar/v2"
 	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
+
+	"code.olapie.com/sugar/v2"
 
 	"code.olapie.com/sugar/v2/conv"
 	"code.olapie.com/sugar/v2/olasec"

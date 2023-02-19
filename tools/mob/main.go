@@ -2,13 +2,14 @@ package main
 
 import (
 	"bytes"
-	"code.olapie.com/sugar/v2"
 	"embed"
 	_ "embed"
 	"fmt"
 	"html/template"
 	"os"
 	"strings"
+
+	"code.olapie.com/sugar/v2"
 
 	"code.olapie.com/sugar/v2/templates"
 	"code.olapie.com/sugar/v2/types"

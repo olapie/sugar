@@ -1,11 +1,12 @@
 package randoms
 
 import (
-	"code.olapie.com/sugar/v2"
 	"crypto/rand"
 	"fmt"
 	"math/big"
 	"sync"
+
+	"code.olapie.com/sugar/v2"
 )
 
 var defaultOTPGenerator *otpGenerator

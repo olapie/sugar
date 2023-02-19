@@ -2,12 +2,13 @@ package sqlutil
 
 import (
 	"bytes"
-	"code.olapie.com/sugar/v2"
 	"database/sql"
 	"fmt"
 	"io/fs"
 	"path/filepath"
 	"text/template"
+
+	"code.olapie.com/sugar/v2"
 )
 
 var Debug = false
