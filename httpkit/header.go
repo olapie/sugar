@@ -43,11 +43,11 @@ const (
 	Basic  = "Basic"
 )
 
-type Headerxtypeet interface {
+type HeaderTypes interface {
 	http.Header | Header | *Header | map[string]string | map[string][]string
 }
 
-func GetHeader[H Headerxtypeet](h H, key string) string {
+func GetHeader[H HeaderTypes](h H, key string) string {
 	switch m := any(h).(type) {
 	case map[string]string:
 		v := m[key]
@@ -56,35 +56,29 @@ func GetHeader[H Headerxtypeet](h H, key string) string {
 		}
 		return v
 	case map[string][]string:
-		hh := http.Header(m)
-		v := hh.Get(key)
-		if v == "" {
-			v = hh.Get(strings.ToLower(key))
-		}
-		return v
+		return getHeader(m, key)
 	case http.Header:
-		v := m.Get(key)
-		if v == "" {
-			v = m.Get(strings.ToLower(key))
-		}
-		return v
+		return getHeader(m, key)
 	case Header:
-		v := m.Get(key)
-		if v == "" {
-			v = m.Get(strings.ToLower(key))
-		}
-		return v
+		return getHeader(m.Header, key)
 	case *Header:
-		v := m.Get(key)
-		if v == "" {
-			v = m.Get(strings.ToLower(key))
-		}
-		return v
+		return getHeader(m.Header, key)
 	}
 	return ""
 }
 
-func SetHeader[H Headerxtypeet](h H, key, value string) {
+func getHeader(m map[string][]string, key string) string {
+	v, ok := m[key]
+	if !ok {
+		v = m[strings.ToLower(key)]
+	}
+	if len(v) == 0 {
+		return ""
+	}
+	return v[0]
+}
+
+func SetHeader[H HeaderTypes](h H, key, value string) {
 	switch m := any(h).(type) {
 	case map[string]string:
 		m[key] = value
@@ -102,14 +96,14 @@ func SetHeader[H Headerxtypeet](h H, key, value string) {
 	}
 }
 
-func SetHeaderNX[H Headerxtypeet](h H, key, value string) {
+func SetHeaderNX[H HeaderTypes](h H, key, value string) {
 	if GetHeader(h, key) != "" {
 		return
 	}
 	SetHeader(h, key, value)
 }
 
-func GetAcceptEncodings[H Headerxtypeet](h H) []string {
+func GetAcceptEncodings[H HeaderTypes](h H) []string {
 	a := strings.Split(GetHeader(h, KeyAcceptEncoding), ",")
 	for i, s := range a {
 		a[i] = strings.TrimSpace(s)
@@ -124,7 +118,7 @@ func GetAcceptEncodings[H Headerxtypeet](h H) []string {
 	return a
 }
 
-func GetContentType[H Headerxtypeet](h H) string {
+func GetContentType[H HeaderTypes](h H) string {
 	t, _, _ := mime.ParseMediaType(GetHeader(h, KeyContentType))
 	return t
 }
@@ -137,19 +131,19 @@ func SetContentTypeIfNX(h http.Header, contentType string) {
 	SetHeaderNX(h, KeyContentType, contentType)
 }
 
-func GetAuthorization[H Headerxtypeet](h H) string {
+func GetAuthorization[H HeaderTypes](h H) string {
 	return GetHeader(h, KeyAuthorization)
 }
 
-func SetAuthorization[H Headerxtypeet](h H, contentType string) {
+func SetAuthorization[H HeaderTypes](h H, contentType string) {
 	SetHeader(h, KeyContentType, contentType)
 }
 
-func SetAuthorizationNX[H Headerxtypeet](h H, contentType string) {
+func SetAuthorizationNX[H HeaderTypes](h H, contentType string) {
 	SetHeaderNX(h, KeyContentType, contentType)
 }
 
-func GetBasicAccount[H Headerxtypeet](h H) (user string, password string) {
+func GetBasicAccount[H HeaderTypes](h H) (user string, password string) {
 	s := GetAuthorization(h)
 	l := strings.Split(s, " ")
 	if len(l) != 2 {
@@ -173,7 +167,7 @@ func GetBasicAccount[H Headerxtypeet](h H) (user string, password string) {
 }
 
 // GetBearer returns bearer token in header
-func GetBearer[H Headerxtypeet](h H) string {
+func GetBearer[H HeaderTypes](h H) string {
 	s := GetAuthorization(h)
 	l := strings.Split(s, " ")
 	if len(l) != 2 {
@@ -185,7 +179,7 @@ func GetBearer[H Headerxtypeet](h H) string {
 	return ""
 }
 
-func SetBearer[H Headerxtypeet](h H, bearer string) {
+func SetBearer[H HeaderTypes](h H, bearer string) {
 	authorization := Bearer + " " + bearer
 	SetHeader(h, KeyAuthorization, authorization)
 }
@@ -194,39 +188,39 @@ func GetContentEncoding(h http.Header, encoding string) string {
 	return GetHeader(h, KeyContentEncoding)
 }
 
-func SetContentEncoding[H Headerxtypeet](h H, encoding string) {
+func SetContentEncoding[H HeaderTypes](h H, encoding string) {
 	SetHeader(h, KeyContentEncoding, encoding)
 }
 
-func GetUserID[H Headerxtypeet](h H) string {
+func GetUserID[H HeaderTypes](h H) string {
 	return GetHeader(h, KeyUserID)
 }
 
-func SetUserID[H Headerxtypeet](h H, id string) {
+func SetUserID[H HeaderTypes](h H, id string) {
 	SetHeader(h, KeyUserID, id)
 }
 
-func GetTraceID[H Headerxtypeet](h H) string {
+func GetTraceID[H HeaderTypes](h H) string {
 	return GetHeader(h, KeyTraceID)
 }
 
-func SetTraceID[H Headerxtypeet](h H, id string) {
+func SetTraceID[H HeaderTypes](h H, id string) {
 	SetHeader(h, KeyTraceID, id)
 }
 
-func GetClientID[H Headerxtypeet](h H) string {
+func GetClientID[H HeaderTypes](h H) string {
 	return GetHeader(h, KeyClientID)
 }
 
-func SetClientID[H Headerxtypeet](h H, id string) {
+func SetClientID[H HeaderTypes](h H, id string) {
 	SetHeader(h, KeyClientID, id)
 }
 
-func GetAppID[H Headerxtypeet](h H) string {
+func GetAppID[H HeaderTypes](h H) string {
 	return GetHeader(h, KeyAppID)
 }
 
-func SetAppID[H Headerxtypeet](h H, id string) {
+func SetAppID[H HeaderTypes](h H, id string) {
 	SetHeader(h, KeyAppID, id)
 }
 
@@ -239,11 +233,11 @@ ETag is enclosed in quotes https://www.rfc-editor.org/rfc/rfc7232#section-2.3
      ETag: ""
 */
 
-func GetETag[H Headerxtypeet](h H) string {
+func GetETag[H HeaderTypes](h H) string {
 	return GetHeader(h, KeyETag)
 }
 
-func SetETag[H Headerxtypeet](h H, etag string) {
+func SetETag[H HeaderTypes](h H, etag string) {
 	SetHeader(h, KeyETag, etag)
 }
 

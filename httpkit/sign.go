@@ -29,37 +29,30 @@ const (
 )
 
 type Signer interface {
-	Sign(ctx context.Context, req *http.Request) error
+	Sign(ctx context.Context, header http.Header) error
 }
 
-type SignerFunc func(ctx context.Context, req *http.Request) error
+type SignerFunc func(ctx context.Context, header http.Header) error
 
-func (h SignerFunc) Sign(ctx context.Context, req *http.Request) error {
-	return h(ctx, req)
+func (h SignerFunc) Sign(ctx context.Context, header http.Header) error {
+	return h(ctx, header)
 }
 
 type PrivateKey interface {
 	ecdsa.PrivateKey | rsa.PrivateKey
 }
 
-func Sign[K PrivateKey](ctx context.Context, req *http.Request, priv *K) error {
-	if ctxutil.HasLogin(ctx) {
-		if login := ctxutil.GetLogin[string](ctx); login != "" {
-			SetHeaderNX(req.Header, KeyUserID, login)
-		} else if login := ctxutil.GetLogin[int64](ctx); login != 0 {
-			SetHeaderNX(req.Header, KeyUserID, fmt.Sprint(login))
-		}
-	}
-	SetHeaderNX(req.Header, KeyAppID, ctxutil.GetAppID(ctx))
-	SetHeaderNX(req.Header, KeyClientID, ctxutil.GetClientID(ctx))
+func Sign[K PrivateKey](ctx context.Context, header http.Header, priv *K) error {
+	SetHeaderNX(header, KeyAppID, ctxutil.GetAppID(ctx))
+	SetHeaderNX(header, KeyClientID, ctxutil.GetClientID(ctx))
 	traceID := ctxutil.GetTraceID(ctx)
 	if traceID == "" {
 		traceID = base62.NewUUIDString()
 	}
-	SetHeaderNX(req.Header, KeyTraceID, traceID)
-	SetHeaderNX(req.Header, KeyTimestamp, fmt.Sprint(time.Now().Unix()))
+	SetHeaderNX(header, KeyTraceID, traceID)
+	SetHeaderNX(header, KeyTimestamp, fmt.Sprint(time.Now().Unix()))
 
-	hash := getMessageHashForSigning(req)
+	hash := getMessageHashForSigning(header)
 	var sign []byte
 	var err error
 	switch k := any(priv).(type) {
@@ -75,32 +68,32 @@ func Sign[K PrivateKey](ctx context.Context, req *http.Request, priv *K) error {
 		return err
 	}
 
-	req.Header.Set(KeySignature, base64.StdEncoding.EncodeToString(sign))
+	header.Set(KeySignature, base64.StdEncoding.EncodeToString(sign))
 	return nil
 }
 
 func GetSigner[K PrivateKey](priv *K) Signer {
-	return SignerFunc(func(ctx context.Context, req *http.Request) error {
-		return Sign(ctx, req, priv)
+	return SignerFunc(func(ctx context.Context, header http.Header) error {
+		return Sign(ctx, header, priv)
 	})
 }
 
 type Verifier interface {
-	Verify(ctx context.Context, req *http.Request) bool
+	Verify(ctx context.Context, header http.Header) bool
 }
 
-type VerifierFunc func(ctx context.Context, req *http.Request) bool
+type VerifierFunc func(ctx context.Context, header http.Header) bool
 
-func (h VerifierFunc) Verify(ctx context.Context, req *http.Request) bool {
-	return h(ctx, req)
+func (h VerifierFunc) Verify(ctx context.Context, header http.Header) bool {
+	return h(ctx, header)
 }
 
 type PublicKey interface {
 	ecdsa.PublicKey | rsa.PublicKey
 }
 
-func Verify[K PublicKey](ctx context.Context, req *http.Request, pub *K) bool {
-	ts := req.Header.Get(KeyTimestamp)
+func Verify[K PublicKey](ctx context.Context, header http.Header, pub *K) bool {
+	ts := header.Get(KeyTimestamp)
 	if ts == "" {
 		fmt.Printf("[sugar/v2/httpkit] missing %s in header\n", KeyTimestamp)
 	}
@@ -115,13 +108,13 @@ func Verify[K PublicKey](ctx context.Context, req *http.Request, pub *K) bool {
 		return false
 	}
 
-	signature := req.Header.Get(KeySignature)
+	signature := GetHeader(header, KeySignature)
 	sign, err := base64.StdEncoding.DecodeString(signature)
 	if err != nil {
 		fmt.Printf("[sugar/v2/httpkit] base64.DecodeString: %s, %v\n", signature, err)
 		return false
 	}
-	hash := getMessageHashForSigning(req)
+	hash := getMessageHashForSigning(header)
 	switch k := any(pub).(type) {
 	case *ecdsa.PublicKey:
 		verified := ecdsa.VerifyASN1(k, hash, sign)
@@ -143,27 +136,20 @@ func Verify[K PublicKey](ctx context.Context, req *http.Request, pub *K) bool {
 }
 
 func GetVerifier[K PublicKey](pub *K) Verifier {
-	return VerifierFunc(func(ctx context.Context, req *http.Request) bool {
-		return Verify(ctx, req, pub)
+	return VerifierFunc(func(ctx context.Context, header http.Header) bool {
+		return Verify(ctx, header, pub)
 	})
 }
 
-func getMessageHashForSigning(req *http.Request) []byte {
+func getMessageHashForSigning(h http.Header) []byte {
 	var buf bytes.Buffer
-	buf.WriteString(req.Method)
-	path := req.URL.Path
-	if path == "" {
-		path = req.URL.RawPath
-	}
-	buf.WriteString(path)
-	buf.WriteString(req.URL.RawQuery)
-	buf.WriteString(GetHeader(req.Header, KeyTraceID))
-	buf.WriteString(GetHeader(req.Header, KeyTimestamp))
+	buf.WriteString(GetHeader(h, KeyTraceID))
+	buf.WriteString(GetHeader(h, KeyTimestamp))
 	hash := md5.Sum(buf.Bytes())
 	return hash[:]
 }
 
-func CheckTimestamp[H Headerxtypeet](h H) error {
+func CheckTimestamp[H HeaderTypes](h H) error {
 	ts := GetHeader(h, KeyTimestamp)
 	if ts == "" {
 		return xerror.New(http.StatusBadRequest, "missing %s", KeyTimestamp)
@@ -179,7 +165,7 @@ func CheckTimestamp[H Headerxtypeet](h H) error {
 	return nil
 }
 
-func DecodeSign[H Headerxtypeet](h H) ([]byte, error) {
+func DecodeSign[H HeaderTypes](h H) ([]byte, error) {
 	signature := GetHeader(h, KeySignature)
 	if signature == "" {
 		return nil, xerror.New(http.StatusBadRequest, "missing %s", KeySignature)
