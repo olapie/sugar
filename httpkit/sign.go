@@ -96,6 +96,7 @@ func Verify[K PublicKey](ctx context.Context, header http.Header, pub *K) bool {
 	ts := header.Get(KeyTimestamp)
 	if ts == "" {
 		fmt.Printf("[sugar/v2/httpkit] missing %s in header\n", KeyTimestamp)
+		return false
 	}
 	t, err := strconv.ParseInt(ts, 0, 64)
 	if err != nil {
@@ -105,6 +106,11 @@ func Verify[K PublicKey](ctx context.Context, header http.Header, pub *K) bool {
 
 	if time.Now().Unix()-t > 5 {
 		fmt.Printf("[sugar/v2/httpkit] outdated timestamp %s in header\n", ts)
+		return false
+	}
+
+	if GetTraceID(header) == "" {
+		fmt.Printf("[sugar/v2/httpkit] missing %s in header\n", KeyTraceID)
 		return false
 	}
 
