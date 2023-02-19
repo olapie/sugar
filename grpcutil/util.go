@@ -1,6 +1,7 @@
 package grpcutil
 
 import (
+	"code.olapie.com/sugar/v2/httpkit"
 	"context"
 	"net/http"
 	"reflect"
@@ -8,7 +9,6 @@ import (
 
 	"code.olapie.com/log"
 	"code.olapie.com/sugar/v2/ctxutil"
-	"code.olapie.com/sugar/v2/httpkit"
 	"code.olapie.com/sugar/v2/xerror"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -39,15 +39,13 @@ func ServerStart(ctx context.Context, info *grpc.UnaryServerInfo, verifier httpk
 		return nil, status.Error(codes.InvalidArgument, "failed reading request metadata")
 	}
 
-	header := http.Header(md)
-
-	if !verifier.Verify(ctx, header) {
+	if !verifier.Verify(ctx, http.Header(md)) {
 		return nil, status.Error(codes.InvalidArgument, "failed verifying")
 	}
 
-	traceID := httpkit.GetTraceID(header)
-	ctx = ctxutil.Request(ctx).WithAppID(httpkit.GetAppID(header)).
-		WithClientID(httpkit.GetClientID(header)).
+	traceID := GetTraceID(md)
+	ctx = ctxutil.Request(ctx).WithAppID(GetAppID(md)).
+		WithClientID(GetClientID(md)).
 		WithTraceID(traceID).
 		Build()
 	logger := log.FromContext(ctx).With(log.String("trace_id", traceID))
