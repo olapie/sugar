@@ -36,13 +36,13 @@ var statusToCodeMap = map[int]codes.Code{
 func ServerStart(ctx context.Context, info *grpc.UnaryServerInfo, verifier httpkit.Verifier) (context.Context, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return ctx, status.Error(codes.InvalidArgument, "failed reading request metadata")
+		return nil, status.Error(codes.InvalidArgument, "failed reading request metadata")
 	}
 
 	header := http.Header(md)
 
 	if !verifier.Verify(ctx, header) {
-		return ctx, status.Error(codes.InvalidArgument, "failed verifying")
+		return nil, status.Error(codes.InvalidArgument, "failed verifying")
 	}
 
 	traceID := httpkit.GetTraceID(header)
@@ -81,4 +81,16 @@ func ServerFinish(resp any, err error, logger *log.Logger, startAt time.Time) (a
 		code = codes.Unknown
 	}
 	return nil, status.Error(code, err.Error())
+}
+
+func SignClientContext(ctx context.Context, signer httpkit.Signer) (context.Context, error) {
+	md, ok := metadata.FromOutgoingContext(ctx)
+	if !ok {
+		md = make(metadata.MD)
+	}
+	err := signer.Sign(ctx, http.Header(md))
+	if err != nil {
+		return nil, err
+	}
+	return metadata.NewOutgoingContext(ctx, md), nil
 }
