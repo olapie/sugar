@@ -40,7 +40,7 @@ func ServerStart(ctx context.Context, info *grpc.UnaryServerInfo) (context.Conte
 		return nil, status.Error(codes.InvalidArgument, "failed reading request metadata")
 	}
 
-	if !Verify(md, 10) {
+	if !VerifyAPIKey(md, 10) {
 		log.FromContext(ctx).Sugar().Infoln(md)
 		return nil, status.Error(codes.InvalidArgument, "failed verifying")
 	}
@@ -111,7 +111,7 @@ func SignClientContext(ctx context.Context) context.Context {
 		}
 	}
 
-	Sign(md)
+	SetAPIKey(md)
 	return metadata.NewOutgoingContext(ctx, md)
 }
 
