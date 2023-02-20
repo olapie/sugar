@@ -38,7 +38,8 @@ func ServerStart(ctx context.Context, info *grpc.UnaryServerInfo) (context.Conte
 		return nil, status.Error(codes.InvalidArgument, "failed reading request metadata")
 	}
 
-	if !Verify(md) {
+	if !Verify(md, 10) {
+		log.FromContext(ctx).Sugar().Infoln(md)
 		return nil, status.Error(codes.InvalidArgument, "failed verifying")
 	}
 

@@ -66,39 +66,37 @@ func GetMetadata(m metadata.MD, key string) string {
 
 func Sign(md metadata.MD) {
 	t := time.Now().Unix()
-	var b [40]byte
-	binary.BigEndian.PutUint64(b[:], uint64(t))
+	var b [41]byte
+	b[0] = 1
+	binary.BigEndian.PutUint64(b[1:], uint64(t))
 	clientID := GetClientID(md)
 	traceID := GetTraceID(md)
 	hash := hashutil.Hash32(fmt.Sprint(t) + traceID + clientID)
-	copy(b[8:], hash[:])
+	copy(b[9:], hash[:])
 	sign := base62.EncodeToString(b[:])
 	md.Set(keySignature, sign)
 }
 
-func Verify(md metadata.MD) bool {
+func Verify(md metadata.MD, delaySeconds int) bool {
 	sign := GetMetadata(md, keySignature)
 	if sign == "" {
 		fmt.Println("missing", keySignature)
 		return false
 	}
 
-	var b [40]byte
-	decoded, err := base62.DecodeString(sign)
+	b, err := base62.DecodeString(sign)
 	if err != nil {
 		fmt.Println("invalid", keySignature, err)
 		return false
 	}
-	copy(b[40-len(decoded):], decoded)
-	t := int64(binary.BigEndian.Uint64(b[:]))
+	t := int64(binary.BigEndian.Uint64(b[1:]))
 	elapsed := time.Now().Unix() - t
-	if elapsed < -3 || elapsed > 10 {
+	if elapsed < -3 || elapsed > int64(delaySeconds) {
 		fmt.Println("invalid timestamp", t, elapsed)
 		return false
 	}
 	clientID := GetClientID(md)
 	traceID := GetTraceID(md)
 	hash := hashutil.Hash32(fmt.Sprint(t) + traceID + clientID)
-	equal := bytes.Equal(b[8:], hash[:])
-	return equal
+	return bytes.Equal(b[9:], hash[:])
 }

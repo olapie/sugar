@@ -16,7 +16,7 @@ func TestSign(t *testing.T) {
 	md := make(metadata.MD)
 	Sign(md)
 	t.Log(md)
-	if !Verify(md) {
+	if !Verify(md, 1) {
 		t.FailNow()
 	}
 
@@ -27,7 +27,7 @@ func TestSign(t *testing.T) {
 	copy(b[4:], hash[:])
 	sign := base62.EncodeToString(b[:])
 	md.Set(keySignature, sign)
-	if Verify(md) {
+	if Verify(md, 1) {
 		t.FailNow()
 	}
 }
