@@ -33,7 +33,7 @@ const (
 	keyClientID = "X-Client-Id"
 	keyAppID    = "X-App-Id"
 	keyTraceID  = "X-Trace-Id"
-	keyAPIKey   = "X-Sign"
+	keyAPIKey   = "X-Api-Key"
 )
 
 const (
