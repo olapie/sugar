@@ -13,10 +13,11 @@ import (
 )
 
 const (
-	keyClientID  = "x-client-id"
-	keyAppID     = "x-app-id"
-	keyTraceID   = "x-trace-id"
-	keySignature = "x-sign"
+	keyClientID      = "x-client-id"
+	keyAppID         = "x-app-id"
+	keyTraceID       = "x-trace-id"
+	keySignature     = "x-sign"
+	keyAuthorization = "authorization"
 )
 
 func MatchMetadata(key string) (string, bool) {
@@ -51,6 +52,14 @@ func GetAppID(md metadata.MD) string {
 
 func SetAppID(md metadata.MD, id string) {
 	md.Set(keyAppID, id)
+}
+
+func GetAuthorization(md metadata.MD) string {
+	return GetMetadata(md, keyAuthorization)
+}
+
+func SetAuthorization(md metadata.MD, a string) {
+	md.Set(keyAuthorization, a)
 }
 
 func GetMetadata(m metadata.MD, key string) string {
