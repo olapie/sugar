@@ -3,6 +3,7 @@ package stringutil
 import (
 	"errors"
 	"fmt"
+	"log"
 	"reflect"
 	"regexp"
 	"strings"
@@ -61,7 +62,7 @@ func squishFields(v reflect.Value) {
 	case reflect.Struct:
 		squishStructFields(v)
 	case reflect.String:
-		fmt.Println(v.CanSet(), v.String())
+		log.Println(v.CanSet(), v.String())
 		if v.CanSet() {
 			v.SetString(Squish(v.String()))
 		}

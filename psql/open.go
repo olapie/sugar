@@ -35,7 +35,7 @@ func (c *OpenOptions) String() string {
 	if c.UnixSocket {
 		u, err := user.Current()
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 			return ""
 		}
 		if c.Schema == "" {
@@ -103,12 +103,12 @@ func MustOpen(options *OpenOptions) *sql.DB {
 
 func OpenLocal() (*sql.DB, error) {
 	if db, err := Open(&OpenOptions{UnixSocket: true}); err == nil {
-		fmt.Println("Connected via unix socket")
+		log.Println("Connected via unix socket")
 		return db, nil
 	}
 	db, err := Open(NewOpenOptions())
 	if err == nil {
-		fmt.Println("Connected via tcp socket")
+		log.Println("Connected via tcp socket")
 	}
 	return db, err
 }

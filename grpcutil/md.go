@@ -89,19 +89,19 @@ func Sign(md metadata.MD) {
 func Verify(md metadata.MD, delaySeconds int) bool {
 	sign := GetMetadata(md, keySignature)
 	if sign == "" {
-		fmt.Println("missing", keySignature)
+		log.Println("missing", keySignature)
 		return false
 	}
 
 	b, err := base62.DecodeString(sign)
 	if err != nil {
-		fmt.Println("invalid", keySignature, err)
+		log.Println("invalid", keySignature, err)
 		return false
 	}
 	t := int64(binary.BigEndian.Uint64(b[1:]))
 	elapsed := time.Now().Unix() - t
 	if elapsed < -3 || elapsed > int64(delaySeconds) {
-		fmt.Println("invalid timestamp", t, elapsed)
+		log.Println("invalid timestamp", t, elapsed)
 		return false
 	}
 	clientID := GetClientID(md)

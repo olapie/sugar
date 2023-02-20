@@ -3,6 +3,7 @@ package ctxutil
 import (
 	"context"
 	"fmt"
+	"log"
 	"reflect"
 
 	"code.olapie.com/sugar/v2/rt"
@@ -55,7 +56,7 @@ func GetLogin[T comparable](ctx context.Context) T {
 	if actualVal.Type().ConvertibleTo(expectType) {
 		defer func() {
 			if msg := recover(); msg != nil {
-				fmt.Printf("[sugar/v2/contexts] GetLogin: %v\n", msg)
+				log.Printf("[sugar/v2/contexts] GetLogin: %v\n", msg)
 			}
 		}()
 		reflect.ValueOf(&expect).Elem().Set(reflect.ValueOf(v).Convert(expectType))

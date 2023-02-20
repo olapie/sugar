@@ -3,6 +3,7 @@ package netkit
 import (
 	"encoding/binary"
 	"fmt"
+	"log"
 	"net"
 	"sort"
 	"strings"
@@ -13,7 +14,7 @@ import (
 func ListMacAddresses() []string {
 	ifaces, err := net.Interfaces()
 	if err != nil {
-		fmt.Println("net.Interfaces:", err)
+		log.Println("net.Interfaces:", err)
 		return nil
 	}
 
@@ -29,7 +30,7 @@ func ListInterfaceNames() []string {
 	var a []string
 	ifaces, err := net.Interfaces()
 	if err != nil {
-		fmt.Println("net.Interfaces:", err)
+		log.Println("net.Interfaces:", err)
 		return nil
 	}
 	for _, ifa := range ifaces {
@@ -41,7 +42,7 @@ func ListInterfaceNames() []string {
 func ListIPNets(ifi *net.Interface) []*net.IPNet {
 	addrs, err := ifi.Addrs()
 	if err != nil {
-		fmt.Println("net.Interfaces:", err)
+		log.Println("net.Interfaces:", err)
 		return nil
 	}
 
@@ -89,7 +90,7 @@ func GetPrivateIPv4(ifi *net.Interface) net.IP {
 func GetPrivateIPv4Net(ifi *net.Interface) *net.IPNet {
 	addrs, err := ifi.Addrs()
 	if err != nil {
-		fmt.Println("net.Interface.Addrs:", err)
+		log.Println("net.Interface.Addrs:", err)
 		return nil
 	}
 

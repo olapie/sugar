@@ -9,7 +9,6 @@ import (
 	"syscall"
 	"time"
 
-	"code.olapie.com/sugar/v2"
 	"code.olapie.com/sugar/v2/olasec"
 	"golang.org/x/crypto/ssh/terminal"
 )
@@ -17,7 +16,7 @@ import (
 func main() {
 	pass := readConfirmedSecret("file password")
 	if len(pass) < 8 {
-		fmt.Println("Password is too short")
+		log.Println("Password is too short")
 		return
 	}
 	pk := sugar.MustGet(olasec.GeneratePrivateKey())
@@ -35,22 +34,22 @@ func main() {
 	sign := sugar.MustGet(ecdsa.SignASN1(rand.Reader, priKey, hash[:]))
 	ok := ecdsa.VerifyASN1(pubKey, hash[:], sign)
 	if !ok {
-		fmt.Println("Test failed")
+		log.Println("Test failed")
 	}
 
 	hash[0] = 20
 	ok = ecdsa.VerifyASN1(pubKey, hash[:], sign)
 	if ok {
-		fmt.Println("Test failed")
+		log.Println("Test failed")
 	}
-	fmt.Println("Test succeeded")
+	log.Println("Test succeeded")
 }
 
 func readConfirmedSecret(name string) string {
 	pass1 := readNonEmptyPassword(fmt.Sprintf("Enter %s: ", name))
 	pass2 := readNonEmptyPassword(fmt.Sprintf("Repeat %s: ", name))
 	if pass1 != pass2 {
-		fmt.Println("Inputs mismatch")
+		log.Println("Inputs mismatch")
 		return ""
 	}
 	return pass1
@@ -59,9 +58,9 @@ func readConfirmedSecret(name string) string {
 func readNonEmptyPassword(msg ...any) string {
 	var pass []byte
 	for len(pass) == 0 {
-		fmt.Print(msg...)
+		log.Print(msg...)
 		pass = sugar.MustGet(terminal.ReadPassword(syscall.Stdin))
-		fmt.Println()
+		log.Println()
 	}
 	return string(pass)
 }

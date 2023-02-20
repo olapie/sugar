@@ -2,7 +2,6 @@ package nomobile
 
 import (
 	"encoding/json"
-	"fmt"
 	"reflect"
 )
 
@@ -118,7 +117,7 @@ func (l *List[E]) Clone() *List[E] {
 func (l *List[E]) JSONString() string {
 	data, err := json.Marshal(l.elements)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return ""
 	}
 	return string(data)

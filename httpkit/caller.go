@@ -2,13 +2,18 @@ package httpkit
 
 import (
 	"bytes"
+	"code.olapie.com/sugar/v2/conv"
 	"context"
 	"encoding/json"
+	"encoding/xml"
+	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"reflect"
+	"sync"
 
 	"code.olapie.com/sugar/v2/rt"
 	"code.olapie.com/sugar/v2/urlutil"
@@ -28,7 +33,7 @@ type Caller[IN any, OUT any] struct {
 	Client     *http.Client
 	Method     string
 	Endpoint   string
-	BeforeCall RequestInterceptorFunc
+	BeforeCall func(req *http.Request) error
 }
 
 func NewCaller[IN any, OUT any](method string, endpoint string) *Caller[IN, OUT] {
@@ -44,7 +49,7 @@ func (c *Caller[IN, OUT]) WithQuery(query url.Values) *Caller[IN, OUT] {
 	var err error
 	cc.Endpoint, err = urlutil.AppendQuery(c.Endpoint, query)
 	if err != nil {
-		fmt.Println("httpkit.Caller.WithQuery", err)
+		log.Println("httpkit.Caller.WithQuery", err)
 	}
 	return &cc
 }
@@ -151,7 +156,7 @@ func (c *Caller[IN, OUT]) call(ctx context.Context, input IN) (*http.Response, e
 		}
 	}
 
-	fmt.Println(req.Method, req.URL.String())
+	log.Println(req.Method, req.URL.String())
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -252,4 +257,66 @@ func NewTrace[T any](endpoint string) *Caller[T, T] {
 
 func NewConnect(endpoint string) *Caller[void, void] {
 	return NewCaller[void, void](http.MethodConnect, endpoint)
+}
+
+type UnmarshalFunc func([]byte, any) error
+
+var contentTypeToUnmarshalFunc sync.Map
+
+func init() {
+	RegisterUnmarshalFunc(JSON, json.Unmarshal)
+	RegisterUnmarshalFunc(JsonUTF8, json.Unmarshal)
+	RegisterUnmarshalFunc(XML, xml.Unmarshal)
+	RegisterUnmarshalFunc(XML2, xml.Unmarshal)
+	RegisterUnmarshalFunc(XmlUTF8, xml.Unmarshal)
+}
+
+func RegisterUnmarshalFunc(contentType string, f UnmarshalFunc) {
+	contentTypeToUnmarshalFunc.Store(contentType, f)
+}
+
+func GetUnmarshalFunc(contentType string) UnmarshalFunc {
+	v, ok := contentTypeToUnmarshalFunc.Load(contentType)
+	if ok {
+		u, _ := v.(UnmarshalFunc)
+		return u
+	}
+	return nil
+}
+
+func GetResponseResult[T any](resp *http.Response) (T, error) {
+	var res T
+	body, err := io.ReadAll(resp.Body)
+	resp.Body.Close()
+	if err != nil {
+		return res, fmt.Errorf("read resp body: %v", err)
+	}
+	if resp.StatusCode >= http.StatusBadRequest {
+		return res, xerror.New(resp.StatusCode, string(body))
+	}
+
+	if any(res) == nil {
+		return res, nil
+	}
+
+	if val := reflect.ValueOf(res); val.Kind() == reflect.Struct && val.Type().NumField() == 0 {
+		return res, nil
+	}
+
+	ct := GetContentType(resp.Header)
+	if f := GetUnmarshalFunc(ct); f != nil {
+		err = f(body, &res)
+		return res, xerror.Wrapf(err, "unmarshal")
+	}
+
+	if len(body) == 0 {
+		err = errors.New("no data")
+	} else if _, ok := any(res).([]byte); ok {
+		res = any(body).(T)
+	} else {
+		if err = conv.SetBytes(&res, body); err != nil {
+			err = fmt.Errorf("cannot handle %s: %w ", ct, err)
+		}
+	}
+	return res, err
 }

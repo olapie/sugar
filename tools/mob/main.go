@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"embed"
 	_ "embed"
-	"fmt"
 	"html/template"
+	"log"
 	"os"
 	"strings"
 
@@ -39,22 +39,22 @@ func main() {
 	).ParseFS(templatesDir, "templates/*"))
 
 	for _, elem := range basicTypes {
-		fmt.Println(elem)
+		log.Println(elem)
 		output.WriteString("\n\n")
 		sugar.MustNil(tpl.ExecuteTemplate(output, "list", types.M{"Elem": elem}))
 	}
 	for _, elem := range basicTypes {
-		fmt.Println(elem)
+		log.Println(elem)
 		output.WriteString("\n\n")
 		sugar.MustNil(tpl.ExecuteTemplate(output, "set", types.M{"Elem": elem}))
 	}
 	for _, elem := range basicTypes {
-		fmt.Println(elem)
+		log.Println(elem)
 		output.WriteString("\n\n")
 		sugar.MustNil(tpl.ExecuteTemplate(output, "pair", types.M{"Elem": elem}))
 	}
 	for _, elem := range basicTypes {
-		fmt.Println(elem)
+		log.Println(elem)
 		output.WriteString("\n\n")
 		sugar.MustNil(tpl.ExecuteTemplate(output, "result", types.M{"Elem": elem}))
 	}
@@ -66,7 +66,7 @@ func main() {
 
 	for _, key := range keys {
 		for _, val := range values {
-			fmt.Println(key, val)
+			log.Println(key, val)
 			output.WriteString("\n")
 			sugar.MustNil(tpl.ExecuteTemplate(output, "map", types.M{"Key": key, "Value": val}))
 		}
@@ -97,7 +97,7 @@ func main() {
 
 	sugar.MustNil(os.WriteFile("mob.gen.go", []byte(s), 0644))
 
-	fmt.Println("Done")
+	log.Println("Done")
 }
 
 func typeToName(typ string) string {

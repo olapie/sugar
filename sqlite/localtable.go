@@ -112,7 +112,7 @@ func (t *LocalTable[R]) SaveRemote(ctx context.Context, localID string, category
 	}
 
 	if exists {
-		fmt.Println("Skipped locally deleted record", localID)
+		log.Println("Skipped locally deleted record", localID)
 		return nil
 	}
 
@@ -123,7 +123,7 @@ func (t *LocalTable[R]) SaveRemote(ctx context.Context, localID string, category
 	}
 
 	if exists {
-		fmt.Println("Don't overwrite newly updated local record", localID)
+		log.Println("Don't overwrite newly updated local record", localID)
 		return nil
 	}
 
@@ -437,9 +437,9 @@ func (t *LocalTable[R]) CleanLocals(ctx context.Context) error {
 	}
 	n, err := res.RowsAffected()
 	if err != nil {
-		fmt.Println("failed getting affected rows count", err)
+		log.Println("failed getting affected rows count", err)
 	} else {
-		fmt.Printf("deleted %d locals which have been saved remotely\n", n)
+		log.Printf("deleted %d locals which have been saved remotely\n", n)
 	}
 	return nil
 }
@@ -550,7 +550,7 @@ func (t *LocalTable[R]) writeEncryptedData(ctx context.Context, tableName string
 		if err != nil {
 			return err
 		}
-		fmt.Println("Updated encrypted data", tableName, id)
+		log.Println("Updated encrypted data", tableName, id)
 	}
 	return nil
 }

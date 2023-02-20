@@ -1,7 +1,6 @@
 package mob
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -18,19 +17,19 @@ func (d *DirInfo) MustMakeDirs() {
 	if d.Document != "" {
 		MustMkdir(d.Document)
 	} else {
-		fmt.Println("Document directory is not specified")
+		log.Println("Document directory is not specified")
 	}
 
 	if d.Cache != "" {
 		MustMkdir(d.Cache)
 	} else {
-		fmt.Println("Cache directory is not specified")
+		log.Println("Cache directory is not specified")
 	}
 
 	if d.Temporary != "" {
 		MustMkdir(d.Temporary)
 	} else {
-		fmt.Println("Temporary directory is not specified")
+		log.Println("Temporary directory is not specified")
 	}
 }
 
@@ -70,7 +69,7 @@ func GetDiskSize(path string) int64 {
 		return err
 	})
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return 0
 	}
 	return sum

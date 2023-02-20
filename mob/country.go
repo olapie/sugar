@@ -3,7 +3,6 @@ package mob
 import (
 	_ "embed"
 	"encoding/json"
-	"fmt"
 	"sync"
 )
 
@@ -33,7 +32,7 @@ var loadCountriesOnce sync.Once
 func loadCountries() {
 	loadCountriesOnce.Do(func() {
 		if err := json.Unmarshal([]byte(countriesJSONString), &countries); err != nil {
-			fmt.Println(err)
+			log.Println(err)
 			countries = []*Country{}
 			return
 		}

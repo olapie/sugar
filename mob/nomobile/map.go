@@ -1,10 +1,8 @@
 package nomobile
 
 import (
-	"encoding/json"
-	"fmt"
-
 	"code.olapie.com/sugar/v2/maps"
+	"encoding/json"
 )
 
 type Map[K comparable, V any] struct {
@@ -62,7 +60,7 @@ func (m *Map[K, V]) InsertMap(m2 *Map[K, V]) {
 func (m *Map[K, V]) JSONString() string {
 	data, err := json.Marshal(m.m)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return ""
 	}
 	return string(data)

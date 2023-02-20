@@ -2,6 +2,7 @@ package termutil
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strings"
 	"syscall"
@@ -30,10 +31,10 @@ func ReadOne() (byte, error) {
 func ReadPassword(msg ...any) string {
 	var pass []byte
 	for len(pass) == 0 {
-		fmt.Print(msg...)
-		fmt.Print(": ")
+		log.Print(msg...)
+		log.Print(": ")
 		pass = sugar.MustGet(terminal.ReadPassword(syscall.Stdin))
-		fmt.Println()
+		log.Println()
 	}
 	return string(pass)
 }
@@ -54,7 +55,7 @@ func ConfirmInput(answer string) bool {
 	if answer == "" {
 		panic("answer cannot be empty")
 	}
-	fmt.Printf("Enter '%s' to confirm: ", answer)
+	log.Printf("Enter '%s' to confirm: ", answer)
 	var actual string
 	fmt.Scanln(&actual)
 	return actual == answer

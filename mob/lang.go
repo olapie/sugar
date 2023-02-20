@@ -1,7 +1,6 @@
 package mob
 
 import (
-	"fmt"
 	"os"
 	"strings"
 )
@@ -18,7 +17,7 @@ var lang langT = english
 
 func SetLang(l string) {
 	if err := os.Setenv("LANG", l); err != nil {
-		fmt.Println("cannot set os lang", err)
+		log.Println("cannot set os lang", err)
 	}
 	l = strings.ToLower(l)
 	strings.Replace(l, "-", "_", -1)

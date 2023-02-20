@@ -311,7 +311,7 @@ func buildFileTreeNode(parent *FileTreeNode, id string, idToEntry map[string]nom
 
 	entry, exists := idToEntry[id]
 	if !exists {
-		fmt.Println("Warn: no entry for file id", id)
+		log.Println("Warn: no entry for file id", id)
 		return
 	}
 	delete(idToEntry, id)
