@@ -17,17 +17,17 @@ var (
 )
 
 type CompressedWriter struct {
-	*Writer
+	*WrapResponseWriter
 	compressWriter io.Writer
 	err            error
 	hasBody        bool
 }
 
-func NewCompressedWriter(w *Writer, encoding string) (*CompressedWriter, error) {
+func NewCompressedWriter(w *WrapResponseWriter, encoding string) (*CompressedWriter, error) {
 	switch encoding {
 	case "gzip":
 		cw := &CompressedWriter{}
-		cw.Writer = w
+		cw.WrapResponseWriter = w
 		cw.compressWriter = gzip.NewWriter(w)
 		SetContentEncoding(w.Header(), encoding)
 		return cw, nil
@@ -38,7 +38,7 @@ func NewCompressedWriter(w *Writer, encoding string) (*CompressedWriter, error) 
 		}
 		cw := &CompressedWriter{}
 		cw.compressWriter = fw
-		cw.Writer = w
+		cw.WrapResponseWriter = w
 		SetContentEncoding(w.Header(), encoding)
 		return cw, nil
 	default:
@@ -60,7 +60,7 @@ func (w *CompressedWriter) Flush() {
 			log.Println("flush", err)
 			w.err = err
 		}
-		w.Writer.Flush()
+		w.WrapResponseWriter.Flush()
 	}
 }
 
@@ -70,7 +70,7 @@ func (w *CompressedWriter) Error() error {
 
 func (w *CompressedWriter) Close() error {
 	if !w.hasBody {
-		w.Writer.Flush()
+		w.WrapResponseWriter.Flush()
 		return nil
 	}
 	if closer, ok := w.compressWriter.(io.Closer); ok {
@@ -86,9 +86,9 @@ func CompressWriter(w http.ResponseWriter, encodings ...string) (http.ResponseWr
 		return w, nil
 	}
 
-	rw, _ := w.(*Writer)
+	rw, _ := w.(*WrapResponseWriter)
 	if rw == nil {
-		rw = NewWriter(w)
+		rw = NewWrapResponseWriter(w)
 	}
 
 	if len(encodings) == 0 {

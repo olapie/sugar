@@ -9,9 +9,9 @@ type joinHandler struct {
 }
 
 func (j *joinHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	w, ok := writer.(*Writer)
+	w, ok := writer.(*WrapResponseWriter)
 	if !ok {
-		w = NewWriter(writer)
+		w = NewWrapResponseWriter(writer)
 	}
 
 	for _, h := range j.handlers {
@@ -32,9 +32,9 @@ func JoinHandlers(handlers ...http.Handler) http.Handler {
 
 func JoinHandlerFuncs(funcs ...http.HandlerFunc) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
-		w, ok := writer.(*Writer)
+		w, ok := writer.(*WrapResponseWriter)
 		if !ok {
-			w = NewWriter(writer)
+			w = NewWrapResponseWriter(writer)
 		}
 
 		for _, f := range funcs {

@@ -8,7 +8,7 @@ import (
 
 var _ io.Writer = (*DecryptedWriter)(nil)
 
-// DecryptedWriter decrypts and writes data into original Writer
+// DecryptedWriter decrypts and writes data into original WrapResponseWriter
 type DecryptedWriter struct {
 	w               io.Writer
 	stream          *cipherStream
