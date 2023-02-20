@@ -6,8 +6,6 @@ import (
 	"mime"
 	"net/http"
 	"strings"
-
-	"code.olapie.com/sugar/v2/conv"
 )
 
 const (
@@ -132,7 +130,7 @@ func IsJSON[T string | http.Header](typeOrHeader T) bool {
 }
 
 type HeaderTypes interface {
-	http.Header | Header | *Header | map[string]string | map[string][]string
+	http.Header | map[string]string | map[string][]string
 }
 
 func GetHeader[H HeaderTypes](h H, key string) string {
@@ -147,10 +145,6 @@ func GetHeader[H HeaderTypes](h H, key string) string {
 		return getHeader(m, key)
 	case http.Header:
 		return getHeader(m, key)
-	case Header:
-		return getHeader(m.Header, key)
-	case *Header:
-		return getHeader(m.Header, key)
 	}
 	return ""
 }
@@ -174,10 +168,6 @@ func SetHeader[H HeaderTypes](h H, key, value string) {
 		hh := http.Header(m)
 		hh.Set(key, value)
 	case http.Header:
-		m.Set(key, value)
-	case Header:
-		m.Set(key, value)
-	case *Header:
 		m.Set(key, value)
 	default:
 		panic(fmt.Sprintf("unsupported type %T", h))
@@ -215,7 +205,7 @@ func SetContentType(h http.Header, contentType string) {
 	h.Set(KeyContentType, contentType)
 }
 
-func SetContentTypeIfNX(h http.Header, contentType string) {
+func SetContentTypeNX(h http.Header, contentType string) {
 	SetHeaderNX(h, KeyContentType, contentType)
 }
 
@@ -345,84 +335,4 @@ func CreateUserAuthorizations(userToPassword map[string]string) map[string]strin
 		userToAuthorization[user] = "Basic " + base64.StdEncoding.EncodeToString([]byte(account))
 	}
 	return userToAuthorization
-}
-
-type Header struct {
-	http.Header
-}
-
-func NewHeader() *Header {
-	return &Header{
-		Header: make(http.Header),
-	}
-}
-
-func (h *Header) WriteTo(rw http.ResponseWriter) {
-	for k, v := range h.Header {
-		rw.Header()[k] = v
-	}
-}
-
-func (h *Header) Clone() *Header {
-	c := &Header{
-		Header: make(http.Header),
-	}
-	for k, v := range h.Header {
-		c.Header[k] = v
-	}
-	return c
-}
-
-func (h *Header) AllowOrigins(origins ...string) {
-	h.Header[KeyACLAllowOrigin] = origins
-}
-
-func (h *Header) SetAuthorization(credential string) {
-	h.Set(KeyAuthorization, credential)
-}
-
-func (h *Header) SetBasicAuthorization(account, password string) {
-	credential := []byte(account + ":" + password)
-	h.Set(KeyAuthorization, "Basic "+base64.StdEncoding.EncodeToString(credential))
-}
-
-func (h *Header) Authorization() string {
-	return h.Get(KeyAuthorization)
-}
-
-func (h *Header) SetClientID(id string) {
-	h.Set(keyClientID, id)
-}
-
-func (h *Header) ClientID() string {
-	return h.Get(keyClientID)
-}
-
-func (h *Header) SetAppID(id string) {
-	h.Set(keyAppID, id)
-}
-
-func (h *Header) AppID() string {
-	return h.Get(keyAppID)
-}
-
-func (h *Header) AllowMethods(methods ...string) {
-	// Combine multiple values separated by comma. Multiple lines style is also fine.
-	h.Header.Set(KeyACLAllowMethods, strings.Join(methods, ","))
-}
-
-func (h *Header) AllowCredentials(b bool) {
-	h.Header.Set(KeyACLAllowCredentials, conv.MustToString(b))
-}
-
-func (h *Header) AllowHeaders(headers ...string) {
-	h.Header.Set(KeyACLAllowHeaders, strings.Join(headers, ","))
-}
-
-func (h *Header) ExposeHeaders(headers ...string) {
-	h.Header.Set(KeyACLExposeHeaders, strings.Join(headers, ","))
-}
-
-func (h *Header) SetContentEncoding(encoding string) {
-	h.Header.Set(KeyContentEncoding, encoding)
 }
