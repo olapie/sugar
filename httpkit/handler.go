@@ -27,3 +27,19 @@ func JoinHandlers(handlers ...http.Handler) http.Handler {
 		handlers: handlers,
 	}
 }
+
+func JoinHandlerFuncs(funcs ...http.HandlerFunc) http.HandlerFunc {
+	return func(writer http.ResponseWriter, request *http.Request) {
+		w, ok := writer.(*Writer)
+		if !ok {
+			w = NewWriter(writer)
+		}
+
+		for _, f := range funcs {
+			f.ServeHTTP(w, request)
+			if w.Status() != 0 {
+				return
+			}
+		}
+	}
+}
