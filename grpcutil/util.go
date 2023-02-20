@@ -3,6 +3,8 @@ package grpcutil
 import (
 	"code.olapie.com/sugar/v2/base62"
 	"context"
+	"crypto/tls"
+	"google.golang.org/grpc/credentials"
 	"net/http"
 	"reflect"
 	"time"
@@ -112,4 +114,16 @@ func SignClientContext(ctx context.Context) context.Context {
 
 	Sign(md)
 	return metadata.NewOutgoingContext(ctx, md)
+}
+
+func WithClientCert(cert []byte) grpc.DialOption {
+	config := &tls.Config{
+		Certificates: []tls.Certificate{
+			{
+				Certificate: [][]byte{cert},
+			},
+		},
+		ClientAuth: tls.RequireAndVerifyClientCert,
+	}
+	return grpc.WithTransportCredentials(credentials.NewTLS(config))
 }
