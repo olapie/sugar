@@ -1,6 +1,8 @@
 package httpkit
 
-import "net/http"
+import (
+	"net/http"
+)
 
 type joinHandler struct {
 	handlers []http.Handler
