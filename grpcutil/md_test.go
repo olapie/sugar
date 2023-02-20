@@ -26,7 +26,7 @@ func TestSign(t *testing.T) {
 	hash := hashutil.Hash32(fmt.Sprintf("%x", ts))
 	copy(b[4:], hash[:])
 	sign := base62.EncodeToString(b[:])
-	md.Set(keySignature, sign)
+	md.Set(keyAPIKey, sign)
 	if Verify(md, 1) {
 		t.FailNow()
 	}

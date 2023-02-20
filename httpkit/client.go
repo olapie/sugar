@@ -33,26 +33,8 @@ func DoWithResponse(ctx context.Context, method, url string, body io.Reader) (*h
 }
 
 func Do(ctx context.Context, method, url string, body io.Reader) error {
-	req, err := http.NewRequestWithContext(ctx, method, url, body)
-	if err != nil {
-		return fmt.Errorf("http.NewRequest: %w", err)
-	}
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return fmt.Errorf("http.DefaultClient.Do: %w", err)
-	}
-
-	if resp.StatusCode < 400 {
-		return nil
-	}
-
-	message, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("io.ReadAll: %w", err)
-	}
-	resp.Body.Close()
-	return xerror.New(resp.StatusCode, string(message))
+	_, err := DoWithResponse(ctx, method, url, body)
+	return err
 }
 
 func Post(ctx context.Context, url string, body io.Reader) error {

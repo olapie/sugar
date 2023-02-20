@@ -30,10 +30,10 @@ const (
 	KeyAcceptLanguage      = "Accept-Language"
 	KeyETag                = "ETag"
 
-	keyClientID  = "X-Client-Id"
-	keyAppID     = "X-App-Id"
-	keyTraceID   = "X-Trace-Id"
-	keySignature = "X-Sign"
+	keyClientID = "X-Client-Id"
+	keyAppID    = "X-App-Id"
+	keyTraceID  = "X-Trace-Id"
+	keyAPIKey   = "X-Sign"
 )
 
 const (
