@@ -15,7 +15,9 @@ func Sign(req *http.Request) {
 	t := time.Now().Unix()
 	var b [40]byte
 	binary.BigEndian.PutUint64(b[:], uint64(t))
-	hash := hashutil.Hash32(fmt.Sprint(t))
+	clientID := GetClientID(req.Header)
+	traceID := GetTraceID(req.Header)
+	hash := hashutil.Hash32(fmt.Sprint(t) + traceID + clientID)
 	copy(b[8:], hash[:])
 	sign := base62.EncodeToString(b[:])
 	req.Header.Set(keySignature, sign)
@@ -41,7 +43,9 @@ func Verify(req *http.Request) bool {
 		fmt.Println("invalid timestamp", t, elapsed)
 		return false
 	}
-	hash := hashutil.Hash32(fmt.Sprint(t))
+	clientID := GetClientID(req.Header)
+	traceID := GetTraceID(req.Header)
+	hash := hashutil.Hash32(fmt.Sprint(t) + traceID + clientID)
 	equal := bytes.Equal(b[8:], hash[:])
 	return equal
 }

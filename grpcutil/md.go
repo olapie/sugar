@@ -68,7 +68,9 @@ func Sign(md metadata.MD) {
 	t := time.Now().Unix()
 	var b [40]byte
 	binary.BigEndian.PutUint64(b[:], uint64(t))
-	hash := hashutil.Hash32(fmt.Sprint(t))
+	clientID := GetClientID(md)
+	traceID := GetTraceID(md)
+	hash := hashutil.Hash32(fmt.Sprint(t) + traceID + clientID)
 	copy(b[8:], hash[:])
 	sign := base62.EncodeToString(b[:])
 	md.Set(keySignature, sign)
@@ -94,7 +96,9 @@ func Verify(md metadata.MD) bool {
 		fmt.Println("invalid timestamp", t, elapsed)
 		return false
 	}
-	hash := hashutil.Hash32(fmt.Sprint(t))
+	clientID := GetClientID(md)
+	traceID := GetTraceID(md)
+	hash := hashutil.Hash32(fmt.Sprint(t) + traceID + clientID)
 	equal := bytes.Equal(b[8:], hash[:])
 	return equal
 }
