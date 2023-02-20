@@ -8,7 +8,6 @@ import (
 
 	"code.olapie.com/log"
 	"code.olapie.com/sugar/v2/ctxutil"
-	"code.olapie.com/sugar/v2/httpkit"
 	"code.olapie.com/sugar/v2/xerror"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -33,13 +32,13 @@ var statusToCodeMap = map[int]codes.Code{
 	http.StatusServiceUnavailable:  codes.Unavailable,
 }
 
-func ServerStart(ctx context.Context, info *grpc.UnaryServerInfo, verifier httpkit.Verifier) (context.Context, error) {
+func ServerStart(ctx context.Context, info *grpc.UnaryServerInfo) (context.Context, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return nil, status.Error(codes.InvalidArgument, "failed reading request metadata")
 	}
 
-	if !verifier.Verify(ctx, http.Header(md)) {
+	if !Verify(md) {
 		return nil, status.Error(codes.InvalidArgument, "failed verifying")
 	}
 
@@ -81,14 +80,11 @@ func ServerFinish(resp any, err error, logger *log.Logger, startAt time.Time) (a
 	return nil, status.Error(code, err.Error())
 }
 
-func SignClientContext(ctx context.Context, signer httpkit.Signer) (context.Context, error) {
+func SignClientContext(ctx context.Context) context.Context {
 	md, ok := metadata.FromOutgoingContext(ctx)
 	if !ok {
 		md = make(metadata.MD)
 	}
-	err := signer.Sign(ctx, http.Header(md))
-	if err != nil {
-		return nil, err
-	}
-	return metadata.NewOutgoingContext(ctx, md), nil
+	Sign(md)
+	return metadata.NewOutgoingContext(ctx, md)
 }
