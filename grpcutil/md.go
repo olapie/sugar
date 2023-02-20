@@ -1,24 +1,32 @@
 package grpcutil
 
 import (
+	"bytes"
+	"encoding/binary"
+	"fmt"
 	"strings"
+	"time"
 
+	"code.olapie.com/sugar/v2/base62"
+	"code.olapie.com/sugar/v2/hashutil"
 	"google.golang.org/grpc/metadata"
 )
 
 const (
-	keyClientID = "x-client-id"
-	keyAppID    = "x-app-id"
-	keyTraceID  = "x-trace-id"
-	keyUserID   = "x-user-id"
+	keyClientID  = "x-client-id"
+	keyAppID     = "x-app-id"
+	keyTraceID   = "x-trace-id"
+	keySignature = "x-sign"
 )
 
-func GetUserID(md metadata.MD) string {
-	return GetMetadata(md, keyUserID)
-}
-
-func SetUserID(md metadata.MD, id string) {
-	md.Set(keyUserID, id)
+func MatchMetadata(key string) (string, bool) {
+	key = strings.ToLower(key)
+	switch key {
+	case keyClientID, keyAppID, keyTraceID, keySignature:
+		return key, true
+	default:
+		return "", false
+	}
 }
 
 func GetTraceID(md metadata.MD) string {
@@ -54,4 +62,39 @@ func GetMetadata(m metadata.MD, key string) string {
 		return ""
 	}
 	return v[0]
+}
+
+func Sign(md metadata.MD) {
+	t := time.Now().Unix()
+	var b [40]byte
+	binary.BigEndian.PutUint64(b[:], uint64(t))
+	hash := hashutil.Hash32(fmt.Sprint(t))
+	copy(b[8:], hash[:])
+	sign := base62.EncodeToString(b[:])
+	md.Set(keySignature, sign)
+}
+
+func Verify(md metadata.MD) bool {
+	sign := GetMetadata(md, keySignature)
+	if sign == "" {
+		fmt.Println("missing", keySignature)
+		return false
+	}
+
+	var b [40]byte
+	decoded, err := base62.DecodeString(sign)
+	if err != nil {
+		fmt.Println("invalid", keySignature, err)
+		return false
+	}
+	copy(b[40-len(decoded):], decoded)
+	t := int64(binary.BigEndian.Uint64(b[:]))
+	elapsed := time.Now().Unix() - t
+	if elapsed < -3 || elapsed > 10 {
+		fmt.Println("invalid timestamp", t, elapsed)
+		return false
+	}
+	hash := hashutil.Hash32(fmt.Sprint(t))
+	equal := bytes.Equal(b[8:], hash[:])
+	return equal
 }
