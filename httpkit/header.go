@@ -30,10 +30,10 @@ const (
 	KeyAcceptLanguage      = "Accept-Language"
 	KeyETag                = "ETag"
 
-	keyClientID = "x-client-id"
-	keyAppID    = "x-app-id"
-	keyTraceID  = "x-trace-id"
-	keyUserID   = "x-user-id"
+	keyClientID  = "X-Client-Id"
+	keyAppID     = "X-App-Id"
+	keyTraceID   = "X-Trace-Id"
+	keySignature = "X-Sign"
 )
 
 const (
@@ -188,14 +188,6 @@ func GetContentEncoding(h http.Header, encoding string) string {
 
 func SetContentEncoding[H HeaderTypes](h H, encoding string) {
 	SetHeader(h, KeyContentEncoding, encoding)
-}
-
-func GetUserID[H HeaderTypes](h H) string {
-	return GetHeader(h, keyUserID)
-}
-
-func SetUserID[H HeaderTypes](h H, id string) {
-	SetHeader(h, keyUserID, id)
 }
 
 func GetTraceID[H HeaderTypes](h H) string {
