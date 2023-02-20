@@ -1,6 +1,7 @@
 package grpcutil
 
 import (
+	"code.olapie.com/sugar/v2/base62"
 	"context"
 	"net/http"
 	"reflect"
@@ -86,6 +87,29 @@ func SignClientContext(ctx context.Context) context.Context {
 	if !ok {
 		md = make(metadata.MD)
 	}
+
+	if traceID := GetTraceID(md); traceID == "" {
+		traceID = ctxutil.GetTraceID(ctx)
+		if traceID == "" {
+			traceID = base62.NewUUIDString()
+		}
+		SetTraceID(md, traceID)
+	}
+
+	if clientID := GetClientID(md); clientID == "" {
+		clientID = ctxutil.GetClientID(ctx)
+		if clientID != "" {
+			SetClientID(md, clientID)
+		}
+	}
+
+	if appID := GetAppID(md); appID == "" {
+		appID = ctxutil.GetAppID(ctx)
+		if appID != "" {
+			SetAppID(md, appID)
+		}
+	}
+
 	Sign(md)
 	return metadata.NewOutgoingContext(ctx, md)
 }
