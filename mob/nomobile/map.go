@@ -1,8 +1,10 @@
 package nomobile
 
 import (
-	"code.olapie.com/sugar/v2/maps"
 	"encoding/json"
+	"log"
+
+	"code.olapie.com/sugar/v2/maps"
 )
 
 type Map[K comparable, V any] struct {

@@ -2,13 +2,14 @@ package grpcutil
 
 import (
 	"bytes"
-	"code.olapie.com/sugar/v2/base62"
-	"code.olapie.com/sugar/v2/hashutil"
 	"encoding/binary"
 	"fmt"
-	"google.golang.org/grpc/metadata"
 	"log"
 	"time"
+
+	"code.olapie.com/sugar/v2/base62"
+	"code.olapie.com/sugar/v2/hashutil"
+	"google.golang.org/grpc/metadata"
 )
 
 func SetAPIKey(md metadata.MD) {
@@ -21,19 +22,19 @@ func SetAPIKey(md metadata.MD) {
 	hash := hashutil.Hash32(fmt.Sprint(t) + traceID + clientID)
 	copy(b[9:], hash[:])
 	sign := base62.EncodeToString(b[:])
-	md.Set(keyAPIKey, sign)
+	md.Set(KeyAPIKey, sign)
 }
 
 func VerifyAPIKey(md metadata.MD, delaySeconds int) bool {
-	sign := GetMetadata(md, keyAPIKey)
+	sign := GetMetadata(md, KeyAPIKey)
 	if sign == "" {
-		log.Println("missing", keyAPIKey)
+		log.Println("missing", KeyAPIKey)
 		return false
 	}
 
 	b, err := base62.DecodeString(sign)
 	if err != nil {
-		log.Println("invalid", keyAPIKey, err)
+		log.Println("invalid", KeyAPIKey, err)
 		return false
 	}
 	t := int64(binary.BigEndian.Uint64(b[1:]))

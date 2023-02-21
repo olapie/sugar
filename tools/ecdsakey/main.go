@@ -5,10 +5,12 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"fmt"
+	"log"
 	"os"
 	"syscall"
 	"time"
 
+	"code.olapie.com/sugar/v2"
 	"code.olapie.com/sugar/v2/olasec"
 	"golang.org/x/crypto/ssh/terminal"
 )

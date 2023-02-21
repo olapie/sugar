@@ -1,22 +1,23 @@
 package grpcutil
 
 import (
-	"google.golang.org/grpc/metadata"
 	"strings"
+
+	"google.golang.org/grpc/metadata"
 )
 
 const (
-	keyClientID      = "x-client-id"
-	keyAppID         = "x-app-id"
-	keyTraceID       = "x-trace-id"
-	keyAPIKey        = "x-api-key"
+	KeyClientID      = "x-client-id"
+	KeyAppID         = "x-app-id"
+	KeyTraceID       = "x-trace-id"
+	KeyAPIKey        = "x-api-key"
 	keyAuthorization = "authorization"
 )
 
 func MatchMetadata(key string) (string, bool) {
 	key = strings.ToLower(key)
 	switch key {
-	case keyClientID, keyAppID, keyTraceID, keyAPIKey:
+	case KeyClientID, KeyAppID, KeyTraceID, KeyAPIKey:
 		return key, true
 	default:
 		return "", false
@@ -24,27 +25,27 @@ func MatchMetadata(key string) (string, bool) {
 }
 
 func GetTraceID(md metadata.MD) string {
-	return GetMetadata(md, keyTraceID)
+	return GetMetadata(md, KeyTraceID)
 }
 
 func SetTraceID(md metadata.MD, id string) {
-	md.Set(keyTraceID, id)
+	md.Set(KeyTraceID, id)
 }
 
 func GetClientID(md metadata.MD) string {
-	return GetMetadata(md, keyClientID)
+	return GetMetadata(md, KeyClientID)
 }
 
 func SetClientID(md metadata.MD, id string) {
-	md.Set(keyClientID, id)
+	md.Set(KeyClientID, id)
 }
 
 func GetAppID(md metadata.MD) string {
-	return GetMetadata(md, keyAppID)
+	return GetMetadata(md, KeyAppID)
 }
 
 func SetAppID(md metadata.MD, id string) {
-	md.Set(keyAppID, id)
+	md.Set(KeyAppID, id)
 }
 
 func GetAuthorization(md metadata.MD) string {

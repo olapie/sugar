@@ -1,21 +1,23 @@
-package httpkit
+package httpwriter
 
 import (
-	"code.olapie.com/sugar/v2/jsonutil"
-	"code.olapie.com/sugar/v2/xerror"
 	"io"
 	"log"
 	"net/http"
 	"strconv"
+
+	"code.olapie.com/sugar/v2/httpheader"
+	"code.olapie.com/sugar/v2/jsonutil"
+	"code.olapie.com/sugar/v2/xerror"
 )
 
-func RequireBasicAuthenticate(realm string, w http.ResponseWriter) {
+func RequireBasicAuthenticate(w http.ResponseWriter, realm string) {
 	a := "Basic realm=" + strconv.Quote(realm)
-	w.Header().Set(KeyWWWAuthenticate, a)
+	w.Header().Set(httpheader.KeyWWWAuthenticate, a)
 	w.WriteHeader(http.StatusUnauthorized)
 }
 
-func WriteError(w http.ResponseWriter, err error) {
+func Error(w http.ResponseWriter, err error) {
 	if err == nil {
 		w.WriteHeader(http.StatusOK)
 		return
@@ -33,8 +35,8 @@ func WriteError(w http.ResponseWriter, err error) {
 	}
 }
 
-func WriteJSON(w http.ResponseWriter, v any) {
-	SetContentType(w.Header(), JSON)
+func JSON(w http.ResponseWriter, v any) {
+	httpheader.SetContentType(w.Header(), httpheader.JSON)
 	_, err := w.Write(jsonutil.ToBytes(v))
 	if err != nil {
 		log.Println(err)
@@ -43,9 +45,9 @@ func WriteJSON(w http.ResponseWriter, v any) {
 
 func StreamFile(w http.ResponseWriter, name string, f io.ReadCloser) {
 	defer f.Close()
-	SetContentType(w.Header(), OctetStream)
+	httpheader.SetContentType(w.Header(), httpheader.OctetStream)
 	if name != "" {
-		w.Header().Set(KeyContentDisposition, ToAttachment(name))
+		w.Header().Set(httpheader.KeyContentDisposition, httpheader.ToAttachment(name))
 	}
 	_, err := io.Copy(w, f)
 	if err != nil {

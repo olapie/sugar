@@ -1,7 +1,9 @@
-package httpkit
+package httphandler
 
 import (
 	"net/http"
+
+	"code.olapie.com/sugar/v2/httpwriter"
 )
 
 type joinHandler struct {
@@ -9,9 +11,9 @@ type joinHandler struct {
 }
 
 func (j *joinHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	w, ok := writer.(*WrapResponseWriter)
+	w, ok := writer.(*httpwriter.Wrapper)
 	if !ok {
-		w = NewWrapResponseWriter(writer)
+		w = httpwriter.NewWrapper(writer)
 	}
 
 	for _, h := range j.handlers {
@@ -24,17 +26,17 @@ func (j *joinHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reques
 
 var _ http.Handler = (*joinHandler)(nil)
 
-func JoinHandlers(handlers ...http.Handler) http.Handler {
+func Join(handlers ...http.Handler) http.Handler {
 	return &joinHandler{
 		handlers: handlers,
 	}
 }
 
-func JoinHandlerFuncs(funcs ...http.HandlerFunc) http.HandlerFunc {
+func JoinFuncs(funcs ...http.HandlerFunc) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
-		w, ok := writer.(*WrapResponseWriter)
+		w, ok := writer.(*httpwriter.Wrapper)
 		if !ok {
-			w = NewWrapResponseWriter(writer)
+			w = httpwriter.NewWrapper(writer)
 		}
 
 		for _, f := range funcs {

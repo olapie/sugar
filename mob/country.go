@@ -3,6 +3,7 @@ package mob
 import (
 	_ "embed"
 	"encoding/json"
+	"log"
 	"sync"
 )
 

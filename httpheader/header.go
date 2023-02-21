@@ -1,4 +1,4 @@
-package httpkit
+package httpheader
 
 import (
 	"encoding/base64"
@@ -28,10 +28,10 @@ const (
 	KeyAcceptLanguage      = "Accept-Language"
 	KeyETag                = "ETag"
 
-	keyClientID = "X-Client-Id"
-	keyAppID    = "X-App-Id"
-	keyTraceID  = "X-Trace-Id"
-	keyAPIKey   = "X-Api-Key"
+	KeyClientID = "X-Client-Id"
+	KeyAppID    = "X-App-Id"
+	KeyTraceID  = "X-Trace-Id"
+	KeyAPIKey   = "X-Api-Key"
 )
 
 const (
@@ -271,27 +271,27 @@ func SetContentEncoding[H HeaderTypes](h H, encoding string) {
 }
 
 func GetTraceID[H HeaderTypes](h H) string {
-	return GetHeader(h, keyTraceID)
+	return GetHeader(h, KeyTraceID)
 }
 
 func SetTraceID[H HeaderTypes](h H, id string) {
-	SetHeader(h, keyTraceID, id)
+	SetHeader(h, KeyTraceID, id)
 }
 
 func GetClientID[H HeaderTypes](h H) string {
-	return GetHeader(h, keyClientID)
+	return GetHeader(h, KeyClientID)
 }
 
 func SetClientID[H HeaderTypes](h H, id string) {
-	SetHeader(h, keyClientID, id)
+	SetHeader(h, KeyClientID, id)
 }
 
 func GetAppID[H HeaderTypes](h H) string {
-	return GetHeader(h, keyAppID)
+	return GetHeader(h, KeyAppID)
 }
 
 func SetAppID[H HeaderTypes](h H, id string) {
-	SetHeader(h, keyAppID, id)
+	SetHeader(h, KeyAppID, id)
 }
 
 /**

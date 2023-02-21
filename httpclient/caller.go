@@ -1,8 +1,7 @@
-package httpkit
+package httpclient
 
 import (
 	"bytes"
-	"code.olapie.com/sugar/v2/conv"
 	"context"
 	"encoding/json"
 	"encoding/xml"
@@ -15,6 +14,8 @@ import (
 	"reflect"
 	"sync"
 
+	"code.olapie.com/sugar/v2/conv"
+	"code.olapie.com/sugar/v2/httpheader"
 	"code.olapie.com/sugar/v2/rt"
 	"code.olapie.com/sugar/v2/urlutil"
 	"code.olapie.com/sugar/v2/xerror"
@@ -142,8 +143,8 @@ func (c *Caller[IN, OUT]) call(ctx context.Context, input IN) (*http.Response, e
 	if err != nil {
 		return nil, fmt.Errorf("create request %s %s: %w", c.Method, endpoint, err)
 	}
-	req.Header.Set(KeyContentType, contentType)
-	req.Header.Set(keyTraceID, uuid.NewString())
+	req.Header.Set(httpheader.KeyContentType, contentType)
+	req.Header.Set(httpheader.KeyTraceID, uuid.NewString())
 
 	client := http.DefaultClient
 	if c.Client != nil {
@@ -184,7 +185,7 @@ func (c *Caller[IN, OUT]) parseInput(contentType *string, endpoint *string, inpu
 	body, ok := input.(io.Reader)
 	if ok {
 		if *contentType == "" {
-			*contentType = OctetStream
+			*contentType = httpheader.OctetStream
 		}
 		return body, nil
 	}
@@ -208,7 +209,7 @@ func (c *Caller[IN, OUT]) parseInput(contentType *string, endpoint *string, inpu
 	kindOfRemain := rt.IndirectKind(remain)
 	switch kindOfRemain {
 	case reflect.Struct, reflect.Map, reflect.Slice:
-		*contentType = JsonUTF8
+		*contentType = httpheader.JsonUTF8
 		data, err := json.Marshal(input)
 		if err != nil {
 			return nil, fmt.Errorf("marshal: %w", err)
@@ -216,7 +217,7 @@ func (c *Caller[IN, OUT]) parseInput(contentType *string, endpoint *string, inpu
 		return bytes.NewBuffer(data), nil
 	default:
 		if rt.IsNumber(remain) || rt.IsString(remain) {
-			*contentType = PlainUTF8
+			*contentType = httpheader.PlainUTF8
 			return bytes.NewReader([]byte(fmt.Sprint(remain))), nil
 		}
 		return nil, fmt.Errorf("unsupported value type: %T", input)
@@ -264,11 +265,11 @@ type UnmarshalFunc func([]byte, any) error
 var contentTypeToUnmarshalFunc sync.Map
 
 func init() {
-	RegisterUnmarshalFunc(JSON, json.Unmarshal)
-	RegisterUnmarshalFunc(JsonUTF8, json.Unmarshal)
-	RegisterUnmarshalFunc(XML, xml.Unmarshal)
-	RegisterUnmarshalFunc(XML2, xml.Unmarshal)
-	RegisterUnmarshalFunc(XmlUTF8, xml.Unmarshal)
+	RegisterUnmarshalFunc(httpheader.JSON, json.Unmarshal)
+	RegisterUnmarshalFunc(httpheader.JsonUTF8, json.Unmarshal)
+	RegisterUnmarshalFunc(httpheader.XML, xml.Unmarshal)
+	RegisterUnmarshalFunc(httpheader.XML2, xml.Unmarshal)
+	RegisterUnmarshalFunc(httpheader.XmlUTF8, xml.Unmarshal)
 }
 
 func RegisterUnmarshalFunc(contentType string, f UnmarshalFunc) {
@@ -303,7 +304,7 @@ func GetResponseResult[T any](resp *http.Response) (T, error) {
 		return res, nil
 	}
 
-	ct := GetContentType(resp.Header)
+	ct := httpheader.GetContentType(resp.Header)
 	if f := GetUnmarshalFunc(ct); f != nil {
 		err = f(body, &res)
 		return res, xerror.Wrapf(err, "unmarshal")

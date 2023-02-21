@@ -1,4 +1,4 @@
-package httpkit
+package httpheader
 
 import (
 	"bytes"
@@ -31,7 +31,7 @@ func setAPIKey(header http.Header) {
 	hash := hashutil.Hash32(fmt.Sprint(t) + traceID + clientID)
 	copy(b[9:], hash[:])
 	sign := base62.EncodeToString(b[:])
-	header.Set(keyAPIKey, sign)
+	header.Set(KeyAPIKey, sign)
 }
 
 func VerifyAPIKey[T http.Header | *http.Request](reqOrHeader T, delaySeconds int) {
@@ -44,15 +44,15 @@ func VerifyAPIKey[T http.Header | *http.Request](reqOrHeader T, delaySeconds int
 }
 
 func verifyAPIKey(header http.Header, delaySeconds int) bool {
-	sign := GetHeader(header, keyAPIKey)
+	sign := GetHeader(header, KeyAPIKey)
 	if sign == "" {
-		log.Println("missing", keyAPIKey)
+		log.Println("missing", KeyAPIKey)
 		return false
 	}
 
 	b, err := base62.DecodeString(sign)
 	if err != nil {
-		log.Println("invalid", keyAPIKey, err)
+		log.Println("invalid", KeyAPIKey, err)
 		return false
 	}
 

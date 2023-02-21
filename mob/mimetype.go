@@ -1,9 +1,8 @@
 package mob
 
 import (
+	"code.olapie.com/sugar/v2/httpheader"
 	"strings"
-
-	"code.olapie.com/sugar/v2/httpkit"
 )
 
 func IsTextFile(f FileInfo) bool {
@@ -23,7 +22,7 @@ func IsAudioFile(f FileInfo) bool {
 }
 
 func IsMIMEText(t string) bool {
-	return httpkit.IsText(t)
+	return httpheader.IsText(t)
 }
 
 func IsMIMEImage(t string) bool {
