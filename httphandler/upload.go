@@ -1,12 +1,13 @@
 package httphandler
 
 import (
-	"code.olapie.com/sugar/v2/types"
 	"io"
 	"log"
 	"mime/multipart"
 	"net/http"
 	"path/filepath"
+
+	"code.olapie.com/sugar/v2/types"
 )
 
 type Upload struct {
