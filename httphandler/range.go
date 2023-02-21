@@ -1,8 +1,6 @@
 package httphandler
 
 import (
-	"code.olapie.com/sugar/v2/httpwriter"
-	"code.olapie.com/sugar/v2/xerror"
 	"errors"
 	"fmt"
 	"io"
@@ -11,6 +9,9 @@ import (
 	"net/textproto"
 	"strconv"
 	"strings"
+
+	"code.olapie.com/sugar/v2/httpwriter"
+	"code.olapie.com/sugar/v2/xerror"
 )
 
 type Content interface {
