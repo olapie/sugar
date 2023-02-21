@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	code.olapie.com/sugar/contacts v0.1.1
-	code.olapie.com/sugar/v2 v2.3.8
+	code.olapie.com/sugar/v2 v2.4.0
 	github.com/google/uuid v1.3.0
 )
 
