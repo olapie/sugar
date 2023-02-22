@@ -123,3 +123,11 @@ func NewSub(code, subCode int, message string) *Error {
 		message: message,
 	}
 }
+
+func Wrapf(err error, format string, a ...any) error {
+	if err == nil {
+		return nil
+	}
+	a = append(a, err)
+	return fmt.Errorf(format+":%w", a...)
+}
