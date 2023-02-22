@@ -37,7 +37,7 @@ func TestJSON(t *testing.T) {
 	}
 	t.Log(e.Code(), e.message)
 
-	obj := &errorJSONObject{
+	obj := &jsonError{
 		Code:    e.code,
 		Message: e.message,
 	}

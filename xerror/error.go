@@ -22,7 +22,7 @@ type Error struct {
 	message string
 }
 
-type errorJSONObject struct {
+type jsonError struct {
 	Code    int    `json:"code,omitempty"`
 	SubCode int    `json:"sub_code,omitempty"`
 	Message string `json:"message,omitempty"`
@@ -71,23 +71,23 @@ func (e *Error) Is(target error) bool {
 }
 
 func (e *Error) MarshalJSON() (text []byte, err error) {
-	obj := &errorJSONObject{
+	je := &jsonError{
 		Code:    e.code,
 		SubCode: e.subCode,
 		Message: e.message,
 	}
-	return json.Marshal(obj)
+	return json.Marshal(je)
 }
 
 func (e *Error) UnmarshalJSON(text []byte) error {
-	var obj errorJSONObject
-	err := json.Unmarshal(text, &obj)
+	var je jsonError
+	err := json.Unmarshal(text, &je)
 	if err != nil {
 		return err
 	}
-	e.code = obj.Code
-	e.subCode = obj.SubCode
-	e.message = obj.Message
+	e.code = je.Code
+	e.subCode = je.SubCode
+	e.message = je.Message
 	return nil
 }
 
