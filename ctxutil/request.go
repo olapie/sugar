@@ -14,45 +14,55 @@ type requestContextInfo struct {
 	TestFlag   bool
 }
 
-type requestContextBuilder struct {
+type RequestContextBuilder interface {
+	Build() context.Context
+	WithAppID(v string) RequestContextBuilder
+	WithClientID(v string) RequestContextBuilder
+	WithHTTPHeader(v http.Header) RequestContextBuilder
+	WithServiceID(v string) RequestContextBuilder
+	WithTraceID(v string) RequestContextBuilder
+	WithTestFlag(v bool) RequestContextBuilder
+}
+
+type requestContextBuilderImpl struct {
 	ctx  context.Context
 	info requestContextInfo
 }
 
-func Request(ctx context.Context) *requestContextBuilder {
-	return &requestContextBuilder{ctx: ctx}
+func Request(ctx context.Context) RequestContextBuilder {
+	return &requestContextBuilderImpl{ctx: ctx}
 }
 
-func (b *requestContextBuilder) Build() context.Context {
+func (b *requestContextBuilderImpl) Build() context.Context {
 	return context.WithValue(b.ctx, keyRequestInfo, &b.info)
 }
 
-func (b *requestContextBuilder) WithAppID(v string) *requestContextBuilder {
+func (b *requestContextBuilderImpl) WithAppID(v string) RequestContextBuilder {
 	b.info.AppID = v
 	return b
 }
 
-func (b *requestContextBuilder) WithClientID(v string) *requestContextBuilder {
+func (b *requestContextBuilderImpl) WithClientID(v string) RequestContextBuilder {
 	b.info.ClientID = v
 	return b
 }
 
-func (b *requestContextBuilder) WithHTTPHeader(v http.Header) *requestContextBuilder {
+func (b *requestContextBuilderImpl) WithHTTPHeader(v http.Header) RequestContextBuilder {
 	b.info.HttpHeader = v
 	return b
 }
 
-func (b *requestContextBuilder) WithServiceID(v string) *requestContextBuilder {
+func (b *requestContextBuilderImpl) WithServiceID(v string) RequestContextBuilder {
 	b.info.ServiceID = v
 	return b
 }
 
-func (b *requestContextBuilder) WithTraceID(v string) *requestContextBuilder {
+func (b *requestContextBuilderImpl) WithTraceID(v string) RequestContextBuilder {
 	b.info.TraceID = v
 	return b
 }
 
-func (b *requestContextBuilder) WithTestFlag(v bool) *requestContextBuilder {
+func (b *requestContextBuilderImpl) WithTestFlag(v bool) RequestContextBuilder {
 	b.info.TestFlag = v
 	return b
 }
