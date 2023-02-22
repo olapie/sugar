@@ -1,6 +1,7 @@
 package httpwriter
 
 import (
+	"code.olapie.com/sugar/v2/xerror"
 	"io"
 	"log"
 	"net/http"
@@ -8,7 +9,6 @@ import (
 
 	"code.olapie.com/sugar/v2/httpheader"
 	"code.olapie.com/sugar/v2/jsonutil"
-	"code.olapie.com/sugar/v2/xerror"
 )
 
 func RequireBasicAuthenticate(w http.ResponseWriter, realm string) {
@@ -23,11 +23,18 @@ func Error(w http.ResponseWriter, err error) {
 		return
 	}
 
-	status := xerror.GetCode(err)
+	status := http.StatusInternalServerError
+	if s := xerror.GetStatus(err); s != 0 {
+		status = s
+	} else if s = xerror.GetCode(err); s != 0 {
+		status = s
+	}
+
 	if status < 100 || status > 599 {
 		log.Println("invalid status:", status)
 		status = http.StatusInternalServerError
 	}
+	
 	w.WriteHeader(status)
 	_, err = w.Write([]byte(err.Error()))
 	if err != nil {
