@@ -3,6 +3,7 @@ package grpcutil
 import (
 	"context"
 	"crypto/tls"
+	"errors"
 	"net/http"
 	"reflect"
 	"time"
@@ -77,11 +78,15 @@ func ServerFinish(resp any, err error, logger *log.Logger, startAt time.Time) (a
 		return nil, err
 	}
 
-	code, ok := statusToCodeMap[xerror.GetCode(err)]
-	if !ok {
-		code = codes.Unknown
+	var xerr *xerror.Error
+	if errors.As(err, &xerr) {
+		code, ok := statusToCodeMap[xerr.Code()]
+		if !ok {
+			code = codes.Unknown
+		}
+		return nil, status.Error(code, err.Error())
 	}
-	return nil, status.Error(code, err.Error())
+	return nil, err
 }
 
 func SignClientContext(ctx context.Context) context.Context {

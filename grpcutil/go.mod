@@ -4,12 +4,11 @@ go 1.20
 
 require (
 	code.olapie.com/log v1.1.6
-	code.olapie.com/sugar/v2 v2.3.12
+	code.olapie.com/sugar/v2 v2.4.2
 	google.golang.org/grpc v1.53.0
 )
 
 require (
-	github.com/golang/geo v0.0.0-20210211234256-740aa86cb551 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/natefinch/lumberjack/v3 v3.0.0-alpha // indirect
