@@ -131,3 +131,15 @@ func Wrapf(err error, format string, a ...any) error {
 	a = append(a, err)
 	return fmt.Errorf(format+":%w", a...)
 }
+
+// Cause returns the root cause error
+func Cause(err error) error {
+	for {
+		u, ok := err.(interface{ Unwrap() error })
+		if !ok {
+			break
+		}
+		err = u.Unwrap()
+	}
+	return err
+}
