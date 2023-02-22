@@ -1,7 +1,6 @@
 package xerror
 
 import (
-	"encoding/json"
 	"io"
 	"log"
 	"net/http"
@@ -21,32 +20,27 @@ func ParseHTTPResponse(resp *http.Response) error {
 	body, ioErr := io.ReadAll(resp.Body)
 	resp.Body.Close()
 	if ioErr != nil {
-		log.Printf("Failed reading response body: %v\n", ioErr)
-		return nil
+		log.Printf("failed reading response body: %v\n", ioErr)
 	}
 
-	var err Error
-
+	var respError Error
 	if strings.HasPrefix(contentType, "application/json") {
-		var errObj errorJSONObject
-		if json.Unmarshal(body, &errObj) == nil {
-			err.code = errObj.Code
-			err.subCode = errObj.SubCode
-			err.message = errObj.Message
+		if err := respError.UnmarshalJSON(body); err != nil {
+			log.Printf("unmarshal json body: %v\n", err)
 		}
 	} else {
-		err.message = string(body)
+		respError.message = string(body)
 	}
 
-	if err.code <= 0 {
-		err.code = resp.StatusCode
+	if respError.code <= 0 {
+		respError.code = resp.StatusCode
 	}
 
-	if err.message == "" {
-		err.message = resp.Status
+	if respError.message == "" {
+		respError.message = resp.Status
 	}
 
-	return &err
+	return &respError
 }
 
 var textTypes = []string{
