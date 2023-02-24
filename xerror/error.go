@@ -13,7 +13,10 @@ func (s String) Error() string {
 }
 
 const (
-	NotExist String = "not exist"
+	NotExist         String = "not exist"
+	AlreadyExists    String = "already exists"
+	Unauthenticated  String = "unauthenticated"
+	PermissionDenied String = "permission denied"
 )
 
 type Error struct {
