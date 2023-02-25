@@ -1,6 +1,7 @@
 package mob
 
 import (
+	"errors"
 	"reflect"
 
 	"code.olapie.com/sugar/v2/xerror"
@@ -37,12 +38,14 @@ func ToError(err error) *Error {
 		return nil
 	}
 
-	if e, ok := xerror.CauseOf[*Error](err); ok && e != nil {
-		return NewError((*xerror.Error)(e).Code(), err.Error())
+	var e *Error
+	if errors.As(err, &e) {
+		return e
 	}
 
-	if e, ok := xerror.CauseOf[*xerror.Error](err); ok && e != nil {
-		return NewError(e.Code(), e.Message())
+	var xe *xerror.Error
+	if errors.As(err, &xe) {
+		return NewError(xe.Code(), xe.Message())
 	}
 
 	return NewError(0, err.Error())
